@@ -753,17 +753,36 @@ async def _fetch_poster_from_asin(asin: str, media_context: MediaResourceContext
     if not success or not html_text:
         return "", ""
     tree = etree.fromstring(html_text, etree.HTMLParser())
+
     img_url = ""
+    # 优先用已知选择器
     for xpath in [
         '//img[@id="landingImage"]/@data-old-hires',
         '//img[@id="landingImage"]/@src',
         '//img[@class="a-dynamic-image"]/@data-old-hires',
         '//img[@class="a-dynamic-image"]/@src',
+        '//img[contains(@id, "hero-image")]//@src',
+        '//img[contains(@id, "hero-image")]//@data-old-hires',
+        '//img[contains(@class, "a-dynamic-image")]//@src',
+        '//img[contains(@class, "a-dynamic-image")]//@data-old-hires',
     ]:
         found = tree.xpath(xpath)
         if found and found[0]:
-            img_url = str(found[0])
-            break
+            candidate = str(found[0])
+            if "m.media-amazon.com/images/I/" in candidate and ".jpg" in candidate.lower():
+                img_url = candidate
+                break
+
+    # 如果已知选择器都没命中，从页面所有图片 URL 中找 Amazon 图片
+    if not img_url:
+        all_srcs = tree.xpath('//img/@src | //img/@data-old-hires | //img/@data-src')
+        amazon_imgs = [
+            str(u) for u in all_srcs
+            if "m.media-amazon.com/images/I/" in u and ".jpg" in u.lower()
+        ]
+        if amazon_imgs:
+            img_url = amazon_imgs[0]
+
     title = ""
     title_nodes = tree.xpath('//span[@id="productTitle"]/text()')
     if title_nodes:
