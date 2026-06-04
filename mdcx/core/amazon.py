@@ -763,7 +763,11 @@ async def get_big_pic_by_amazon(
             url=f"https://www.amazon.co.jp/dp/{cache_hit['asin']}",
         )
 
-        # 返回图片 URL
+        # 优先使用缓存的封面 URL
+        poster_url = cache_hit.get("poster_url", "")
+        if poster_url:
+            return _convert_to_target_size(poster_url)
+        # 没有封面 URL 则尝试从 ASIN 猜测
         image_url = _get_image_url_from_asin(cache_hit['asin'])
         if image_url:
             return _convert_to_target_size(image_url)
