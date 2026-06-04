@@ -147,8 +147,6 @@ class BuildManager:
             "resources:resources",
             "--add-data",
             "libs:.",
-            "--add-data",
-            "userdata:resources/userdata",
             "--icon",
             "resources/Img/MDCx.icns",
             "--hidden-import",

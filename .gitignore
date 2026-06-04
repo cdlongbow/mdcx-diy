@@ -176,9 +176,8 @@ test.ini
 test.json
 test.v2.json
 MDCx.config
-# userdata 目录（仅保留 ASIN 数据库文件）
-userdata/*
-!userdata/amazon_asin_database.xlsx
+# 运行时数据目录
+userdata/
 Log/
 
 # dev files
@@ -194,5 +193,5 @@ uv.toml
 test_amazon_*.py
 test_*.xlsx
 
-# Excel 数据库文件已移至 userdata/ 目录
+# Excel 数据库文件在 resources/userdata/ 目录下
 *.mdcx/
