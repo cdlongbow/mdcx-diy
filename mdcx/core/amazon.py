@@ -78,67 +78,44 @@ async def _save_asin_record(
     result: CrawlersResult,
     asin: str,
     title: str,
-    pic_ver: str,
-    match_type: str,
-    confidence: float,
+    poster_url: str,
     search_keyword: str,
     detail_url: str = "",
 ):
     """保存 ASIN 记录到数据库
-    
+
     注意：只有成功获取到 ASIN 时才会保存，失败时仅记录日志
-    
-    去重逻辑：如果相同番号已有高置信度记录，则不保存新记录
+
+    去重逻辑：如果相同番号已有记录，则不保存新记录
     """
-    # 检查 ASIN 是否有效
     if not asin or not asin.strip():
         LogBuffer.log().write(f"\n 🟡 Amazon ASIN 数据库：跳过保存 {result.number} - ASIN 为空")
         return
-    
-    # 规范化 ASIN（转为大写，去除空格）
+
     asin = asin.strip().upper()
-    
-    # 验证 ASIN 格式（亚马逊 ASIN 通常是 10 位字母数字组合）
-    import re
+
     if not re.match(r"^[A-Z0-9]{10}$", asin):
         LogBuffer.log().write(f"\n 🟡 Amazon ASIN 数据库：跳过保存 {result.number} - ASIN 格式不正确：{asin}")
         return
-    
-    # 改进 2：去重逻辑 - 检查是否已有相同番号的记录
+
     existing_records = await amazon_database.query_asin_database(number=result.number)
     if existing_records:
-        # 已有记录，检查置信度
-        best_existing = max(existing_records, key=lambda x: x.get('confidence', 0))
-        best_confidence = best_existing.get('confidence', 0)
-        
-        # 如果已有记录的置信度 >= 当前置信度，则跳过保存（避免低置信度覆盖高置信度）
-        if best_confidence >= confidence:
-            LogBuffer.log().write(
-                f"\n 📚 Amazon ASIN 数据库：{result.number} 已有高置信度记录 "
-                f"(ASIN: {best_existing.get('asin')}, 置信度：{best_confidence:.2f} >= {confidence:.2f})，跳过保存"
-            )
-            return
-        else:
-            LogBuffer.log().write(
-                f"\n 📚 Amazon ASIN 数据库：{result.number} 已有记录但置信度较低 "
-                f"(ASIN: {best_existing.get('asin')}, 置信度：{best_confidence:.2f} < {confidence:.2f})，更新记录"
-            )
-    
-    # 构建产品链接
-    product_url = f"https://www.amazon.co.jp/dp/{asin}" if asin else ""
-    
+        LogBuffer.log().write(
+            f"\n 📚 Amazon ASIN 数据库：{result.number} 已有记录 "
+            f"(ASIN: {existing_records[0].get('asin')})，跳过保存"
+        )
+        return
+
+    product_url = f"https://www.amazon.co.jp/dp/{asin}"
+
     try:
         await amazon_database.save_single_asin_record(
             number=result.number or "",
             asin=asin,
             title=title,
             product_url=product_url,
-            poster_url="",
-            match_type=match_type,
-            confidence=confidence,
+            poster_url=poster_url,
             search_keyword=search_keyword,
-            media_type=pic_ver or "unknown",
-            note=f"匹配原因：{result.amazon_match_reason or 'unknown'}",
         )
         LogBuffer.log().write(f"\n 📊 Amazon ASIN 数据库：已记录 {result.number} → {asin}")
     except ImportError:
@@ -150,27 +127,23 @@ async def _save_asin_record(
 async def _check_asin_cache(number: str) -> dict | None:
     """
     检查 ASIN 缓存
-    
+
     Args:
         number: 影片番号
-        
+
     Returns:
         如果有缓存记录则返回记录字典，否则返回 None
     """
     if not number:
         return None
-    
+
     try:
         records = await amazon_database.query_asin_database(number=number)
         if records:
-            # 返回置信度最高的记录
-            best_record = max(records, key=lambda x: x.get('confidence', 0))
-            # 只返回置信度 >= 0.7 的记录（避免低质量缓存）
-            if best_record.get('confidence', 0) >= 0.7:
-                return best_record
+            return records[0]
     except Exception:
         pass
-    
+
     return None
 
 
@@ -1732,9 +1705,7 @@ async def get_big_pic_by_amazon(
                         result,
                         asin=asin,
                         title=str(best_candidate["pic_title"]),
-                        pic_ver=str(best_candidate["pic_ver"]),
-                        match_type="barcode",
-                        confidence=1.0,
+                        poster_url=str(best_candidate["url"]),
                         search_keyword=barcode,
                         detail_url=detail_url_str,
                     )
@@ -1748,9 +1719,7 @@ async def get_big_pic_by_amazon(
                     result,
                     asin=asin,
                     title=str(best_candidate["pic_title"]),
-                    pic_ver=str(best_candidate["pic_ver"]),
-                    match_type="barcode",
-                    confidence=1.0,
+                    poster_url=str(best_candidate["url"]),
                     search_keyword=barcode,
                     detail_url=detail_url_str,
                 )
@@ -1780,9 +1749,7 @@ async def get_big_pic_by_amazon(
                         result,
                         asin=asin,
                         title=str(best_candidate["pic_title"]),
-                        pic_ver=str(best_candidate["pic_ver"]),
-                        match_type="barcode_weak" if candidate_number_match(best_candidate) else "number",
-                        confidence=float(best_candidate["title_confidence"]),
+                        poster_url=str(best_candidate["url"]),
                         search_keyword=barcode,
                         detail_url=detail_url_str,
                     )
@@ -1801,9 +1768,7 @@ async def get_big_pic_by_amazon(
                     result,
                     asin=asin,
                     title=str(best_candidate["pic_title"]),
-                    pic_ver=str(best_candidate["pic_ver"]),
-                    match_type="barcode_weak" if candidate_number_match(best_candidate) else "number",
-                    confidence=float(best_candidate["title_confidence"]),
+                    poster_url=str(best_candidate["url"]),
                     search_keyword=barcode,
                     detail_url=detail_url_str,
                 )
@@ -1953,9 +1918,7 @@ async def get_big_pic_by_amazon(
                         result,
                         asin=asin,
                         title=str(each_candidate["pic_title"]),
-                        pic_ver=str(each_candidate["pic_ver"]),
-                        match_type=candidate_match_reason(each_candidate),
-                        confidence=float(each_candidate["title_confidence"]),
+                        poster_url=str(each_candidate["url"]),
                         search_keyword=str(current_title if 'current_title' in locals() else ""),
                         detail_url=detail_url_str,
                     )
@@ -1975,9 +1938,7 @@ async def get_big_pic_by_amazon(
                     result,
                     asin=asin,
                     title=str(best_fallback_candidate["pic_title"]),
-                    pic_ver=str(best_fallback_candidate["pic_ver"]),
-                    match_type=candidate_match_reason(best_fallback_candidate),
-                    confidence=float(best_fallback_candidate["title_confidence"]),
+                    poster_url=str(best_fallback_candidate["url"]),
                     search_keyword=str(current_title if 'current_title' in locals() else ""),
                     detail_url=detail_url_str,
                 ))

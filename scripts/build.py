@@ -124,7 +124,7 @@ class BuildManager:
             logger.info(f"\tcreate-dmg 版本: {r}")
 
         logger.info("检查必要文件...")
-        required_files = ["main.py", "mdcx", "resources/Img/MDCx.icns", "resources", "libs"]
+        required_files = ["main.py", "mdcx", "resources/Img/MDCx.icns", "resources", "libs", "userdata"]
         for file_path in required_files:
             if not Path(file_path).exists():
                 raise BuildError(f"文件检查失败: {file_path}")
@@ -147,6 +147,8 @@ class BuildManager:
             "resources:resources",
             "--add-data",
             "libs:.",
+            "--add-data",
+            "userdata:resources/userdata",
             "--icon",
             "resources/Img/MDCx.icns",
             "--hidden-import",

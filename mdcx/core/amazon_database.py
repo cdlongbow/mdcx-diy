@@ -3,7 +3,6 @@ Amazon ASIN 数据库保存功能
 用于保存影片番号与 ASIN 对应关系，方便后续统计和复用
 """
 
-import asyncio
 from datetime import datetime
 from pathlib import Path
 from typing import TypedDict
@@ -12,17 +11,20 @@ from typing import TypedDict
 class AsinRecord(TypedDict, total=False):
     """ASIN 记录结构"""
 
-    timestamp: str  # 记录时间
     number: str  # 影片番号
     asin: str  # 亚马逊 ASIN
     product_url: str  # 亚马逊商品详情页链接
     title: str  # 商品标题
     poster_url: str  # 封面图片 URL
-    match_type: str  # 匹配类型 (barcode/number/actor 等)
-    confidence: float  # 置信度
     search_keyword: str  # 搜索关键词
-    media_type: str  # 媒体类型
-    note: str  # 备注
+
+
+def _get_default_excel_path() -> Path:
+    """获取默认的 Excel 文件路径，位于 userdata 目录下（与 mapping、watermark 等同目录）"""
+    from ..config.manager import manager
+    userdata_dir = manager.data_folder / "userdata"
+    userdata_dir.mkdir(parents=True, exist_ok=True)
+    return userdata_dir / "amazon_asin_database.xlsx"
 
 
 async def save_asin_to_excel(
@@ -54,8 +56,7 @@ async def save_asin_to_excel(
         raise ImportError("请安装 openpyxl 库：pip install openpyxl")
 
     if excel_path is None:
-        # 改进 3：默认保存到运行目录
-        excel_path = Path.cwd() / "amazon_asin_database.xlsx"
+        excel_path = _get_default_excel_path()
     elif isinstance(excel_path, str):
         excel_path = Path(excel_path)
 
@@ -71,17 +72,12 @@ async def save_asin_to_excel(
 
     if not ws["A1"].value:
         headers = [
-            "记录时间",
             "影片番号",
             "ASIN 编号",
             "影片链接",
             "商品标题",
             "封面 URL",
-            "匹配类型",
-            "置信度",
             "搜索关键词",
-            "媒体类型",
-            "备注",
         ]
         # 使用 cell() 直接设置表头，避免 append() 的空行问题
         for col, header in enumerate(headers, 1):
@@ -94,17 +90,12 @@ async def save_asin_to_excel(
 
     for record in records:
         row_data = [
-            record.get("timestamp", datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
             record.get("number", ""),
             record.get("asin", ""),
             record.get("product_url", ""),
             record.get("title", ""),
             record.get("poster_url", ""),
-            record.get("match_type", ""),
-            record.get("confidence", 0.0),
             record.get("search_keyword", ""),
-            record.get("media_type", ""),
-            record.get("note", ""),
         ]
         ws.append(row_data)
 
@@ -135,11 +126,7 @@ async def save_single_asin_record(
     title: str = "",
     product_url: str = "",
     poster_url: str = "",
-    match_type: str = "",
-    confidence: float = 0.0,
     search_keyword: str = "",
-    media_type: str = "",
-    note: str = "",
     excel_path: Path | None = None,
 ) -> bool:
     """
@@ -151,11 +138,7 @@ async def save_single_asin_record(
         title: 商品标题
         product_url: 亚马逊商品详情页链接
         poster_url: 封面图片 URL
-        match_type: 匹配类型 (barcode/number/actor/soft 等)
-        confidence: 置信度 (0-1 之间)
         search_keyword: 搜索关键词
-        media_type: 媒体类型 (DVD/Blu-ray 等)
-        note: 备注信息
         excel_path: Excel 文件路径
 
     Returns:
@@ -167,37 +150,30 @@ async def save_single_asin_record(
             asin="B0000001",
             title="作品标题",
             product_url="https://www.amazon.co.jp/dp/B0000001",
-            match_type="number",
-            confidence=0.95,
+            poster_url="https://m.media-amazon.com/images/I/xxx.jpg",
         )
         if success:
             print("保存成功")
         else:
             print("保存失败或跳过")
     """
-    # 验证 ASIN
     import re
-    
+
     if not asin or not asin.strip():
         return False
-    
+
     asin = asin.strip().upper()
-    
-    # 验证 ASIN 格式（10 位字母数字）
+
     if not re.match(r"^[A-Z0-9]{10}$", asin):
         return False
-    
+
     record: AsinRecord = {
         "number": number,
         "asin": asin,
         "product_url": product_url,
         "title": title,
         "poster_url": poster_url,
-        "match_type": match_type,
-        "confidence": confidence,
         "search_keyword": search_keyword,
-        "media_type": media_type,
-        "note": note,
     }
 
     try:
@@ -233,38 +209,30 @@ async def query_asin_database(
         raise ImportError("请安装 openpyxl 库：pip install openpyxl")
 
     if excel_path is None:
-        excel_path = Path.cwd() / "amazon_asin_database.xlsx"
+        excel_path = _get_default_excel_path()
 
     if not excel_path.exists():
         return []
 
     wb = openpyxl.load_workbook(excel_path, read_only=True, data_only=True)
     ws = wb.active
-    
-    print(f"[DEBUG] Loaded file, max_row={ws.max_row}, max_col={ws.max_column}")
 
     results: list[AsinRecord] = []
 
     for row_idx, row in enumerate(ws.iter_rows(values_only=True), start=1):
-        print(f"[DEBUG] Processing row {row_idx}: {len(row)} cols")
         if row_idx == 1:
             continue
 
-        if len(row) < 11:
+        if len(row) < 6:
             continue
 
         record = AsinRecord(
-            timestamp=str(row[0] or ""),
-            number=str(row[1] or ""),
-            asin=str(row[2] or ""),
-            product_url=str(row[3] or ""),
-            title=str(row[4] or ""),
-            poster_url=str(row[5] or ""),
-            match_type=str(row[6] or ""),
-            confidence=float(row[7]) if row[7] else 0.0,
-            search_keyword=str(row[8] or ""),
-            media_type=str(row[9] or ""),
-            note=str(row[10] or ""),
+            number=str(row[0] or ""),
+            asin=str(row[1] or ""),
+            product_url=str(row[2] or ""),
+            title=str(row[3] or ""),
+            poster_url=str(row[4] or ""),
+            search_keyword=str(row[5] or ""),
         )
 
         if number and str(record.get("number", "")).upper() == number.upper():
@@ -292,7 +260,7 @@ async def export_asin_statistics(
         raise ImportError("请安装 openpyxl 库：pip install openpyxl")
 
     if excel_path is None:
-        excel_path = Path.home() / ".mdcx" / "amazon_asin_database.xlsx"
+        excel_path = _get_default_excel_path()
 
     if not excel_path.exists():
         return {}
@@ -304,30 +272,20 @@ async def export_asin_statistics(
     ws = wb.active
 
     total_records = 0
-    match_type_stats: dict[str, int] = {}
-    media_type_stats: dict[str, int] = {}
 
     for row_idx, row in enumerate(ws.iter_rows(values_only=True), start=1):
         if row_idx == 1:
             continue
 
-        if len(row) < 7:
+        if len(row) < 2:
             continue
 
         total_records += 1
-
-        match_type = str(row[5] or "unknown")
-        match_type_stats[match_type] = match_type_stats.get(match_type, 0) + 1
-
-        media_type = str(row[8] or "unknown") if len(row) > 8 else "unknown"
-        media_type_stats[media_type] = media_type_stats.get(media_type, 0) + 1
 
     wb.close()
 
     stats = {
         "total_records": total_records,
-        "match_type_stats": match_type_stats,
-        "media_type_stats": media_type_stats,
     }
 
     with open(output_path, "w", encoding="utf-8") as f:
@@ -336,18 +294,7 @@ async def export_asin_statistics(
         f.write(f"生成时间：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
         f.write("=" * 60 + "\n\n")
 
-        f.write(f"总记录数：{total_records}\n\n")
-
-        f.write("匹配类型分布：\n")
-        for match_type, count in sorted(match_type_stats.items(), key=lambda x: x[1], reverse=True):
-            percentage = (count / total_records * 100) if total_records > 0 else 0
-            f.write(f"  {match_type}: {count} 条 ({percentage:.1f}%)\n")
-
-        f.write("\n媒体类型分布：\n")
-        for media_type, count in sorted(media_type_stats.items(), key=lambda x: x[1], reverse=True):
-            percentage = (count / total_records * 100) if total_records > 0 else 0
-            f.write(f"  {media_type}: {count} 条 ({percentage:.1f}%)\n")
-
+        f.write(f"总记录数：{total_records}\n")
         f.write("\n" + "=" * 60 + "\n")
 
     return stats

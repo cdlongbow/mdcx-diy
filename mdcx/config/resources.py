@@ -178,6 +178,12 @@ class Resources:
         if not os.path.exists(info_map_local_path):
             if not copy_file_sync(self.info_map_backup_path, info_map_local_path):
                 info_map_local_path = self.info_map_backup_path
+
+        # 载入 amazon_asin_database.xlsx
+        asin_db_local_path = self.u("amazon_asin_database.xlsx")
+        asin_db_backup_path = self.r("userdata/amazon_asin_database.xlsx")
+        if not os.path.exists(asin_db_local_path):
+            copy_file_sync(asin_db_backup_path, asin_db_local_path)
         try:
             parser = etree.HTMLParser(encoding="utf-8")
             with open(actor_map_local_path, encoding="utf-8") as f:
