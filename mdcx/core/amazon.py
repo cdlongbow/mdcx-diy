@@ -752,63 +752,15 @@ async def _fetch_poster_from_asin(asin: str, media_context: MediaResourceContext
     success, html_text = await get_amazon_data(detail_url)
     if not success or not html_text:
         return "", ""
-    tree = etree.fromstring(html_text, etree.HTMLParser())
 
     img_url = ""
-    # 1. 优先用已知 img 选择器
-    for xpath in [
-        '//img[@id="landingImage"]/@data-old-hires',
-        '//img[@id="landingImage"]/@src',
-        '//img[@class="a-dynamic-image"]/@data-old-hires',
-        '//img[@class="a-dynamic-image"]/@src',
-        '//img[contains(@id, "hero-image")]//@src',
-        '//img[contains(@id, "hero-image")]//@data-old-hires',
-        '//img[contains(@class, "a-dynamic-image")]//@src',
-        '//img[contains(@class, "a-dynamic-image")]//@data-old-hires',
-    ]:
-        found = tree.xpath(xpath)
-        if found and found[0]:
-            candidate = str(found[0])
-            if "m.media-amazon.com/images/I/" in candidate and ".jpg" in candidate.lower():
-                img_url = candidate
-                break
-
-    # 2. 尝试从 data-a-dynamic-image JSON 数据块中提取图片
-    if not img_url:
-        dynamic_images = tree.xpath('//*/@data-a-dynamic-image')
-        for data in dynamic_images:
-            try:
-                import json
-                images = json.loads(data)
-                # images 通常是 dict: {size_key: [url, width, height]}
-                if isinstance(images, dict):
-                    # 选最大的图片
-                    best_key = max(images.keys(), key=lambda k: (isinstance(images[k], list) and len(images[k]) > 1 and images[k][1] or 0))
-                    if images[best_key] and isinstance(images[best_key], list):
-                        img_url = str(images[best_key][0])
-                    elif isinstance(images[best_key], str):
-                        img_url = images[best_key]
-                    break
-            except (json.JSONDecodeError, TypeError, KeyError, IndexError):
-                continue
-
-    # 3. 从页面所有图片 URL 中找 Amazon 图片
-    if not img_url:
-        all_srcs = tree.xpath('//img/@src | //img/@data-old-hires | //img/@data-src')
-        amazon_imgs = [
-            str(u) for u in all_srcs
-            if "m.media-amazon.com/images/I/" in u and ".jpg" in u.lower()
-        ]
-        if amazon_imgs:
-            img_url = amazon_imgs[0]
-
-    # 4. 从 HTML 全文中用正则提取 Amazon 图片 URL
-    if not img_url:
-        matches = re.findall(r'https://m\.media-amazon\.com/images/I/[^"\s\']+\.(?:jpg|jpeg)', html_text, re.IGNORECASE)
-        if matches:
-            img_url = matches[0]
+    # 从 HTML 全文中用正则提取 Amazon 图片 URL（最可靠的方式）
+    matches = re.findall(r'https://m\.media-amazon\.com/images/I/[^"\s\'&]+\.(?:jpg|jpeg)', html_text, re.IGNORECASE)
+    if matches:
+        img_url = matches[0]
 
     title = ""
+    tree = etree.fromstring(html_text, etree.HTMLParser())
     title_nodes = tree.xpath('//span[@id="productTitle"]/text()')
     if title_nodes:
         title = title_nodes[0].strip()
@@ -849,28 +801,7 @@ async def get_big_pic_by_amazon(
             )
             return _convert_to_target_size(poster_url)
         else:
-            LogBuffer.log().write(f"  缓存无封面 URL，直接用 ASIN 获取")
-            cached_asin = cache_hit['asin']
-            img_url, fetched_title = await _fetch_poster_from_asin(cached_asin, media_context)
-            if img_url:
-                converted_url = _convert_to_target_size(img_url)
-                _set_amazon_match_state(
-                    result,
-                    is_hard=False,
-                    reason="cache",
-                    url=f"https://www.amazon.co.jp/dp/{cached_asin}",
-                )
-                await _save_asin_record(
-                    result,
-                    asin=cached_asin,
-                    title=fetched_title or cache_hit.get("title", ""),
-                    poster_url=img_url,
-                    search_keyword=result.number or "",
-                    detail_url=f"https://www.amazon.co.jp/dp/{cached_asin}",
-                )
-                return converted_url
-            else:
-                LogBuffer.log().write(f"  ASIN 详情页未获取到图片，回退标题搜索")
+            LogBuffer.log().write(f"  缓存无封面 URL，回退搜索获取")
     
     if not originaltitle_amazon and not originaltitle_amazon_raw:
         return ""
