@@ -755,16 +755,14 @@ async def get_big_pic_by_amazon(
     cache_hit = await _check_asin_cache(result.number)
     if cache_hit:
         LogBuffer.log().write(f"\n 📚 Amazon ASIN 缓存：命中 {result.number} → {cache_hit['asin']}")
-        LogBuffer.log().write(f"  使用缓存的 ASIN，跳过搜索（置信度：{cache_hit['confidence']:.2f}）")
-        
-        # 设置匹配状态
+
         _set_amazon_match_state(
             result,
-            is_hard=cache_hit.get("match_type") in ["barcode", "number"],
-            reason=cache_hit.get("match_type", "cache"),
+            is_hard=False,
+            reason="cache",
             url=f"https://www.amazon.co.jp/dp/{cache_hit['asin']}",
         )
-        
+
         # 返回图片 URL
         image_url = _get_image_url_from_asin(cache_hit['asin'])
         if image_url:
