@@ -755,7 +755,7 @@ async def _fetch_poster_from_asin(asin: str, media_context: MediaResourceContext
     tree = etree.fromstring(html_text, etree.HTMLParser())
 
     img_url = ""
-    # 优先用已知选择器
+    # 1. 优先用已知 img 选择器
     for xpath in [
         '//img[@id="landingImage"]/@data-old-hires',
         '//img[@id="landingImage"]/@src',
@@ -773,7 +773,26 @@ async def _fetch_poster_from_asin(asin: str, media_context: MediaResourceContext
                 img_url = candidate
                 break
 
-    # 如果已知选择器都没命中，从页面所有图片 URL 中找 Amazon 图片
+    # 2. 尝试从 data-a-dynamic-image JSON 数据块中提取图片
+    if not img_url:
+        dynamic_images = tree.xpath('//*/@data-a-dynamic-image')
+        for data in dynamic_images:
+            try:
+                import json
+                images = json.loads(data)
+                # images 通常是 dict: {size_key: [url, width, height]}
+                if isinstance(images, dict):
+                    # 选最大的图片
+                    best_key = max(images.keys(), key=lambda k: (isinstance(images[k], list) and len(images[k]) > 1 and images[k][1] or 0))
+                    if images[best_key] and isinstance(images[best_key], list):
+                        img_url = str(images[best_key][0])
+                    elif isinstance(images[best_key], str):
+                        img_url = images[best_key]
+                    break
+            except (json.JSONDecodeError, TypeError, KeyError, IndexError):
+                continue
+
+    # 3. 从页面所有图片 URL 中找 Amazon 图片
     if not img_url:
         all_srcs = tree.xpath('//img/@src | //img/@data-old-hires | //img/@data-src')
         amazon_imgs = [
@@ -782,6 +801,12 @@ async def _fetch_poster_from_asin(asin: str, media_context: MediaResourceContext
         ]
         if amazon_imgs:
             img_url = amazon_imgs[0]
+
+    # 4. 从 HTML 全文中用正则提取 Amazon 图片 URL
+    if not img_url:
+        matches = re.findall(r'https://m\.media-amazon\.com/images/I/[^"\s\']+\.(?:jpg|jpeg)', html_text, re.IGNORECASE)
+        if matches:
+            img_url = matches[0]
 
     title = ""
     title_nodes = tree.xpath('//span[@id="productTitle"]/text()')
