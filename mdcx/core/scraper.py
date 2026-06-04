@@ -21,7 +21,7 @@ from ..base.file import (
     save_success_list,
 )
 from ..base.image import extrafanart_copy2, extrafanart_extras_copy
-from ..config.enums import DownloadableFile, EmbyAction, FixedScrapingType, KeepableFile, ReadMode, Switch
+from ..config.enums import DownloadableFile, EmbyAction, FixedScrapingType, KeepableFile, NfoInclude, ReadMode, Switch
 from ..config.extend import get_movie_path_setting, parse_media_paths
 from ..config.manager import manager
 from ..config.resources import resources
@@ -702,6 +702,11 @@ class Scraper:
             replace_special_word(res)  # 替换特殊字符
             await translate_title_outline(res, file_info.cd_part, movie_number)  # 翻译json_data（标题/介绍）
             deal_some_field(res)  # 再处理一遍字段，翻译后可能出现要去除的内容
+            # 查询演员 TMDB ID（在演员名映射前，使用原始名）
+            if NfoInclude.ACTOR_TMDBID in manager.config.nfo_include_new:
+                from .tmdb_actor import fetch_actor_tmdb_ids
+
+                res.actor_tmdb_ids = await fetch_actor_tmdb_ids(res.actors, self.crawler_provider.client)
             await translate_actor(res)  # 映射输出演员名/信息
             translate_info(res, file_info.has_sub)  # 映射输出标签等信息
             replace_word(res)

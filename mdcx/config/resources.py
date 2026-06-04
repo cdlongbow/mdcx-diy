@@ -184,6 +184,13 @@ class Resources:
         asin_db_backup_path = self.r("userdata/amazon_asin_database.xlsx")
         if not os.path.exists(asin_db_local_path):
             copy_file_sync(asin_db_backup_path, asin_db_local_path)
+
+        # 载入 actor_tmdbid.xlsx
+        tmdb_db_local_path = self.u("actor_tmdbid.xlsx")
+        tmdb_db_backup_path = self.r("userdata/actor_tmdbid.xlsx")
+        if not os.path.exists(tmdb_db_local_path):
+            copy_file_sync(tmdb_db_backup_path, tmdb_db_local_path)
+
         try:
             parser = etree.HTMLParser(encoding="utf-8")
             with open(actor_map_local_path, encoding="utf-8") as f:

@@ -176,6 +176,7 @@ class NfoInclude(Enum):
     CRITICRATING = "criticrating"
     ACTOR = "actor"
     ACTOR_ALL = "actor_all"
+    ACTOR_TMDBID = "actor_tmdbid"
     DIRECTOR = "director"
     SERIES = "series"
     TAG = "tag"
@@ -214,6 +215,7 @@ class NfoInclude(Enum):
             "评论家评分",
             "演员",
             "所有演员",
+            "演员TMDB ID",
             "导演",
             "系列",
             "标签",

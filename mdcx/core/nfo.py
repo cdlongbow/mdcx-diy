@@ -255,10 +255,20 @@ async def write_nfo(file_info: FileInfo, data: CrawlersResult, nfo_file: Path, o
         if NfoInclude.ACTOR in nfo_include_new:
             if not actors:
                 actors = [manager.config.actor_no_name]
+            actor_tmdb_ids = data.actor_tmdb_ids if NfoInclude.ACTOR_TMDBID in nfo_include_new else {}
             for name in actors:
                 print("  <actor>", file=code)
                 write_text_element(code, "name", name, indent="    ")
                 write_text_element(code, "type", "Actor", indent="    ")
+                if actor_tmdb_ids:
+                    # 查找原始演员名对应的 tmdbid
+                    tmdbid = None
+                    for orig_name, tid in actor_tmdb_ids.items():
+                        if escape_xml_text(orig_name) == escape_xml_text(name) or orig_name.strip() == name.strip():
+                            tmdbid = tid
+                            break
+                    if tmdbid:
+                        write_text_element(code, "tmdbid", str(tmdbid), indent="    ")
                 print("  </actor>", file=code)
 
         # 输出导演

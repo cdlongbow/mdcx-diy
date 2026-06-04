@@ -386,6 +386,7 @@ def load_config(self: "MyMAinWindow"):
             (self.Ui.checkBox_nfo_criticrating, NfoInclude.CRITICRATING),
             (self.Ui.checkBox_nfo_actor, NfoInclude.ACTOR),
             (self.Ui.checkBox_nfo_all_actor, NfoInclude.ACTOR_ALL),
+            (self.Ui.checkBox_nfo_actor_tmdbid, NfoInclude.ACTOR_TMDBID),
             (self.Ui.checkBox_nfo_director, NfoInclude.DIRECTOR),
             (self.Ui.checkBox_nfo_series, NfoInclude.SERIES),
             (self.Ui.checkBox_nfo_tag, NfoInclude.TAG),
@@ -905,6 +906,8 @@ def load_config(self: "MyMAinWindow"):
             self.Ui.lineEdit_site_custom_url.setText(manager.config.get_site_url(Website(site)))
 
         self.Ui.lineEdit_api_token_theporndb.setText(manager.config.theporndb_api_token)
+        self.Ui.lineEdit_tmdb_api_base.setText(manager.config.tmdb_api_base)
+        self.Ui.lineEdit_tmdb_api_key.setText(manager.config.tmdb_api_key)
         # javdb cookie
         self.set_javdb_cookie.emit(manager.config.javdb)
         # fc2ppvdb cookie（兼容旧配置：旧版本可能填在 javdb 中）

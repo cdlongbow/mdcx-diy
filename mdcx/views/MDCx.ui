@@ -5922,7 +5922,7 @@
                           <x>50</x>
                           <y>30</y>
                           <width>631</width>
-                          <height>181</height>
+                        <height>260</height>
                         </rect>
                       </property>
                       <layout class="QGridLayout" name="gridLayout_15">
@@ -16978,7 +16978,43 @@
                             </item>
                           </layout>
                         </item>
-                        <item row="8" column="0">
+                        <item row="8" column="1">
+                          <layout class="QHBoxLayout" name="horizontalLayout_147">
+                            <item>
+                              <widget class="QLabel" name="label_403">
+                                <property name="sizePolicy">
+                                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                  </sizepolicy>
+                                </property>
+                                <property name="minimumSize">
+                                  <size>
+                                    <width>20</width>
+                                    <height>0</height>
+                                  </size>
+                                </property>
+                                <property name="layoutDirection">
+                                  <enum>Qt::LeftToRight</enum>
+                                </property>
+                                <property name="text">
+                                  <string />
+                                </property>
+                                <property name="alignment">
+                                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                                </property>
+                              </widget>
+                            </item>
+                            <item>
+                              <widget class="QCheckBox" name="checkBox_nfo_actor_tmdbid">
+                                <property name="text">
+                                  <string>为演员写入 TMDB ID（需配置 TMDB API）</string>
+                                </property>
+                              </widget>
+                            </item>
+                          </layout>
+                        </item>
+                        <item row="9" column="0">
                           <widget class="QLabel" name="label_391">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -21406,7 +21442,7 @@
                           <x>20</x>
                           <y>30</y>
                           <width>661</width>
-                          <height>51</height>
+                          <height>130</height>
                         </rect>
                       </property>
                       <layout class="QGridLayout" name="gridLayout_65">
@@ -21437,6 +21473,103 @@
                         </item>
                         <item row="0" column="1">
                           <widget class="QLineEdit" name="lineEdit_api_token_theporndb">
+                            <property name="sizePolicy">
+                              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                              </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                              <size>
+                                <width>300</width>
+                                <height>30</height>
+                              </size>
+                            </property>
+                            <property name="styleSheet">
+                              <string notr="true"> font: &quot;Courier&quot;;
+                                border: 1px solid rgba(0,0,0, 50);
+                                border-radius: 15px;
+</string>
+                            </property>
+                          </widget>
+                        </item>
+                        <item row="1" column="0">
+                          <widget class="QLabel" name="label_423">
+                            <property name="sizePolicy">
+                              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                              </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                              <size>
+                                <width>130</width>
+                                <height>30</height>
+                              </size>
+                            </property>
+                            <property name="layoutDirection">
+                              <enum>Qt::RightToLeft</enum>
+                            </property>
+                            <property name="text">
+                              <string>TMDB API地址：</string>
+                            </property>
+                            <property name="alignment">
+                              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                            </property>
+                          </widget>
+                        </item>
+                        <item row="1" column="1">
+                          <widget class="QLineEdit" name="lineEdit_tmdb_api_base">
+                            <property name="sizePolicy">
+                              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                              </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                              <size>
+                                <width>300</width>
+                                <height>30</height>
+                              </size>
+                            </property>
+                            <property name="styleSheet">
+                              <string notr="true"> font: &quot;Courier&quot;;
+                                border: 1px solid rgba(0,0,0, 50);
+                                border-radius: 15px;
+</string>
+                            </property>
+                            <property name="text">
+                              <string>api.tmdb.org</string>
+                            </property>
+                          </widget>
+                        </item>
+                        <item row="2" column="0">
+                          <widget class="QLabel" name="label_424">
+                            <property name="sizePolicy">
+                              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                              </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                              <size>
+                                <width>130</width>
+                                <height>30</height>
+                              </size>
+                            </property>
+                            <property name="layoutDirection">
+                              <enum>Qt::RightToLeft</enum>
+                            </property>
+                            <property name="text">
+                              <string>TMDB API Key：</string>
+                            </property>
+                            <property name="alignment">
+                              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                            </property>
+                          </widget>
+                        </item>
+                        <item row="2" column="1">
+                          <widget class="QLineEdit" name="lineEdit_tmdb_api_key">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                                 <horstretch>0</horstretch>

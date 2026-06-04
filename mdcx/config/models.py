@@ -615,6 +615,8 @@ class Config(BaseModel):
     timeout: int = Field(default=10, title="超时")
     retry: int = Field(default=3, title="重试")
     theporndb_api_token: str = Field(default="", title="Theporndb API令牌")
+    tmdb_api_base: str = Field(default="api.tmdb.org", title="TMDB API地址")
+    tmdb_api_key: str = Field(default="", title="TMDB API Key")
     javdb: str = Field(default="", title="Javdb")
     fc2ppvdb: str = Field(default="", title="FC2PPVDB")
     javbus: str = Field(default="", title="Javbus")
