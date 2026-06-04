@@ -56,6 +56,10 @@ def _normalize_amazon_image_url(pic_url: str, *, target_size: str = "SL1500") ->
     if "m.media-amazon.com/images/I/" not in pic_url:
         return pic_url
 
+    # 如果已经是目标尺寸，直接返回
+    if f".{target_size}" in pic_url:
+        return pic_url
+
     if re.search(r"\._[A-Z0-9_]+_\.", pic_url, flags=re.IGNORECASE):
         return re.sub(rf"\._[A-Z0-9_]+\.", f".{target_size}.", pic_url, flags=re.IGNORECASE)
 
@@ -738,6 +742,35 @@ async def try_get_amazon_barcode_from_covers(
     return barcodes[0] if barcodes else ""
 
 
+async def _fetch_poster_from_asin(asin: str, media_context: MediaResourceContext) -> tuple[str, str]:
+    """直接用 ASIN 访问 Amazon 详情页获取封面图片 URL 和标题
+
+    Returns:
+        (图片URL, 商品标题)
+    """
+    detail_url = f"https://www.amazon.co.jp/dp/{asin}"
+    success, html_text = await get_amazon_data(detail_url)
+    if not success or not html_text:
+        return "", ""
+    tree = etree.fromstring(html_text, etree.HTMLParser())
+    img_url = ""
+    for xpath in [
+        '//img[@id="landingImage"]/@data-old-hires',
+        '//img[@id="landingImage"]/@src',
+        '//img[@class="a-dynamic-image"]/@data-old-hires',
+        '//img[@class="a-dynamic-image"]/@src',
+    ]:
+        found = tree.xpath(xpath)
+        if found and found[0]:
+            img_url = str(found[0])
+            break
+    title = ""
+    title_nodes = tree.xpath('//span[@id="productTitle"]/text()')
+    if title_nodes:
+        title = title_nodes[0].strip()
+    return img_url, title
+
+
 async def get_big_pic_by_amazon(
     result: CrawlersResult,
     originaltitle_amazon: str,
@@ -772,7 +805,28 @@ async def get_big_pic_by_amazon(
             )
             return _convert_to_target_size(poster_url)
         else:
-            LogBuffer.log().write(f"  缓存无封面 URL，继续搜索 Amazon 获取")
+            LogBuffer.log().write(f"  缓存无封面 URL，直接用 ASIN 获取")
+            cached_asin = cache_hit['asin']
+            img_url, fetched_title = await _fetch_poster_from_asin(cached_asin, media_context)
+            if img_url:
+                converted_url = _convert_to_target_size(img_url)
+                _set_amazon_match_state(
+                    result,
+                    is_hard=False,
+                    reason="cache",
+                    url=f"https://www.amazon.co.jp/dp/{cached_asin}",
+                )
+                await _save_asin_record(
+                    result,
+                    asin=cached_asin,
+                    title=fetched_title or cache_hit.get("title", ""),
+                    poster_url=img_url,
+                    search_keyword=result.number or "",
+                    detail_url=f"https://www.amazon.co.jp/dp/{cached_asin}",
+                )
+                return converted_url
+            else:
+                LogBuffer.log().write(f"  ASIN 详情页未获取到图片，回退标题搜索")
     
     if not originaltitle_amazon and not originaltitle_amazon_raw:
         return ""
