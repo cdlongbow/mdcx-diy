@@ -82,11 +82,11 @@ async def _save_asin_record(
     search_keyword: str,
     detail_url: str = "",
 ):
-    """保存 ASIN 记录到数据库
+    """保存或更新 ASIN 记录到数据库
 
     注意：只有成功获取到 ASIN 时才会保存，失败时仅记录日志
 
-    去重逻辑：如果相同番号已有记录，则不保存新记录
+    去重逻辑：如果相同番号已有记录且 poster_url 不为空，则跳过；否则更新 poster_url
     """
     if not asin or not asin.strip():
         LogBuffer.log().write(f"\n 🟡 Amazon ASIN 数据库：跳过保存 {result.number} - ASIN 为空")
@@ -100,10 +100,15 @@ async def _save_asin_record(
 
     existing_records = await amazon_database.query_asin_database(number=result.number)
     if existing_records:
-        LogBuffer.log().write(
-            f"\n 📚 Amazon ASIN 数据库：{result.number} 已有记录 "
-            f"(ASIN: {existing_records[0].get('asin')})，跳过保存"
-        )
+        existing = existing_records[0]
+        if existing.get("poster_url"):
+            LogBuffer.log().write(
+                f"\n 📚 Amazon ASIN 数据库：{result.number} 已有完整记录，跳过保存"
+            )
+            return
+        # 已有记录但缺少 poster_url，原地更新
+        await amazon_database.update_asin_record(number=result.number, poster_url=poster_url)
+        LogBuffer.log().write(f"\n 📊 Amazon ASIN 数据库：已更新 {result.number} 的封面 URL")
         return
 
     product_url = f"https://www.amazon.co.jp/dp/{asin}"
@@ -756,21 +761,18 @@ async def get_big_pic_by_amazon(
     if cache_hit:
         LogBuffer.log().write(f"\n 📚 Amazon ASIN 缓存：命中 {result.number} → {cache_hit['asin']}")
 
-        _set_amazon_match_state(
-            result,
-            is_hard=False,
-            reason="cache",
-            url=f"https://www.amazon.co.jp/dp/{cache_hit['asin']}",
-        )
-
-        # 优先使用缓存的封面 URL
         poster_url = cache_hit.get("poster_url", "")
         if poster_url:
+            LogBuffer.log().write(f"  使用缓存的封面 URL")
+            _set_amazon_match_state(
+                result,
+                is_hard=False,
+                reason="cache",
+                url=f"https://www.amazon.co.jp/dp/{cache_hit['asin']}",
+            )
             return _convert_to_target_size(poster_url)
-        # 没有封面 URL 则尝试从 ASIN 猜测
-        image_url = _get_image_url_from_asin(cache_hit['asin'])
-        if image_url:
-            return _convert_to_target_size(image_url)
+        else:
+            LogBuffer.log().write(f"  缓存无封面 URL，继续搜索 Amazon 获取")
     
     if not originaltitle_amazon and not originaltitle_amazon_raw:
         return ""

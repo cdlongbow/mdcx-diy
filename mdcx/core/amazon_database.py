@@ -183,6 +183,50 @@ async def save_single_asin_record(
         return False
 
 
+async def update_asin_record(
+    number: str,
+    poster_url: str,
+    excel_path: Path | None = None,
+) -> bool:
+    """
+    更新已有 ASIN 记录的 poster_url（原地更新，不新增行）
+
+    Args:
+        number: 影片番号
+        poster_url: 新的封面 URL
+        excel_path: Excel 文件路径
+
+    Returns:
+        bool: 更新成功返回 True，未找到记录返回 False
+    """
+    try:
+        import openpyxl
+    except ImportError:
+        return False
+
+    if excel_path is None:
+        excel_path = _get_default_excel_path()
+
+    if not excel_path.exists():
+        return False
+
+    wb = openpyxl.load_workbook(excel_path)
+    ws = wb.active
+
+    updated = False
+    for row in ws.iter_rows(min_row=2, values_only=False):
+        row_number = str(row[0].value or "").upper()
+        if row_number == number.upper():
+            row[4].value = poster_url
+            updated = True
+            break
+
+    if updated:
+        wb.save(excel_path)
+    wb.close()
+    return updated
+
+
 async def query_asin_database(
     number: str | None = None,
     asin: str | None = None,
