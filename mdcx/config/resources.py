@@ -37,9 +37,10 @@ class Resources:
         self._userdata_base.mkdir(parents=True, exist_ok=True)  # 确保用户数据目录存在
 
         # 获取资源路径
-        self.actor_map_backup_path = self.r("mapping_table/mapping_actor.xml")  # 内置演员映射表的文件路径（用于迁移）
+        self.actor_map_backup_path = self.r("mapping_table/mapping_actor.xml")  # 内置演员映射表 XML（仅用于老用户迁移）
         self.actor_db_backup_path = self.r("userdata/actor_database.xlsx")  # 内置演员数据库 xlsx
-        self.info_map_backup_path = self.r("mapping_table/mapping_info.xml")  # 内置信息映射表的文件路径
+        self.info_map_backup_path = self.r("mapping_table/mapping_info.xml")  # 内置信息映射表 XML（仅用于老用户迁移）
+        self.info_db_backup_path = self.r("userdata/info_database.xlsx")  # 内置信息映射数据库 xlsx
 
         self.icon_ico = self.qtr("Img/MDCx.ico")  # 任务栏图标
         self.right_menu = self.qtr("Img/menu.svg")  # 主界面菜单按钮
@@ -229,9 +230,8 @@ class Resources:
                 pass
 
             # 如果迁移未生成文件，尝试复制内置备份
-            info_db_backup_path = self.r("userdata/info_database.xlsx")
-            if not os.path.exists(info_db_local_path) and os.path.exists(info_db_backup_path):
-                copy_file_sync(info_db_backup_path, info_db_local_path)
+            if not os.path.exists(info_db_local_path) and os.path.exists(self.info_db_backup_path):
+                copy_file_sync(self.info_db_backup_path, info_db_local_path)
 
         # 载入 amazon_asin_database.xlsx
         asin_db_local_path = self.u("amazon_asin_database.xlsx")

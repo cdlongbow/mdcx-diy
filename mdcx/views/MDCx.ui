@@ -14288,7 +14288,7 @@
                               <string notr="true">color: rgb(8, 128, 128);</string>
                             </property>
                             <property name="text">
-                              <string>映射表文件名：mapping_info.xml。作用和演员映射表类似，说明可参考演员映射表。</string>
+                               <string>映射表文件名：info_database.xlsx。作用和演员映射表类似，说明可参考演员映射表。</string>
                             </property>
                             <property name="alignment">
                               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -14457,7 +14457,7 @@
                               <string notr="true">color: rgb(8, 128, 128);</string>
                             </property>
                             <property name="text">
-                              <string>映射表文件名：mapping_info.xml。作用和演员映射表类似，说明可参考演员映射表。</string>
+                               <string>映射表文件名：info_database.xlsx。作用和演员映射表类似，说明可参考演员映射表。</string>
                             </property>
                             <property name="alignment">
                               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -14604,7 +14604,7 @@
                               <string notr="true">color: rgb(8, 128, 128);</string>
                             </property>
                             <property name="text">
-                              <string>映射表文件名：mapping_info.xml。作用和演员映射表类似，说明可参考演员映射表。</string>
+                               <string>映射表文件名：info_database.xlsx。作用和演员映射表类似，说明可参考演员映射表。</string>
                             </property>
                             <property name="alignment">
                               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -14751,7 +14751,7 @@
                               <string notr="true">color: rgb(8, 128, 128);</string>
                             </property>
                             <property name="text">
-                              <string>映射表文件名：mapping_info.xml。作用和演员映射表类似，说明可参考演员映射表。</string>
+                               <string>映射表文件名：info_database.xlsx。作用和演员映射表类似，说明可参考演员映射表。</string>
                             </property>
                             <property name="alignment">
                               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -14898,7 +14898,7 @@
                               <string notr="true">color: rgb(8, 128, 128);</string>
                             </property>
                             <property name="text">
-                              <string>映射表文件名：mapping_info.xml。作用和演员映射表类似，说明可参考演员映射表。</string>
+                               <string>映射表文件名：info_database.xlsx。作用和演员映射表类似，说明可参考演员映射表。</string>
                             </property>
                             <property name="alignment">
                               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
