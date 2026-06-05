@@ -260,11 +260,19 @@ async def write_nfo(file_info: FileInfo, data: CrawlersResult, nfo_file: Path, o
                 print("  <actor>", file=code)
                 write_text_element(code, "name", name, indent="    ")
                 write_text_element(code, "type", "Actor", indent="    ")
-                if actor_tmdb_ids:
-                    # 查找原始演员名对应的 tmdbid
-                    tmdbid = None
+            if actor_tmdb_ids:
+                # 查找原始演员名对应的 tmdbid
+                tmdbid = None
+                # 优先通过 original_actors 建立原名→映射名对照
+                if data.original_actors and len(data.original_actors) == len(data.actors):
+                    for i, orig_name in enumerate(data.original_actors):
+                        if i < len(data.actors) and data.actors[i] == actor and data.actor_tmdb_ids.get(orig_name):
+                            tmdbid = data.actor_tmdb_ids[orig_name]
+                            break
+                # 兼容读取模式：actor_tmdb_ids 的 key 可能是映射名
+                if tmdbid is None:
                     for orig_name, tid in actor_tmdb_ids.items():
-                        if escape_xml_text(orig_name) == escape_xml_text(name) or orig_name.strip() == name.strip():
+                        if orig_name in [a.strip() for a in data.actors]:
                             tmdbid = tid
                             break
                     if tmdbid:
@@ -421,7 +429,17 @@ async def get_nfo_data(file_path: Path, movie_number: str) -> tuple[CrawlersResu
     if originaltitle:
         for key, value in ManualConfig.SPECIAL_WORD.items():
             originaltitle_amazon = originaltitle_amazon.replace(value, key)
-    actor = ",".join(xml_nfo.xpath("//actor/name/text()"))
+    actor_elements = xml_nfo.xpath("//actor")
+    actor_list: list[str] = []
+    actor_tmdb_ids: dict[str, int] = {}
+    for ae in actor_elements:
+        name = "".join(ae.xpath("name/text()"))
+        tmdbid_text = "".join(ae.xpath("tmdbid/text()"))
+        if name:
+            actor_list.append(name)
+            if tmdbid_text and tmdbid_text.isdigit():
+                actor_tmdb_ids[name] = int(tmdbid_text)
+    actor = ",".join(actor_list)
     originalplot = "".join(xml_nfo.xpath("//originalplot/text()"))
     outline = xml_nfo.xpath("string(//plot)") or xml_nfo.xpath("string(//outline)")
     outline = outline.replace("\r\n", "\n").replace("\r", "\n").strip()
@@ -539,6 +557,8 @@ async def get_nfo_data(file_path: Path, movie_number: str) -> tuple[CrawlersResu
     json_data.letters = letters
     json_data.actor = actor
     json_data.all_actor = actor
+    json_data.actor_tmdb_ids = actor_tmdb_ids
+    json_data.original_actors = actor_list.copy()  # 保存 NFO 中的原始演员名（可能是映射名）
     json_data.outline = outline
     if (
         manager.config.get_field_config(CrawlerResultFields.OUTLINE).language == Language.JP

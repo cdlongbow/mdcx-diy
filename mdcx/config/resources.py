@@ -1,3 +1,4 @@
+import asyncio
 import os
 import sys
 import traceback
@@ -13,6 +14,11 @@ from ..signals import signal
 from ..utils import singleton
 from ..utils.file import copy_file_sync
 from .manager import manager
+
+try:
+    import openpyxl
+except ImportError:
+    openpyxl = None
 
 
 @singleton
@@ -31,7 +37,8 @@ class Resources:
         self._userdata_base.mkdir(parents=True, exist_ok=True)  # 确保用户数据目录存在
 
         # 获取资源路径
-        self.actor_map_backup_path = self.r("mapping_table/mapping_actor.xml")  # 内置演员映射表的文件路径
+        self.actor_map_backup_path = self.r("mapping_table/mapping_actor.xml")  # 内置演员映射表的文件路径（用于迁移）
+        self.actor_db_backup_path = self.r("userdata/actor_database.xlsx")  # 内置演员数据库 xlsx
         self.info_map_backup_path = self.r("mapping_table/mapping_info.xml")  # 内置信息映射表的文件路径
 
         self.icon_ico = self.qtr("Img/MDCx.ico")  # 任务栏图标
@@ -72,7 +79,7 @@ class Resources:
         self.icon_leak_path = self.u("watermark/leak.png")
         self.icon_wuma_path = self.u("watermark/wuma.png")
 
-        self.actor_mapping_data = None  # 演员映射表数据
+        self.actor_db: dict[str, dict] | None = None  # 演员数据库（xlsx 格式）
         self.info_mapping_data = None  # 信息映射表数据
 
         self._get_or_generate_local_data()
@@ -100,24 +107,33 @@ class Resources:
             "has_name": False,
         }
 
-        # 查询映射表
-        xml_actor = self.actor_mapping_data
-        if xml_actor is not None and len(xml_actor):
+        # 查询演员数据库 xlsx
+        actor_db = self.actor_db
+        if actor_db is not None:
             actor_name = f",{actor.upper()},"
             for each in ManualConfig.FULL_HALF_CHAR:
                 actor_name = actor_name.replace(each[0], each[1])
-            actor_ob = xml_actor.xpath(
-                '//a[contains(translate(@keyword, "abcdefghijklmnopqrstuvwxyzａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ・", "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ·"), $name)]',
-                name=actor_name,
-            )
-            if actor_ob:
-                actor_ob = actor_ob[0]
-                actor_data["zh_cn"] = actor_ob.get("zh_cn")
-                actor_data["zh_tw"] = actor_ob.get("zh_tw")
-                actor_data["jp"] = actor_ob.get("jp")
-                actor_data["keyword"] = actor_ob.get("keyword").strip(",").split(",")
-                actor_data["href"] = actor_ob.get("href")
-                actor_data["has_name"] = True
+
+            # 在 xlsx 中搜索匹配的演员
+            for jp, data in actor_db.items():
+                # 构建所有可搜索的名字列表
+                searchable = [jp]
+                if data.get("keyword"):
+                    searchable.extend(k.strip() for k in data["keyword"].split(",") if k.strip())
+
+                for name in searchable:
+                    test_name = f",{name.upper()},"
+                    for each in ManualConfig.FULL_HALF_CHAR:
+                        test_name = test_name.replace(each[0], each[1])
+                    if test_name == actor_name:
+                        actor_data["zh_cn"] = data.get("zh_cn") or actor
+                        actor_data["zh_tw"] = data.get("zh_tw") or actor
+                        actor_data["jp"] = jp
+                        kw = data.get("keyword") or ""
+                        actor_data["keyword"] = [k.strip() for k in kw.split(",") if k.strip()] if kw else [jp]
+                        actor_data["href"] = data.get("href") or ""
+                        actor_data["has_name"] = True
+                        return actor_data
         return actor_data
 
     def get_info_data(self, info):
@@ -169,15 +185,31 @@ class Resources:
 
     def _get_or_generate_local_data(self):
         """如果用户数据目录下已有数据则直接读取, 否则根据内置数据生成"""
-        # 载入 mapping_actor.xml mapping_info.xml 数据
-        actor_map_local_path = self.u("mapping_actor.xml")
+        # 载入 mapping_info.xml 数据（信息映射表仍用 XML）
         info_map_local_path = self.u("mapping_info.xml")
-        if not os.path.exists(actor_map_local_path):
-            if not copy_file_sync(self.actor_map_backup_path, actor_map_local_path):
-                actor_map_local_path = self.actor_map_backup_path
         if not os.path.exists(info_map_local_path):
             if not copy_file_sync(self.info_map_backup_path, info_map_local_path):
                 info_map_local_path = self.info_map_backup_path
+
+        # 演员数据库 xlsx：尝试迁移 XML → xlsx，或直接加载
+        db_local_path = self.u("actor_database.xlsx")
+        if not os.path.exists(db_local_path):
+            # 尝试从 XML 迁移
+            try:
+                from ..core.tmdb_actor import migrate_xml_to_xlsx
+
+                # 同步执行迁移（在事件循环外）
+                import asyncio
+
+                loop = asyncio.new_event_loop()
+                loop.run_until_complete(migrate_xml_to_xlsx())
+                loop.close()
+            except Exception:
+                pass
+
+            # 如果迁移未生成文件，尝试复制内置备份
+            if not os.path.exists(db_local_path) and os.path.exists(self.actor_db_backup_path):
+                copy_file_sync(self.actor_db_backup_path, db_local_path)
 
         # 载入 amazon_asin_database.xlsx
         asin_db_local_path = self.u("amazon_asin_database.xlsx")
@@ -185,27 +217,60 @@ class Resources:
         if not os.path.exists(asin_db_local_path):
             copy_file_sync(asin_db_backup_path, asin_db_local_path)
 
-        # 载入 actor_tmdbid.xlsx
-        tmdb_db_local_path = self.u("actor_tmdbid.xlsx")
-        tmdb_db_backup_path = self.r("userdata/actor_tmdbid.xlsx")
-        if not os.path.exists(tmdb_db_local_path):
-            copy_file_sync(tmdb_db_backup_path, tmdb_db_local_path)
-
+        # 加载信息映射表 XML
         try:
             parser = etree.HTMLParser(encoding="utf-8")
-            with open(actor_map_local_path, encoding="utf-8") as f:
-                content = f.read()
-            self.actor_mapping_data = etree.HTML(content.encode("utf-8"), parser=parser)
             with open(info_map_local_path, encoding="utf-8") as f:
                 content = f.read()
             self.info_mapping_data = etree.HTML(content.encode("utf-8"), parser=parser)
         except Exception as e:
             signal.show_log_text(
-                f" {actor_map_local_path} 读取失败！请检查该文件是否存在问题！如需重置请删除该文件！错误信息：\n{str(e)}"
+                f" {info_map_local_path} 读取失败！请检查该文件是否存在问题！如需重置请删除该文件！错误信息：\n{str(e)}"
             )
             signal.show_traceback_log(traceback.format_exc())
             signal.show_log_text(traceback.format_exc())
-            self.actor_mapping_data = None
+
+        # 加载演员数据库 xlsx
+        self.reload_actor_db()
+
+    def reload_actor_db(self):
+        """重新加载演员数据库 xlsx（在刮削更新后调用）"""
+        if openpyxl is None:
+            self.actor_db = None
+            return
+        db_path = self.u("actor_database.xlsx")
+        if not db_path.exists():
+            self.actor_db = None
+            return
+        try:
+            wb = openpyxl.load_workbook(db_path, read_only=True, data_only=True)
+            ws = wb.active
+            db: dict[str, dict] = {}
+            for row_idx, row in enumerate(ws.iter_rows(values_only=True), start=1):
+                if row_idx == 1:
+                    continue
+                if len(row) < 1:
+                    continue
+                jp = str(row[0] or "").strip()
+                if not jp:
+                    continue
+                tmdbid_val = None
+                if len(row) > 5:
+                    tmdbid_raw = str(row[5] or "").strip()
+                    if tmdbid_raw and tmdbid_raw.isdigit():
+                        tmdbid_val = int(tmdbid_raw)
+                db[jp] = {
+                    "zh_cn": str(row[1] or "").strip() if len(row) > 1 else "",
+                    "zh_tw": str(row[2] or "").strip() if len(row) > 2 else "",
+                    "keyword": str(row[3] or "").strip() if len(row) > 3 else "",
+                    "href": str(row[4] or "").strip() if len(row) > 4 else "",
+                    "tmdbid": tmdbid_val,
+                    "tmdb_url": str(row[6] or "").strip() if len(row) > 6 else "",
+                }
+            wb.close()
+            self.actor_db = db
+        except Exception:
+            self.actor_db = None
 
     def _get_mark_icon(self):
         mark_folder = self.u("watermark")

@@ -218,8 +218,8 @@ async def translate_actor(res: CrawlersResult):
         return res
 
     # 映射表数据加载失败，返回
-    xml_actor = resources.actor_mapping_data
-    if xml_actor is not None and len(xml_actor) == 0:
+    actor_db = resources.actor_db
+    if actor_db is not None and len(actor_db) == 0:
         return res
 
     map_actor_names(res)

@@ -348,6 +348,7 @@ class CrawlersResult(BaseCrawlerResult):
     amazon_raw_studio: str  # Amazon 标题清洗用制作商（未映射）
     amazon_raw_publisher: str  # Amazon 标题清洗用发行商（未映射）
     actor_tmdb_ids: dict[str, int]  # 演员原名 -> TMDB ID 映射
+    original_actors: list[str]  # 映射前的原始演员名列表（用于读取模式反向查找）
 
     # 用于 log
     site_log: str
@@ -380,6 +381,7 @@ class CrawlersResult(BaseCrawlerResult):
             amazon_raw_studio="",
             amazon_raw_publisher="",
             actor_tmdb_ids={},
+            original_actors=[],
             site_log="",
             field_log="",
             field_sources=dict.fromkeys(CrawlerResultFields, ""),
