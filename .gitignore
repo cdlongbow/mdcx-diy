@@ -194,4 +194,6 @@ test_amazon_*.py
 test_*.xlsx
 
 # Excel 数据库文件在 resources/userdata/ 目录下
+!resources/userdata/*.xlsx
+
 *.mdcx/
