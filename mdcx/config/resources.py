@@ -80,7 +80,7 @@ class Resources:
         self.icon_wuma_path = self.u("watermark/wuma.png")
 
         self.actor_db: dict[str, dict] | None = None  # 演员数据库（xlsx 格式）
-        self.info_mapping_data = None  # 信息映射表数据
+        self.info_db: list[dict] | None = None  # 信息映射数据库（xlsx 格式，有序列表以保持行顺序）
 
         self._get_or_generate_local_data()
         self._get_mark_icon()
@@ -146,36 +146,48 @@ class Resources:
             "has_name": False,
         }
 
-        # 查询映射表
-        xml_info = self.info_mapping_data
-        if xml_info is not None and len(xml_info):
+        # 查询信息映射数据库 xlsx
+        info_db = self.info_db
+        if info_db is not None:
             info_key = info.upper()
             for each in ManualConfig.FULL_HALF_CHAR:
                 info_key = info_key.replace(each[0], each[1])
             info_name = f",{info_key},"
-            info_ob = xml_info.xpath(
-                "//a[contains(translate(@keyword, "
-                '"abcdefghijklmnopqrstuvwxyzａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ・", '
-                '"ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ·"), $name) '
-                "or translate(@zh_cn, "
-                '"abcdefghijklmnopqrstuvwxyzａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ・", '
-                '"ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ·") = $key '
-                "or translate(@zh_tw, "
-                '"abcdefghijklmnopqrstuvwxyzａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ・", '
-                '"ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ·") = $key '
-                "or translate(@jp, "
-                '"abcdefghijklmnopqrstuvwxyzａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ・", '
-                '"ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ·") = $key]',
-                name=info_name,
-                key=info_key,
-            )
-            if info_ob:
-                info_ob = info_ob[0]
-                info_data["zh_cn"] = info_ob.get("zh_cn").replace("删除", "")
-                info_data["zh_tw"] = info_ob.get("zh_tw").replace("删除", "")
-                info_data["jp"] = info_ob.get("jp").replace("删除", "")
-                info_data["keyword"] = info_ob.get("keyword").strip(",").split(",")
-                info_data["has_name"] = True
+
+            for row in info_db:
+                # 在 keyword 中搜索（逗号包裹匹配）
+                matched = False
+                if row.get("keyword"):
+                    for kw in row["keyword"].split(","):
+                        kw = kw.strip()
+                        if not kw:
+                            continue
+                        test_name = f",{kw.upper()},"
+                        for each in ManualConfig.FULL_HALF_CHAR:
+                            test_name = test_name.replace(each[0], each[1])
+                        if test_name == info_name:
+                            matched = True
+                            break
+
+                # 在 zh_cn/zh_tw/jp 中搜索
+                if not matched:
+                    for attr in ("zh_cn", "zh_tw", "jp"):
+                        val = row.get(attr) or ""
+                        test_key = val.upper()
+                        for each in ManualConfig.FULL_HALF_CHAR:
+                            test_key = test_key.replace(each[0], each[1])
+                        if test_key == info_key:
+                            matched = True
+                            break
+
+                if matched:
+                    info_data["zh_cn"] = (row.get("zh_cn") or info).replace("删除", "")
+                    info_data["zh_tw"] = (row.get("zh_tw") or info).replace("删除", "")
+                    info_data["jp"] = (row.get("jp") or info).replace("删除", "")
+                    kw = row.get("keyword") or ""
+                    info_data["keyword"] = [k.strip() for k in kw.split(",") if k.strip()] if kw else [row.get("jp") or info]
+                    info_data["has_name"] = True
+                    return info_data
         return info_data
 
     def get_fonts(self):
@@ -185,12 +197,6 @@ class Resources:
 
     def _get_or_generate_local_data(self):
         """如果用户数据目录下已有数据则直接读取, 否则根据内置数据生成"""
-        # 载入 mapping_info.xml 数据（信息映射表仍用 XML）
-        info_map_local_path = self.u("mapping_info.xml")
-        if not os.path.exists(info_map_local_path):
-            if not copy_file_sync(self.info_map_backup_path, info_map_local_path):
-                info_map_local_path = self.info_map_backup_path
-
         # 演员数据库 xlsx：尝试迁移 XML → xlsx，或直接加载
         db_local_path = self.u("actor_database.xlsx")
         if not os.path.exists(db_local_path):
@@ -199,8 +205,6 @@ class Resources:
                 from ..core.tmdb_actor import migrate_xml_to_xlsx
 
                 # 同步执行迁移（在事件循环外）
-                import asyncio
-
                 loop = asyncio.new_event_loop()
                 loop.run_until_complete(migrate_xml_to_xlsx())
                 loop.close()
@@ -211,27 +215,33 @@ class Resources:
             if not os.path.exists(db_local_path) and os.path.exists(self.actor_db_backup_path):
                 copy_file_sync(self.actor_db_backup_path, db_local_path)
 
+        # 信息映射数据库 xlsx：尝试迁移 XML → xlsx，或直接加载
+        info_db_local_path = self.u("info_database.xlsx")
+        if not os.path.exists(info_db_local_path):
+            # 尝试从 XML 迁移
+            try:
+                from ..core.tmdb_actor import migrate_info_xml_to_xlsx
+
+                loop = asyncio.new_event_loop()
+                loop.run_until_complete(migrate_info_xml_to_xlsx())
+                loop.close()
+            except Exception:
+                pass
+
+            # 如果迁移未生成文件，尝试复制内置备份
+            info_db_backup_path = self.r("userdata/info_database.xlsx")
+            if not os.path.exists(info_db_local_path) and os.path.exists(info_db_backup_path):
+                copy_file_sync(info_db_backup_path, info_db_local_path)
+
         # 载入 amazon_asin_database.xlsx
         asin_db_local_path = self.u("amazon_asin_database.xlsx")
         asin_db_backup_path = self.r("userdata/amazon_asin_database.xlsx")
         if not os.path.exists(asin_db_local_path):
             copy_file_sync(asin_db_backup_path, asin_db_local_path)
 
-        # 加载信息映射表 XML
-        try:
-            parser = etree.HTMLParser(encoding="utf-8")
-            with open(info_map_local_path, encoding="utf-8") as f:
-                content = f.read()
-            self.info_mapping_data = etree.HTML(content.encode("utf-8"), parser=parser)
-        except Exception as e:
-            signal.show_log_text(
-                f" {info_map_local_path} 读取失败！请检查该文件是否存在问题！如需重置请删除该文件！错误信息：\n{str(e)}"
-            )
-            signal.show_traceback_log(traceback.format_exc())
-            signal.show_log_text(traceback.format_exc())
-
-        # 加载演员数据库 xlsx
+        # 加载数据库 xlsx
         self.reload_actor_db()
+        self.reload_info_db()
 
     def reload_actor_db(self):
         """重新加载演员数据库 xlsx（在刮削更新后调用）"""
@@ -271,6 +281,38 @@ class Resources:
             self.actor_db = db
         except Exception:
             self.actor_db = None
+
+    def reload_info_db(self):
+        """加载信息映射数据库 xlsx"""
+        if openpyxl is None:
+            self.info_db = None
+            return
+        db_path = self.u("info_database.xlsx")
+        if not db_path.exists():
+            self.info_db = None
+            return
+        try:
+            wb = openpyxl.load_workbook(db_path, read_only=True, data_only=True)
+            ws = wb.active
+            db: list[dict] = []
+            for row_idx, row in enumerate(ws.iter_rows(values_only=True), start=1):
+                if row_idx == 1:
+                    continue
+                if len(row) < 1:
+                    continue
+                jp = str(row[0] or "").strip()
+                if not jp:
+                    continue
+                db.append({
+                    "jp": jp,
+                    "zh_cn": str(row[1] or "").strip() if len(row) > 1 else "",
+                    "zh_tw": str(row[2] or "").strip() if len(row) > 2 else "",
+                    "keyword": str(row[3] or "").strip() if len(row) > 3 else "",
+                })
+            wb.close()
+            self.info_db = db
+        except Exception:
+            self.info_db = None
 
     def _get_mark_icon(self):
         mark_folder = self.u("watermark")

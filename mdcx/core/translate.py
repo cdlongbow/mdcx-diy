@@ -42,7 +42,7 @@ def _should_query_avwiki_actor(res: CrawlersResult) -> bool:
 
 
 def translate_info(json_data: CrawlersResult, has_sub: bool):
-    xml_info = resources.info_mapping_data
+    xml_info = resources.info_db
     if xml_info is not None and len(xml_info) == 0:
         return json_data
     tag_translate = manager.config.get_field_config(CrawlerResultFields.TAGS).translate

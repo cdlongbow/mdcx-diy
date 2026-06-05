@@ -648,6 +648,104 @@ async def _fetch_person_translations(
             data = trans.get("data", {})
             native_name = data.get("name", "")
 
+            if iso == "zh":
+                name_to_use = native_name or en_name
+                if name_to_use:
+                    result["zh_cn"] = name_to_use
+                    result["zh_tw"] = name_to_use
+            elif iso == "zh-CN":
+                result["zh_cn"] = data.get("name") or en_name or ""
+            elif iso == "zh-TW":
+                result["zh_tw"] = data.get("name") or en_name or ""
+    except Exception:
+        pass
+
+    return result
+
+
+# ============= Info XML → xlsx 迁移 =============
+
+
+async def migrate_info_xml_to_xlsx() -> bool:
+    """
+    将 mapping_info.xml 迁移到 info_database.xlsx。
+    迁移成功后返回 True。
+    """
+    from openpyxl.utils import get_column_letter
+
+    db_path = manager.data_folder / "userdata" / "info_database.xlsx"
+    if db_path.exists():
+        return True
+
+    xml_path = manager.data_folder / "userdata" / "mapping_info.xml"
+    if not xml_path.exists():
+        return False
+
+    try:
+        parser = None
+        try:
+            from lxml import etree
+
+            parser = etree.HTMLParser(encoding="utf-8")
+        except ImportError:
+            pass
+        if not parser:
+            return False
+
+        with open(xml_path, encoding="utf-8") as f:
+            content = f.read()
+        xml_data = etree.HTML(content.encode("utf-8"), parser)
+        info_objects = xml_data.xpath("//a")
+
+        import openpyxl
+
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "信息映射表"
+        headers = ["日文名", "中文名", "繁体名", "别名"]
+        for col, header in enumerate(headers, 1):
+            cell = ws.cell(row=1, column=col, value=header)
+            cell.font = openpyxl.styles.Font(bold=True)
+            cell.fill = openpyxl.styles.PatternFill("solid", fgColor="C0C0C0")
+            cell.alignment = openpyxl.styles.Alignment(horizontal="center")
+
+        for ob in info_objects:
+            jp = ob.get("jp") or ""
+            zh_cn = ob.get("zh_cn") or ""
+            zh_tw = ob.get("zh_tw") or ""
+            keyword = ob.get("keyword") or ""
+            ws.append([jp, zh_cn, zh_tw, keyword])
+
+        ws.auto_filter.ref = f"A1:{get_column_letter(len(headers))}1"
+
+        # 自动列宽
+        for col in ws.columns:
+            max_length = 0
+            column = col[0].column_letter
+            for cell in col:
+                try:
+                    if cell.value:
+                        max_length = max(max_length, len(str(cell.value)) + 2)
+                except (TypeError, AttributeError):
+                    pass
+            adjusted_width = min(max_length, 30)
+            ws.column_dimensions[column].width = adjusted_width
+
+        wb.save(db_path)
+        wb.close()
+        LogBuffer.log().write(f"  ℹ️ [信息映射表] 已从 XML 迁移 {len(info_objects)} 条记录")
+        return True
+    except Exception as e:
+        LogBuffer.log().write(f"  ⚠️ [信息映射表] 迁移失败: {e}")
+        return False
+
+        trans_data = trans_resp.json()
+        for trans in trans_data.get("translations", []):
+            iso = trans.get("iso_639_1", "")
+            en_name = trans.get("english_name", "")
+            data = trans.get("data", {})
+            native_name = data.get("name", "")
+
             # zh-CN: iso_639_1="zh" 或 en_name 包含中文
             if iso == "zh":
                 # 区分简繁

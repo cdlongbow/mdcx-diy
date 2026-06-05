@@ -75,10 +75,10 @@ def _normalize_tag(value: str) -> str:
 
 
 def _get_mapping_nodes():
-    xml_info = resources.info_mapping_data
-    if xml_info is None or not len(xml_info):
+    info_db = resources.info_db
+    if info_db is None or not info_db:
         return None, []
-    return id(xml_info), xml_info.xpath("//a")
+    return id(info_db), info_db
 
 
 def get_priority_tag_names() -> frozenset[str]:
@@ -106,7 +106,14 @@ def get_priority_tag_names() -> frozenset[str]:
             value = (node.get(attr) or "").strip().strip(",")
             if not value or value == "删除" or value in _NON_CONTENT_TAGS:
                 continue
-            names.add(_normalize_tag(value))
+            # 别名中的多个值需要拆分
+            if attr == "keyword" and value:
+                for kv in value.split(","):
+                    kv = kv.strip()
+                    if kv and kv != "删除" and kv not in _NON_CONTENT_TAGS:
+                        names.add(_normalize_tag(kv))
+            else:
+                names.add(_normalize_tag(value))
 
     cached_names = frozenset(names)
     _priority_tag_names_cache = (mapping_id, cached_names)
