@@ -176,9 +176,14 @@ test.ini
 test.json
 test.v2.json
 MDCx.config
-# 运行时数据目录
-userdata/
+# 运行时数据目录（仅根目录）
+/userdata/
 Log/
+
+# resources/userdata/ 仅保留 xlsx 内置数据文件
+resources/userdata/*
+!resources/userdata/.gitignore
+!resources/userdata/*.xlsx
 
 # dev files
 dev/
@@ -193,7 +198,5 @@ uv.toml
 test_amazon_*.py
 test_*.xlsx
 
-# Excel 数据库文件在 resources/userdata/ 目录下
-!resources/userdata/*.xlsx
-
+# Excel 数据库文件在 resources/userdata/ 目录下（由 resources/userdata/.gitignore 管理）
 *.mdcx/
