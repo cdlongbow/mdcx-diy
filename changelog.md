@@ -14,6 +14,14 @@
   - mapping_info.xml 转为 info_database.xlsx
   - 删除废弃的 actor_tmdbid.xlsx，TMDB ID 数据已整合进 actor_database.xlsx
   - 内置 xlsx 数据库，支持表头冻结，提升数据管理效率
+- 新增不使用代理网站选择器功能。
+  - 网络设置栏"不使用代理"输入框左侧新增下拉选择器
+  - 支持从下拉框快速选择网站（40+ 个可用刮削源）
+  - 保留手动输入模式，逗号分隔多个网站
+  - 智能域名匹配：支持网站简称（如 libredmm）自动匹配完整域名
+  - 自动识别常见 TLD（.com/.net/.org/.co/.jp/.io）和子域名
+  - 默认配置 api.tmdb.org（TMDB API 不走代理）
+  - 自动去重，配置自动保存
 
 ## 修改
 - Amazon 高清封面 poster 为 1500 尺寸。
