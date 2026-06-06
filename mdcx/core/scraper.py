@@ -634,46 +634,55 @@ class Scraper:
                     # 仍未命中的演员，尝试用 xlsx 找到日文原名后查 TMDB API
                     still_missing = [a for a in missing_actors if a not in existing_tmdb_ids]
                     if still_missing:
-                        async with aiohttp.ClientSession() as client:
-                            protocol = "https://"
-                            base = tmdb_api_base.strip()
-                            if base.startswith("http://"):
-                                protocol = "http://"
-                                base = base[7:]
-                            elif base.startswith("https://"):
+                        try:
+                            import aiohttp
+                        except ImportError:
+                            LogBuffer.log().write(
+                                f"  ⚠️ [TMDB] 缺少 aiohttp 库，读取模式下无法通过 API 补充 {len(still_missing)} 个演员的 tmdbid"
+                            )
+                            res.actor_tmdb_ids = existing_tmdb_ids
+                            resources.reload_actor_db()
+                        else:
+                            async with aiohttp.ClientSession() as client:
                                 protocol = "https://"
-                                base = base[8:]
-                            base_url = f"{protocol}{base}" if base else "https://api.tmdb.org"
+                                base = tmdb_api_base.strip()
+                                if base.startswith("http://"):
+                                    protocol = "http://"
+                                    base = base[7:]
+                                elif base.startswith("https://"):
+                                    protocol = "https://"
+                                    base = base[8:]
+                                base_url = f"{protocol}{base}" if base else "https://api.tmdb.org"
 
-                            for actor_name in still_missing:
-                                # 先从 xlsx 找日文原名
-                                row = search_actor_db_reverse(actor_name)
-                                jp_name = row.get("jp") if row else None
-                                if not jp_name:
-                                    continue  # 无法找到日文原名，跳过
+                                for actor_name in still_missing:
+                                    # 先从 xlsx 找日文原名
+                                    row = search_actor_db_reverse(actor_name)
+                                    jp_name = row.get("jp") if row else None
+                                    if not jp_name:
+                                        continue  # 无法找到日文原名，跳过
 
-                                try:
-                                    query_result = await _query_single_actor(jp_name, base_url, tmdb_api_key, client)
-                                    if query_result:
-                                        tmdbid = query_result["pid"]
-                                        existing_tmdb_ids[actor_name] = tmdbid
-                                        # 更新 xlsx
-                                        translations = query_result.get("translations", {})
-                                        aka = query_result.get("also_known_as", [])
-                                        await update_actor_db_row(
-                                            jp=jp_name,
-                                            zh_cn=translations.get("zh_cn", ""),
-                                            zh_tw=translations.get("zh_tw", ""),
-                                            keyword=",".join(aka) if aka else "",
-                                            tmdbid=tmdbid,
-                                            append_keyword=True,
-                                        )
-                                        LogBuffer.log().write(f"  ✅ [TMDB] {actor_name} -> tmdbid={tmdbid} (读取模式补充)")
-                                        time.sleep(0.5)
-                                    else:
-                                        LogBuffer.log().write(f"  ⚠️ [TMDB] {actor_name} 未找到匹配的 TMDB 演员")
-                                except Exception as e:
-                                    LogBuffer.log().write(f"  ❌ [TMDB] {actor_name} 查询失败: {e}")
+                                    try:
+                                        query_result = await _query_single_actor(jp_name, base_url, tmdb_api_key, client)
+                                        if query_result:
+                                            tmdbid = query_result["pid"]
+                                            existing_tmdb_ids[actor_name] = tmdbid
+                                            # 更新 xlsx
+                                            translations = query_result.get("translations", {})
+                                            aka = query_result.get("also_known_as", [])
+                                            await update_actor_db_row(
+                                                jp=jp_name,
+                                                zh_cn=translations.get("zh_cn", ""),
+                                                zh_tw=translations.get("zh_tw", ""),
+                                                keyword=",".join(aka) if aka else "",
+                                                tmdbid=tmdbid,
+                                                append_keyword=True,
+                                            )
+                                            LogBuffer.log().write(f"  ✅ [TMDB] {actor_name} -> tmdbid={tmdbid} (读取模式补充)")
+                                            time.sleep(0.5)
+                                        else:
+                                            LogBuffer.log().write(f"  ⚠️ [TMDB] {actor_name} 未找到匹配的 TMDB 演员")
+                                    except Exception as e:
+                                        LogBuffer.log().write(f"  ❌ [TMDB] {actor_name} 查询失败: {e}")
 
                     res.actor_tmdb_ids = existing_tmdb_ids
                     # 重新加载演员数据库以反映更新
