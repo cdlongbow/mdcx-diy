@@ -16942,7 +16942,7 @@
                         </rect>
                       </property>
                       <layout class="QGridLayout" name="gridLayout_40">
-                        <item row="11" column="1">
+                        <item row="12" column="1">
                           <layout class="QHBoxLayout" name="horizontalLayout_146">
                             <item>
                               <widget class="QLabel" name="label_402">
@@ -17011,7 +17011,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="14" column="1">
+                        <item row="15" column="1">
                           <layout class="QHBoxLayout" name="horizontalLayout_37">
                             <item>
                               <widget class="QCheckBox" name="checkBox_tag_letters">
@@ -17043,7 +17043,7 @@
                             </item>
                           </layout>
                         </item>
-                        <item row="16" column="0">
+                        <item row="17" column="0">
                           <widget class="QLabel" name="label_413">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -17139,7 +17139,7 @@
                             </item>
                           </layout>
                         </item>
-                        <item row="23" column="1">
+                        <item row="24" column="1">
                           <layout class="QHBoxLayout" name="horizontalLayout_114">
                             <item>
                               <widget class="QCheckBox" name="checkBox_nfo_genre">
@@ -17197,7 +17197,7 @@
                             </item>
                           </layout>
                         </item>
-                        <item row="25" column="1">
+                        <item row="26" column="1">
                           <layout class="QHBoxLayout" name="horizontalLayout_108">
                             <item>
                               <widget class="QCheckBox" name="checkBox_nfo_poster">
@@ -17229,7 +17229,7 @@
                             </item>
                           </layout>
                         </item>
-                        <item row="15" column="0">
+                        <item row="16" column="0">
                           <widget class="QLabel" name="label_301">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -17354,7 +17354,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="24" column="0">
+                        <item row="25" column="0">
                           <widget class="QLabel" name="label_388">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -17428,7 +17428,7 @@
                             </item>
                           </layout>
                         </item>
-                        <item row="16" column="1">
+                        <item row="17" column="1">
                           <layout class="QHBoxLayout" name="horizontalLayout_144">
                             <item>
                               <widget class="QLabel" name="label_412">
@@ -17485,7 +17485,7 @@
                             </item>
                           </layout>
                         </item>
-                        <item row="17" column="1">
+                        <item row="18" column="1">
                           <layout class="QHBoxLayout" name="horizontalLayout_145">
                             <item>
                               <widget class="QLabel" name="label_416">
@@ -17578,7 +17578,7 @@
                             </item>
                           </layout>
                         </item>
-                        <item row="21" column="0">
+                        <item row="10" column="0">
                           <widget class="QLabel" name="label_390">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -17603,7 +17603,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="21" column="1">
+                        <item row="10" column="1">
                           <layout class="QHBoxLayout" name="horizontalLayout_139">
                             <item>
                               <widget class="QCheckBox" name="checkBox_nfo_score">
@@ -17645,7 +17645,7 @@
                             </item>
                           </layout>
                         </item>
-                        <item row="24" column="1">
+                        <item row="25" column="1">
                           <layout class="QHBoxLayout" name="horizontalLayout_138">
                             <item>
                               <widget class="QCheckBox" name="checkBox_nfo_studio">
@@ -17719,7 +17719,7 @@
                             </item>
                           </layout>
                         </item>
-                        <item row="18" column="0">
+                        <item row="19" column="0">
                           <widget class="QLabel" name="label_419">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -17744,7 +17744,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="17" column="0">
+                        <item row="18" column="0">
                           <widget class="QLabel" name="label_417">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -17769,7 +17769,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="15" column="1">
+                        <item row="16" column="1">
                           <layout class="QHBoxLayout" name="horizontalLayout_91">
                             <item>
                               <widget class="QCheckBox" name="checkBox_tag_mosaic">
@@ -17801,7 +17801,7 @@
                             </item>
                           </layout>
                         </item>
-                        <item row="12" column="1">
+                        <item row="13" column="1">
                           <layout class="QHBoxLayout" name="horizontalLayout_140">
                             <item>
                               <widget class="QCheckBox" name="checkBox_nfo_series">
@@ -17868,7 +17868,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="12" column="0">
+                        <item row="13" column="0">
                           <widget class="QLabel" name="label_208">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -17893,7 +17893,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="14" column="0">
+                        <item row="15" column="0">
                           <widget class="QLabel" name="label_161">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -17918,7 +17918,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="18" column="1">
+                        <item row="19" column="1">
                           <layout class="QHBoxLayout" name="horizontalLayout_147">
                             <item>
                               <widget class="QLabel" name="label_418">
@@ -18024,7 +18024,7 @@
                             </item>
                           </layout>
                         </item>
-                        <item row="23" column="0">
+                        <item row="24" column="0">
                           <widget class="QLabel" name="label_334">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -18154,7 +18154,7 @@
                             </item>
                           </layout>
                         </item>
-                        <item row="11" column="0">
+                        <item row="12" column="0">
                           <widget class="QLabel" name="label_403">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -18264,7 +18264,7 @@
                             </item>
                           </layout>
                         </item>
-                        <item row="10" column="0">
+                        <item row="11" column="0">
                           <widget class="QLabel" name="label_386">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -18289,7 +18289,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="10" column="1">
+                        <item row="11" column="1">
                           <layout class="QHBoxLayout" name="horizontalLayout_34">
                             <item>
                               <widget class="QCheckBox" name="checkBox_nfo_actor">
@@ -18331,7 +18331,7 @@
                             </item>
                           </layout>
                         </item>
-                        <item row="13" column="1">
+                        <item row="14" column="1">
                           <widget class="QLabel" name="label_395">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -18347,7 +18347,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="25" column="0">
+                        <item row="26" column="0">
                           <widget class="QLabel" name="label_150">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -18372,7 +18372,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="19" column="0">
+                        <item row="20" column="0">
                           <widget class="QLabel" name="label_433">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -18397,7 +18397,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="19" column="1">
+                        <item row="20" column="1">
                           <layout class="QHBoxLayout" name="horizontalLayout_161">
                             <item>
                               <widget class="QLabel" name="label_423">
@@ -18454,7 +18454,7 @@
                             </item>
                           </layout>
                         </item>
-                        <item row="20" column="0">
+                        <item row="21" column="0">
                           <widget class="QLabel" name="label_434">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -18479,7 +18479,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="20" column="1">
+                        <item row="21" column="1">
                           <layout class="QHBoxLayout" name="horizontalLayout_162">
                             <item>
                               <widget class="QLabel" name="label_424">
@@ -18533,7 +18533,7 @@
                             </item>
                           </layout>
                         </item>
-                        <item row="21" column="0">
+                        <item row="22" column="0">
                           <widget class="QLabel" name="label_435">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -18558,7 +18558,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="21" column="1">
+                        <item row="22" column="1">
                           <widget class="QLabel" name="label_432">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
@@ -18586,7 +18586,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="22" column="1">
+                        <item row="23" column="1">
                           <widget class="QLabel" name="label_428">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
@@ -18614,7 +18614,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="22" column="0">
+                        <item row="23" column="0">
                           <widget class="QLabel" name="label_429">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -21399,7 +21399,7 @@
                          <x>30</x>
                          <y>870</y>
                          <width>701</width>
-                         <height>270</height>
+                          <height>320</height>
                        </rect>
                     </property>
                     <property name="styleSheet">
@@ -21414,11 +21414,11 @@
                           <x>20</x>
                           <y>30</y>
                           <width>661</width>
-                          <height>130</height>
+                           <height>220</height>
                         </rect>
                       </property>
                       <layout class="QGridLayout" name="gridLayout_65">
-                        <item row="0" column="0">
+                        <item row="1" column="0">
                           <widget class="QLabel" name="label_355">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -21443,7 +21443,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="0" column="1">
+                        <item row="1" column="1">
                           <widget class="QLineEdit" name="lineEdit_api_token_theporndb">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -21465,7 +21465,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="1" column="0">
+                        <item row="2" column="0">
                           <widget class="QLabel" name="label_423">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -21490,7 +21490,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="1" column="1">
+                        <item row="2" column="1">
                           <widget class="QLineEdit" name="lineEdit_tmdb_api_base">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -21515,7 +21515,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="2" column="0">
+                        <item row="0" column="0">
                           <widget class="QLabel" name="label_424">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -21540,7 +21540,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="2" column="1">
+                        <item row="0" column="1">
                           <widget class="QLineEdit" name="lineEdit_tmdb_api_key">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -21562,75 +21562,8 @@
                             </property>
                           </widget>
                         </item>
-                      </layout>
-                    </widget>
-                    <widget class="QLabel" name="label_356">
-                      <property name="geometry">
-                        <rect>
-                          <x>120</x>
-                          <y>165</y>
-                          <width>561</width>
-                          <height>41</height>
-                        </rect>
-                      </property>
-                      <property name="sizePolicy">
-                        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                        </sizepolicy>
-                      </property>
-                      <property name="styleSheet">
-                        <string notr="true">color: rgb(8, 128, 128);</string>
-                      </property>
-                      <property name="text">
-                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a
-                          href=&quot;https://theporndb.net/&quot;&gt;&lt;span style=&quot;
-                          text-decoration: underline;
-                          color:#094fd1;&quot;&gt;https://theporndb.net/&lt;/span&gt;&lt;/a&gt;
-                          注册登录后，点头像 - API Tokens - CREATE。复制生成的 API Token
-                          填入此处。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                      </property>
-                      <property name="scaledContents">
-                        <bool>true</bool>
-                      </property>
-                      <property name="alignment">
-                        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-                      </property>
-                      <property name="wordWrap">
-                        <bool>true</bool>
-                      </property>
-                      <property name="openExternalLinks">
-                        <bool>true</bool>
-                      </property>
-                      <property name="textInteractionFlags">
-                        <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse</set>
-                      </property>
-                    </widget>
-                    <widget class="QWidget" name="layoutWidget">
-                      <property name="geometry">
-                        <rect>
-                          <x>160</x>
-                          <y>210</y>
-                          <width>441</width>
-                          <height>43</height>
-                        </rect>
-                      </property>
-                      <layout class="QHBoxLayout" name="horizontalLayout_150">
-                        <item>
-                          <widget class="QCheckBox" name="checkBox_theporndb_hash">
-                            <property name="sizePolicy">
-                              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                                <horstretch>0</horstretch>
-                                <verstretch>0</verstretch>
-                              </sizepolicy>
-                            </property>
-                            <property name="text">
-                              <string>不使用Hash值匹配数据</string>
-                            </property>
-                          </widget>
-                        </item>
-                        <item>
-                          <widget class="QLabel" name="label_422">
+                        <item row="3" column="1">
+                          <widget class="QLabel" name="label_356">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                                 <horstretch>0</horstretch>
@@ -21641,14 +21574,18 @@
                               <string notr="true">color: rgb(8, 128, 128);</string>
                             </property>
                             <property name="text">
-                              <string>
-                                &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;该网站的Hash值匹配结果可能错误&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a
+                                href=&quot;https://theporndb.net/&quot;&gt;&lt;span style=&quot;
+                                text-decoration: underline;
+                                color:#094fd1;&quot;&gt;https://theporndb.net/&lt;/span&gt;&lt;/a&gt;
+                                注册登录后，点头像 - API Tokens - CREATE。复制生成的 API Token
+                                填入此处。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                             </property>
                             <property name="scaledContents">
                               <bool>true</bool>
                             </property>
                             <property name="alignment">
-                              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
                             </property>
                             <property name="wordWrap">
                               <bool>true</bool>
@@ -21661,8 +21598,57 @@
                             </property>
                           </widget>
                         </item>
-                      </layout>
-                    </widget>
+                        <item row="4" column="1">
+                          <layout class="QHBoxLayout" name="horizontalLayout_150">
+                            <item>
+                              <widget class="QCheckBox" name="checkBox_theporndb_hash">
+                                <property name="sizePolicy">
+                                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                  </sizepolicy>
+                                </property>
+                                <property name="text">
+                                  <string>不使用Hash值匹配数据</string>
+                                </property>
+                              </widget>
+                            </item>
+                            <item>
+                              <widget class="QLabel" name="label_422">
+                                <property name="sizePolicy">
+                                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                  </sizepolicy>
+                                </property>
+                                <property name="styleSheet">
+                                  <string notr="true">color: rgb(8, 128, 128);</string>
+                                </property>
+                                <property name="text">
+                                  <string>
+                                    &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;该网站的Hash值匹配结果可能错误&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                </property>
+                                <property name="scaledContents">
+                                  <bool>true</bool>
+                                </property>
+                                <property name="alignment">
+                                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                                </property>
+                                <property name="wordWrap">
+                                  <bool>true</bool>
+                                </property>
+                                <property name="openExternalLinks">
+                                  <bool>true</bool>
+                                </property>
+                                <property name="textInteractionFlags">
+                                  <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse</set>
+                                </property>
+                              </widget>
+                            </item>
+                          </layout>
+                        </item>
+                       </layout>
+                     </widget>
                   </widget>
                 </widget>
               </widget>
