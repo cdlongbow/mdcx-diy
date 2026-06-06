@@ -59,13 +59,15 @@ def load_config(self: "MyMAinWindow"):
     errors = manager.load()
     v1_msgs = [e for e in errors if e.startswith("[V1]")]
     if v1_msgs:
-        signal_qt.show_log_text(f"\n\t{'\n\t'.join(v1_msgs)}\n\n")
+        joined = "\n\t".join(v1_msgs)
+        signal_qt.show_log_text(f"\n\t{joined}\n\n")
         errors = [e for e in errors if not e.startswith("[V1]")]
     if errors:
+        joined = "\n\t".join(errors)
         signal_qt.show_log_text(
-            f"⚠️ 读取配置文件出错:\n\t{'\n\t'.join(errors)}\n\n"
-            "为避免破坏配置文件, 已自动切换为 _failed.json\n"
-            f'这是非预期错误, 请提交 <a href="{GITHUB_ISSUES_URL}">GitHub Issue</a>\n'
+            f"⚠️ 读取配置文件出错:\n\t{joined}\n\n"
+            "为避免破坏配置文件，已自动切换为 _failed.json\n"
+            f'这是非预期错误，请提交 <a href="{GITHUB_ISSUES_URL}">GitHub Issue</a>\n'
         )
         manager.path = manager.data_folder / "_failed.json"
         return
@@ -893,6 +895,8 @@ def load_config(self: "MyMAinWindow"):
         self.Ui.lineEdit_cf_bypass_url.setText(manager.config.cf_bypass_url)
         # Cloudflare bypass 独立代理地址
         self.Ui.lineEdit_cf_bypass_proxy.setText(manager.config.cf_bypass_proxy)
+        # 不使用代理的网站
+        self.Ui.lineEdit_no_proxy_sites.setText(manager.config.no_proxy_sites)
         # 超时时间
         self.Ui.horizontalSlider_timeout.setValue(int(manager.config.timeout))
         self.Ui.lcdNumber_timeout.display(int(manager.config.timeout))

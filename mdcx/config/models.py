@@ -610,6 +610,7 @@ class Config(BaseModel):
     # region: Network Settings
     use_proxy: bool = Field(default=False, title="代理类型")
     proxy: str = Field(default="http://127.0.0.1:7890", title="代理地址")
+    no_proxy_sites: str = Field(default="api.tmdb.org", title="不使用代理网站")
     cf_bypass_url: str = Field(default="", title="Cloudflare Bypass地址")
     cf_bypass_proxy: str = Field(default="", title="Cloudflare Bypass代理地址")
     timeout: int = Field(default=10, title="超时")

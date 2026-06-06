@@ -1415,7 +1415,7 @@ class MyMAinWindow(QMainWindow):
         box = QMessageBox(QMessageBox.Icon.Warning, f"{action_name}结果", f"{action_name}完成")
         box.setInformativeText(
             f"{self._build_action_result_text(success_count, len(failure_details), skipped_count)}\n\n"
-            f"{'\n'.join(preview_lines)}"
+            f"{str(chr(10)).join(preview_lines)}"
         )
         box.setDetailedText(detail_text)
         view_log_button = box.addButton("查看日志", QMessageBox.ButtonRole.ActionRole)
@@ -2890,6 +2890,24 @@ class MyMAinWindow(QMainWindow):
         self.Ui.lineEdit_site_custom_url.setText(manager.config.get_site_url(site))
 
     # 切换配置
+
+    # 设置 - 网络 - 不使用代理 - 添加网站
+    def _add_no_proxy_site(self, site_value: str):
+        """当用户从下拉框选择网站时，添加到输入框"""
+        if not site_value or site_value == "选择网站...":
+            return
+        # 重置下拉框到默认值
+        self.Ui.comboBox_no_proxy_sites.setCurrentIndex(0)
+        # 获取当前输入
+        current = self.Ui.lineEdit_no_proxy_sites.text().strip()
+        # 分割现有值
+        existing_sites = [s.strip() for s in current.split(",") if s.strip()]
+        # 添加新网站（如果不存在）
+        if site_value not in existing_sites:
+            existing_sites.append(site_value)
+            # 更新输入框
+            self.Ui.lineEdit_no_proxy_sites.setText(",".join(existing_sites))
+
     def config_file_change(self, new_config_file: str):
         if new_config_file != manager.file:
             new_config_path = manager.data_folder / new_config_file
