@@ -8,16 +8,48 @@
 """
 
 import asyncio
+import json
 from pathlib import Path
+from typing import Any
 
 from ..config.manager import manager
 from ..config.resources import resources
 from ..log import LogBuffer
 from ..utils import norm_name
-from .web import AsyncWebClient
 
 
-def is_japan_place(place: str) -> bool:
+# ============= HTTP 适配器 =============
+
+class _TmdbResponse:
+    """Unified response wrapper for TMDB API calls."""
+
+    def __init__(self, status_code: int, text: str):
+        self.status_code = status_code
+        self._text = text
+
+    def json(self) -> dict[str, Any]:
+        return json.loads(self._text)
+
+
+async def _tmdb_request(client: Any, method: str, url: str, **kwargs) -> _TmdbResponse | None:
+    """
+    Unified HTTP request for both curl_cffi AsyncWebClient and aiohttp ClientSession.
+    Returns _TmdbResponse or None on failure.
+    """
+    params = kwargs.get("params")
+    if hasattr(client, "request"):
+        resp, err = await client.request(method, url, params=params)
+        if resp is None:
+            return None
+        return _TmdbResponse(resp.status, resp.text)
+    elif hasattr(client, method.lower()):
+        send = getattr(client, method.lower())
+        resp = await send(url, params=params, allow_redirects=kwargs.get("follow_redirects", True))
+        return _TmdbResponse(resp.status, await resp.text())
+    return None
+
+
+# ============= 演员数据库 xlsx 管理 =============
     if not place:
         return False
     p = place.lower()
@@ -99,7 +131,7 @@ def is_japan_place(place: str) -> bool:
         "日野",
         "多摩",
         "青梅",
-        # 常见日语地名后缀
+        # 常见日语地名后缀（仅当长度>=3时匹配，避免单字误匹配中文）
         "都",
         "道",
         "府",
@@ -109,7 +141,15 @@ def is_japan_place(place: str) -> bool:
         "村",
         "区",
     ]
-    return any(kw in p for kw in japan_keywords)
+    # 排除明显非日本籍（中国地址中 "都" 常见于 "广东/成都"）
+    if "中国" in p or "china" in p:
+        return False
+    for kw in japan_keywords:
+        if len(kw) >= 2 and kw in p:
+            return True
+        if len(kw) == 1 and len(p) >= 3 and p.endswith(kw):
+            return True
+    return False
 
 
 # ============= 演员数据库 xlsx 管理 =============
@@ -318,24 +358,24 @@ def search_actor_db_reverse(query_name: str) -> dict | None:
     # 精确匹配
     for jp, data in actor_db.items():
         # 匹配日文原名
-        if target == _norm_name_set([jp]):
+        if target in _norm_name_set([jp]):
             data_copy = dict(data)
             data_copy["jp"] = jp
             return data_copy
         # 匹配中文名
-        if data.get("zh_cn") and target == _norm_name_set([data["zh_cn"]]):
+        if data.get("zh_cn") and target in _norm_name_set([data["zh_cn"]]):
             data_copy = dict(data)
             data_copy["jp"] = jp
             return data_copy
         # 匹配繁体名
-        if data.get("zh_tw") and target == _norm_name_set([data["zh_tw"]]):
+        if data.get("zh_tw") and target in _norm_name_set([data["zh_tw"]]):
             data_copy = dict(data)
             data_copy["jp"] = jp
             return data_copy
         # 匹配别名
         if data.get("keyword"):
             for kw in data["keyword"].split(","):
-                if kw.strip() and target == _norm_name_set([kw.strip()]):
+                if kw.strip() and target in _norm_name_set([kw.strip()]):
                     data_copy = dict(data)
                     data_copy["jp"] = jp
                     return data_copy
@@ -561,23 +601,20 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: AsyncWebClient) -> dic
         await asyncio.sleep(0.5)
 
     # 查询完成后重新加载演员数据库
+    old_db = dict(resources.actor_db) if resources.actor_db else {}
     resources.reload_actor_db()
 
-    matched = len(result) - len(
-        [
-            a
-            for a in actors
-            if a.strip() in (resources.actor_db or {}) and (resources.actor_db or {})[a.strip()].get("tmdbid")
-        ]
+    cached_before = len(
+        [a for a in actors if a.strip() in old_db and old_db[a.strip()].get("tmdbid")]
     )
     LogBuffer.log().write(
         f" 🎬 [TMDB] 查询完成: 缓存命中 {len(actors) - len(need_query)} 个, "
-        f"本次匹配 {len(result)} 个, 共 {len(result)} 个"
+        f"本次匹配 {len(result) - cached_before} 个, 共 {len(result)} 个"
     )
     return result
 
 
-async def _query_single_actor(actor_name: str, base_url: str, api_key: str, client: AsyncWebClient) -> dict | None:
+async def _query_single_actor(actor_name: str, base_url: str, api_key: str, client: Any) -> dict | None:
     """
     查询单个演员的 TMDB 信息。
     返回: {"pid": int, "translations": {"zh_cn": str, "zh_tw": str}, "also_known_as": list} 或 None
@@ -585,22 +622,21 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
     search_url = f"{base_url}/3/search/person"
     target = norm_name(actor_name)
 
-    resp = await client.get(
-        search_url,
-        params={
-            "api_key": api_key,
-            "query": actor_name,
-            "include_adult": "true",
-            "language": "zh-CN",
-            "page": 1,
-        },
-        follow_redirects=True,
-    )
+    resp = await _tmdb_request(client, "GET", search_url, params={
+        "api_key": api_key,
+        "query": actor_name,
+        "include_adult": "true",
+        "language": "zh-CN",
+        "page": 1,
+    })
 
     if resp.status_code != 200:
         return None
 
-    data = resp.json()
+    try:
+        data = resp.json()
+    except (json.JSONDecodeError, ValueError):
+        return None
     results = data.get("results", [])
 
     if not results:
@@ -618,16 +654,15 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
             continue
 
         detail_url = f"{base_url}/3/person/{pid}"
-        detail_resp = await client.get(
-            detail_url,
-            params={"api_key": api_key, "language": "zh-CN"},
-            follow_redirects=True,
-        )
+        detail_resp = await _tmdb_request(client, "GET", detail_url, params={"api_key": api_key, "language": "zh-CN"})
 
         if detail_resp.status_code != 200:
             continue
 
-        detail = detail_resp.json()
+        try:
+            detail = detail_resp.json()
+        except (json.JSONDecodeError, ValueError):
+            continue
         place = detail.get("place_of_birth", "")
 
         if not is_japan_place(place):
@@ -645,7 +680,8 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
         all_norm = {norm_name(n) for n in all_names if n}
         is_match = target in all_norm
 
-        popularity = float(item.get("popularity", 0))
+        _pop = item.get("popularity", 0) or 0
+        popularity = float(_pop) if isinstance(_pop, (int, float, str)) else 0.0
         known_for_count = len(detail.get("known_for", [])) if "known_for" in detail else 0
         place_has_japan = "japan" in place.lower() or "日本" in place
 
@@ -685,7 +721,7 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
     return matched[0]
 
 
-async def _fetch_person_translations(pid: int, base_url: str, api_key: str, client: AsyncWebClient) -> dict:
+async def _fetch_person_translations(pid: int, base_url: str, api_key: str, client: Any) -> dict:
     """
     从 TMDB translations API 获取演员的多语言翻译。
     返回: {"zh_cn": str, "zh_tw": str}
@@ -693,15 +729,14 @@ async def _fetch_person_translations(pid: int, base_url: str, api_key: str, clie
     result = {"zh_cn": "", "zh_tw": ""}
     try:
         trans_url = f"{base_url}/3/person/{pid}/translations"
-        trans_resp = await client.get(
-            trans_url,
-            params={"api_key": api_key},
-            follow_redirects=True,
-        )
+        trans_resp = await _tmdb_request(client, "GET", trans_url, params={"api_key": api_key})
         if trans_resp.status_code != 200:
             return result
 
-        trans_data = trans_resp.json()
+        try:
+            trans_data = trans_resp.json()
+        except (json.JSONDecodeError, ValueError):
+            return result
         for trans in trans_data.get("translations", []):
             iso = trans.get("iso_639_1", "")
             en_name = trans.get("english_name", "")
@@ -757,7 +792,11 @@ async def migrate_info_xml_to_xlsx() -> bool:
         xml_data = etree.HTML(content.encode("utf-8"), parser)
         info_objects = xml_data.xpath("//a")
 
-        import openpyxl
+        try:
+            import openpyxl
+        except ImportError:
+            LogBuffer.log().write("  ⚠️ [信息映射表] 缺少 openpyxl 库，无法迁移")
+            return False
 
         wb = openpyxl.Workbook()
         ws = wb.active
@@ -798,29 +837,3 @@ async def migrate_info_xml_to_xlsx() -> bool:
     except Exception as e:
         LogBuffer.log().write(f"  ⚠️ [信息映射表] 迁移失败: {e}")
         return False
-
-        trans_data = trans_resp.json()
-        for trans in trans_data.get("translations", []):
-            iso = trans.get("iso_639_1", "")
-            en_name = trans.get("english_name", "")
-            data = trans.get("data", {})
-            native_name = data.get("name", "")
-
-            # zh-CN: iso_639_1="zh" 或 en_name 包含中文
-            if iso == "zh":
-                # 区分简繁
-                name_to_use = native_name or en_name
-                if name_to_use:
-                    # 简单判断：如果包含繁体字倾向 zh_tw，否则 zh_cn
-                    # 更可靠的方式是看 translations 里是否区分了 zh-CN 和 zh-TW
-                    result["zh_cn"] = name_to_use
-                    result["zh_tw"] = name_to_use
-            # 有些翻译可能用不同方式标识
-            elif iso == "zh-CN":
-                result["zh_cn"] = data.get("name") or en_name or ""
-            elif iso == "zh-TW":
-                result["zh_tw"] = data.get("name") or en_name or ""
-    except Exception:
-        pass
-
-    return result
