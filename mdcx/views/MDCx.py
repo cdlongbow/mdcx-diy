@@ -9173,7 +9173,7 @@ class Ui_MDCx(object):
         sizePolicy.setHeightForWidth(self.lineEdit_tmdb_api_base.sizePolicy().hasHeightForWidth())
         self.lineEdit_tmdb_api_base.setSizePolicy(sizePolicy)
         self.lineEdit_tmdb_api_base.setMinimumSize(QtCore.QSize(300, 30))
-        self.lineEdit_tmdb_api_base.setStyleSheet(" font: "Courier";\n"
+        self.lineEdit_tmdb_api_base.setStyleSheet(" font: \"Courier\";\n"
 "                                border: 1px solid rgba(0,0,0, 50);\n"
 "                                border-radius: 15px;\n"
 "")
@@ -9197,7 +9197,7 @@ class Ui_MDCx(object):
         sizePolicy.setHeightForWidth(self.lineEdit_tmdb_api_key.sizePolicy().hasHeightForWidth())
         self.lineEdit_tmdb_api_key.setSizePolicy(sizePolicy)
         self.lineEdit_tmdb_api_key.setMinimumSize(QtCore.QSize(300, 30))
-        self.lineEdit_tmdb_api_key.setStyleSheet(" font: "Courier";\n"
+        self.lineEdit_tmdb_api_key.setStyleSheet(" font: \"Courier\";\n"
 "                                border: 1px solid rgba(0,0,0, 50);\n"
 "                                border-radius: 15px;\n"
 "")
