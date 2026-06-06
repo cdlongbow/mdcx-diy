@@ -1,3 +1,4 @@
+import html
 import re
 from typing import TypedDict, Unpack
 
@@ -61,17 +62,12 @@ def extract_all_texts(html: Selector, *selector: SelectorType) -> list[str]:
 
 def clean_string(text: str | None) -> str:
     """
-    通过删除首尾空格和常见的 HTML 实体来清理字符串.
-
-    Args:
-        text (str | None): 输入字符串.
-
-    Returns:
-        str: 清理后的字符串.
+    通过删除首尾空格、转义 HTML 实体和清理常见空白字符来清理字符串.
     """
     if not text:
         return ""
-    return text.strip().replace("\n", "").replace("\r", "").replace("&nbsp;", " ")
+    text = html.unescape(text).strip()
+    return text.replace("\n", "").replace("\r", "").replace("\xa0", " ").replace("\u3000", " ")
 
 
 def re_findall(pattern: str, text: str, flags: int = 0) -> list[tuple[str, ...]]:

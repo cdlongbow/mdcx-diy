@@ -9,7 +9,7 @@ from parsel import Selector
 from ..base.web import get_imgsize
 from ..config.models import Website
 from ..models.types import CrawlerInput
-from .base import Context, CralwerException, CrawlerData, GenericBaseCrawler
+from .base import Context, CrawlerException, CrawlerData, GenericBaseCrawler
 
 
 def get_web_number(html, number):
@@ -123,7 +123,7 @@ class FantasticaCrawler(GenericBaseCrawler[FantasticaContext]):
         search_page = etree.fromstring(html.get(), etree.HTMLParser())
         detail_url, poster = get_real_url(search_page, ctx.input.number)
         if not detail_url:
-            raise CralwerException("搜索结果: 未匹配到番号")
+            raise CrawlerException("搜索结果: 未匹配到番号")
         ctx.search_poster = poster
         return [detail_url]
 
@@ -132,7 +132,7 @@ class FantasticaCrawler(GenericBaseCrawler[FantasticaContext]):
         html_info = etree.fromstring(html.get(), etree.HTMLParser())
         title = get_title(html_info)
         if not title:
-            raise CralwerException("数据获取失败: 未获取到 title")
+            raise CrawlerException("数据获取失败: 未获取到 title")
 
         actor = get_actor(html_info)
         release = get_release(html_info)

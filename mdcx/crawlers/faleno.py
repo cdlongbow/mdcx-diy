@@ -11,7 +11,7 @@ from ..config.models import Website
 from ..models.types import CrawlerInput
 from .base import (
     Context,
-    CralwerException,
+    CrawlerException,
     CrawlerData,
     DetailPageParser,
     GenericBaseCrawler,
@@ -307,7 +307,7 @@ class FalenoCrawler(GenericBaseCrawler[FalenoContext]):
     async def _parse_detail_page(self, ctx: FalenoContext, html: Selector, detail_url: str) -> CrawlerData | None:
         data = await self.parser.parse(ctx, html, external_id=detail_url)
         if not data.title:
-            raise CralwerException("数据获取失败: 番号标题不存在")
+            raise CrawlerException("数据获取失败: 番号标题不存在")
         if search_poster := ctx.search_posters.get(detail_url):
             data.poster = search_poster
         return data

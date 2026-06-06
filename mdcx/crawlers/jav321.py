@@ -13,7 +13,7 @@ from ..config.enums import DownloadableFile
 from ..config.manager import manager
 from ..config.models import Website
 from ..models.types import CrawlerResult
-from .base import BaseCrawler, CralwerException, CrawlerData
+from .base import BaseCrawler, CrawlerException, CrawlerData
 
 type ImageLogFn = Callable[[str], None] | None
 
@@ -441,9 +441,9 @@ class Jav321Crawler(BaseCrawler):
 
         response, error = await self.async_client.post_text(result_url, data={"sn": ctx.input.number})
         if response is None:
-            raise CralwerException(f"网络请求错误: {error}")
+            raise CrawlerException(f"网络请求错误: {error}")
         if "AVが見つかりませんでした" in response:
-            raise CralwerException("搜索结果: 未匹配到番号")
+            raise CrawlerException("搜索结果: 未匹配到番号")
 
         detail_page = etree.fromstring(response, etree.HTMLParser())
         detail_url = self._extract_website(detail_page, fallback=result_url)
@@ -466,7 +466,7 @@ class Jav321Crawler(BaseCrawler):
         actor = getActor(response)
         title = getTitle(response).strip()
         if not title:
-            raise CralwerException("数据获取失败: 未获取到标题")
+            raise CrawlerException("数据获取失败: 未获取到标题")
 
         cover_url = getCover(detail_page)
         poster_url = getCoverSmall(detail_page)

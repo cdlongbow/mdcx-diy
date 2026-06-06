@@ -11,7 +11,7 @@ from mdcx.config.models import Website
 from mdcx.models.types import CrawlerResult
 from mdcx.signals import signal
 
-from .base import CralwerException, CrawlerData
+from .base import CrawlerException, CrawlerData
 from .dmm_new import DMMContext, DmmCrawler
 
 
@@ -84,7 +84,7 @@ class JavdbApiCrawler(DmmCrawler):
     async def _run(self, ctx: DMMContext) -> CrawlerResult:
         number = ctx.input.number.strip()
         if not number:
-            raise CralwerException("番号为空")
+            raise CrawlerException("番号为空")
 
         api_url = self._api_url(number)
         ctx.debug(f"API URL: {api_url}")
@@ -92,18 +92,18 @@ class JavdbApiCrawler(DmmCrawler):
 
         response, error = await self.async_client.get_json(api_url, headers={"Accept": "application/json"})
         if response is None:
-            raise CralwerException(f"API 请求失败: {error}")
+            raise CrawlerException(f"API 请求失败: {error}")
 
         try:
             movie = JavdbApiMovie.model_validate(response)
         except Exception as e:
             ctx.debug(f"API 响应解析失败: {e} {response=}")
-            raise CralwerException("API 响应解析失败") from e
+            raise CrawlerException("API 响应解析失败") from e
 
         data = self._to_crawler_data(movie, fallback_number=number)
         if not data.title and not data.thumb:
             ctx.debug(f"API 返回空内容: {response=}")
-            raise CralwerException("API 返回空内容")
+            raise CrawlerException("API 返回空内容")
 
         if data.external_id:
             ctx.debug_info.detail_urls = [str(data.external_id)]

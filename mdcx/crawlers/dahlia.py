@@ -7,7 +7,7 @@ from lxml import etree
 from parsel import Selector
 
 from ..config.models import Website
-from .base import BaseCrawler, CralwerException, CrawlerData
+from .base import BaseCrawler, CrawlerException, CrawlerData
 
 
 def get_title(html):
@@ -109,7 +109,7 @@ class DahliaCrawler(BaseCrawler):
         html_detail = etree.fromstring(html.get(), etree.HTMLParser())
         title = get_title(html_detail)
         if not title:
-            raise CralwerException("数据获取失败: 番号标题不存在")
+            raise CrawlerException("数据获取失败: 番号标题不存在")
 
         actor = get_actor(html_detail)
         actors = [item.strip() for item in actor.split(",") if item.strip()]

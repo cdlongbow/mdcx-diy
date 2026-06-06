@@ -8,7 +8,7 @@ from lxml import etree
 from ..config.enums import Language, Website
 from ..config.manager import manager
 from ..gen.field_enums import CrawlerResultFields
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 
 
 def get_real_url(html, number, domain_2):
@@ -191,26 +191,26 @@ class JavlibraryCrawler(BaseCrawler):
             ctx.debug_info.search_urls = [*(ctx.debug_info.search_urls or []), search_url]
             html_search, error = await self.async_client.get_text(search_url, use_proxy=self.use_proxy)
             if html_search is None:
-                raise CralwerException(f"请求错误: {error}")
+                raise CrawlerException(f"请求错误: {error}")
             if "Cloudflare" in html_search:
-                raise CralwerException("搜索结果: 被 Cloudflare 5 秒盾拦截！")
+                raise CrawlerException("搜索结果: 被 Cloudflare 5 秒盾拦截！")
             html = etree.fromstring(html_search, etree.HTMLParser())
             real_url = get_real_url(html, number, domain_2)
             if not real_url:
-                raise CralwerException("搜索结果: 未匹配到番号！")
+                raise CrawlerException("搜索结果: 未匹配到番号！")
 
         ctx.debug(f"番号地址[{language.value}]: {real_url}")
         ctx.debug_info.detail_urls = [*(ctx.debug_info.detail_urls or []), real_url]
         html_info, error = await self.async_client.get_text(real_url, use_proxy=self.use_proxy)
         if html_info is None:
-            raise CralwerException(f"请求错误: {error}")
+            raise CrawlerException(f"请求错误: {error}")
         if "Cloudflare" in html_info:
-            raise CralwerException("搜索结果: 被 Cloudflare 5 秒盾拦截！")
+            raise CrawlerException("搜索结果: 被 Cloudflare 5 秒盾拦截！")
 
         html_detail = etree.fromstring(html_info, etree.HTMLParser())
         title = get_title(html_detail)
         if not title:
-            raise CralwerException("数据获取失败: 未获取到标题！")
+            raise CrawlerException("数据获取失败: 未获取到标题！")
         web_number = get_number(html_detail, number)
         title = title.replace(web_number + " ", "")
         release = get_release(html_detail)

@@ -6,7 +6,7 @@ import urllib.parse
 
 from lxml import etree
 
-from .base import Context, CralwerException, CrawlerData
+from .base import Context, CrawlerException, CrawlerData
 
 
 def get_title(html):
@@ -88,7 +88,7 @@ async def scrape_dl_getchu(client, number: str, appoint_url: str = "", ctx: Cont
 
         html_search, error = await client.get_text(search_url, cookies=cookies, encoding="euc-jp")
         if html_search is None:
-            raise CralwerException(f"网络请求错误: {error}")
+            raise CrawlerException(f"网络请求错误: {error}")
         html = etree.fromstring(html_search, etree.HTMLParser())
         res_list = html.xpath("//table/tr/td[@valign='top' and not (@align)]/div/a")
         for each in res_list:
@@ -98,19 +98,19 @@ async def scrape_dl_getchu(client, number: str, appoint_url: str = "", ctx: Cont
                 real_url = temp_url
                 break
         else:
-            raise CralwerException("搜索结果: 未匹配到番号！")
+            raise CrawlerException("搜索结果: 未匹配到番号！")
 
     if ctx:
         ctx.debug(f"DL Getchu 番号地址: {real_url}")
         ctx.debug_info.detail_urls.append(real_url)
     html_content, error = await client.get_text(real_url, cookies=cookies, encoding="euc-jp")
     if html_content is None:
-        raise CralwerException(f"网络请求错误: {error}")
+        raise CrawlerException(f"网络请求错误: {error}")
     html_info = etree.fromstring(html_content, etree.HTMLParser())
     number = "DLID-" + re.findall(r"\d+", real_url)[0]
     title = get_title(html_info)
     if not title:
-        raise CralwerException("数据获取失败: 未获取到title！")
+        raise CrawlerException("数据获取失败: 未获取到title！")
     release = get_release(html_info)
     cover_url = get_cover(html_info)
     return CrawlerData(

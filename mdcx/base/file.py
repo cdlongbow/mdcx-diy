@@ -238,7 +238,7 @@ def save_remain_list() -> None:
             signal.show_log_text(f"save remain list error: {str(e)}\n {traceback.format_exc()}")
 
 
-async def _clean_empty_fodlers(path: Path, file_mode: FileMode) -> None:
+async def _clean_empty_folders(path: Path, file_mode: FileMode) -> None:
     start_time = time.time()
     if not manager.config.del_empty_folder or file_mode == FileMode.Again:
         return
@@ -321,7 +321,7 @@ async def check_and_clean_files() -> None:
     signal.show_log_text(f" 🍀 Clean done!({get_used_time(start_time)}s)")
     signal.show_log_text("================================================================================")
     for movie_path in movie_paths:
-        await _clean_empty_fodlers(movie_path, FileMode.Default)
+        await _clean_empty_folders(movie_path, FileMode.Default)
     signal.set_label_file_path.emit("🗑 清理完成！")
     signal.show_log_text(
         f" 🎉🎉🎉 All finished!!!({get_used_time(start_time)}s) Total {total} , Success {succ} , Failed {fail} "

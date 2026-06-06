@@ -7,7 +7,7 @@ from parsel import Selector
 
 from ..config.models import Website
 from ..number import is_uncensored
-from .base import BaseCrawler, CralwerException, CrawlerData
+from .base import BaseCrawler, CrawlerException, CrawlerData
 from .guochan import get_extra_info
 
 
@@ -186,7 +186,7 @@ class MmtvCrawler(BaseCrawler):
         search_page = etree.fromstring(html.get(), etree.HTMLParser())
         detail_url = get_real_url(search_page, ctx.input.number)
         if not detail_url:
-            raise CralwerException("搜索结果: 未匹配到番号")
+            raise CrawlerException("搜索结果: 未匹配到番号")
         return [detail_url]
 
     @override
@@ -196,7 +196,7 @@ class MmtvCrawler(BaseCrawler):
         number, release, runtime, web_number = get_number(html_info, ctx.input.number)
         title = get_title(html_info, web_number)
         if not title:
-            raise CralwerException("数据获取失败: 未获取到title")
+            raise CrawlerException("数据获取失败: 未获取到title")
 
         actor = get_actor(html_info, title, str(ctx.input.file_path or ""))
         outline, originalplot = get_outline(html_info)

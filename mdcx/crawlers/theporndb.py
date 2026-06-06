@@ -10,7 +10,7 @@ from ..base.number import remove_escape_string
 from ..config.enums import Switch, Website
 from ..config.manager import manager
 from ..number import long_name
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 
 TheporndbKind = Literal["scenes", "movies"]
 
@@ -212,7 +212,7 @@ class TheporndbCrawler(BaseCrawler):
     def _headers(self):
         api_token = manager.config.theporndb_api_token
         if not api_token:
-            raise CralwerException("请添加 API Token 后刮削！（「设置」-「网络」-「API Token」）")
+            raise CrawlerException("请添加 API Token 后刮削！（「设置」-「网络」-「API Token」）")
         return {
             "Authorization": f"Bearer {api_token}",
             "Content-Type": "application/json",
@@ -233,7 +233,7 @@ class TheporndbCrawler(BaseCrawler):
             except Exception as e:
                 errors.append(f"{kind}: {e}")
                 ctx.debug(f"{kind} 获取失败，尝试下一类型: {e}")
-        raise CralwerException("；".join(errors))
+        raise CrawlerException("；".join(errors))
 
     async def _scrape_kind(self, ctx: Context, kind: TheporndbKind) -> CrawlerData:
         headers = self._headers()
@@ -253,13 +253,13 @@ class TheporndbCrawler(BaseCrawler):
                     hash_search, error = await self.async_client.get_json(hash_url, headers=headers)
                     if hash_search is None:
                         if "HTTP 401" in str(error):
-                            raise CralwerException(f"请检查 API Token 是否正确: {manager.config.theporndb_api_token}")
+                            raise CrawlerException(f"请检查 API Token 是否正确: {manager.config.theporndb_api_token}")
                         ctx.debug(f"Hash 请求失败，继续文件名搜索: {error}")
                         hash_search = {}
                     hash_data = hash_search.get("data")
                     if hash_data:
                         return read_data(hash_data, kind)
-                except CralwerException:
+                except CrawlerException:
                     raise
                 except Exception:
                     pass
@@ -274,26 +274,26 @@ class TheporndbCrawler(BaseCrawler):
                 res_search, error = await self.async_client.get_json(last_search_url, headers=headers)
                 if res_search is None:
                     if "HTTP 401" in str(error):
-                        raise CralwerException(f"请检查 API Token 是否正确: {manager.config.theporndb_api_token}")
-                    raise CralwerException(f"请求错误: {error}")
+                        raise CrawlerException(f"请检查 API Token 是否正确: {manager.config.theporndb_api_token}")
+                    raise CrawlerException(f"请求错误: {error}")
 
                 real_url = get_real_url(res_search, file_path, series_ex, date, kind)
                 if real_url:
                     break
             else:
-                raise CralwerException(f"未找到匹配的内容: {last_search_url}")
+                raise CrawlerException(f"未找到匹配的内容: {last_search_url}")
 
         ctx.debug(f"番号地址: {real_url}")
         ctx.debug_info.detail_urls = [*(ctx.debug_info.detail_urls or []), real_url]
         res_real, error = await self.async_client.get_json(real_url, headers=headers)
         if res_real is None:
             if "HTTP 401" in str(error):
-                raise CralwerException(f"请检查 API Token 是否正确: {manager.config.theporndb_api_token}")
-            raise CralwerException(f"请求错误: {error}")
+                raise CrawlerException(f"请检查 API Token 是否正确: {manager.config.theporndb_api_token}")
+            raise CrawlerException(f"请求错误: {error}")
 
         real_data = res_real.get("data")
         if not real_data:
-            raise CralwerException(f"未获取正确数据: {real_url}")
+            raise CrawlerException(f"未获取正确数据: {real_url}")
         return read_data(real_data, kind)
 
     @override

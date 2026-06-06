@@ -8,7 +8,7 @@ from lxml import etree
 from ..config.enums import FieldRule, Website
 from ..config.manager import manager
 from ..signals import signal
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 
 
 def getTitle(html):  # 获取标题
@@ -201,21 +201,21 @@ class Fc2Crawler(BaseCrawler):
 
         html_content, error = await self.async_client.get_text(real_url)
         if html_content is None:
-            raise CralwerException(f"网络请求错误: {error}")
+            raise CrawlerException(f"网络请求错误: {error}")
         html_info = etree.fromstring(html_content, etree.HTMLParser())
 
         if isNotFoundPage(html_info):
-            raise CralwerException("搜索结果: 未匹配到番号！")
+            raise CrawlerException("搜索结果: 未匹配到番号！")
         if not isDetailPage(html_info):
-            raise CralwerException("数据获取失败: 未进入影片详情页！")
+            raise CrawlerException("数据获取失败: 未进入影片详情页！")
 
         title = getTitle(html_info)
         if not title:
-            raise CralwerException("数据获取失败: 未获取到title！")
+            raise CrawlerException("数据获取失败: 未获取到title！")
 
         cover_url, extrafanart = getCover(html_info)
         if "http" not in cover_url:
-            raise CralwerException("数据获取失败: 未获取到cover！")
+            raise CrawlerException("数据获取失败: 未获取到cover！")
 
         tag = getTag(html_info)
         release = getRelease(html_info)

@@ -6,7 +6,7 @@ from lxml import etree
 from parsel import Selector
 
 from ..config.models import Website
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 
 
 def getTitle(html):
@@ -150,7 +150,7 @@ class XcityCrawler(BaseCrawler):
         detail_page = etree.fromstring(html.get(), etree.HTMLParser())
         title = getTitle(detail_page)
         if not title:
-            raise CralwerException("数据获取失败: 未获取到title！")
+            raise CrawlerException("数据获取失败: 未获取到title！")
         web_number = getWebNumber(detail_page, ctx.input.number)
         title = title.replace(f" {web_number}", "").strip()
         actor = getActor(detail_page)

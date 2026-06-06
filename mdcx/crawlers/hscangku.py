@@ -9,7 +9,7 @@ from parsel import Selector
 from ..config.manager import manager
 from ..config.models import Website
 from ..models.types import CrawlerInput
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 from .guochan import get_extra_info, get_number_list
 
 
@@ -87,7 +87,7 @@ class HscangkuCrawler(BaseCrawler):
         ctx.number_candidates = number_list[:1] + filename_list
         base_url = await self._get_redirected_url(self.base_url)
         if not base_url:
-            raise CralwerException("没有正确的 hscangku_url，无法刮削")
+            raise CrawlerException("没有正确的 hscangku_url，无法刮削")
         return [f"{base_url}/vodsearch/-------------.html?wd={each}&submit=" for each in ctx.number_candidates]
 
     @override
@@ -108,7 +108,7 @@ class HscangkuCrawler(BaseCrawler):
         number = ctx.matched_number or ctx.input.number
         number, title, actor, cover_url, tag = get_detail_info(detail_page, detail_url, number, file_path)
         if not title:
-            raise CralwerException("数据获取失败: 未获取到标题")
+            raise CrawlerException("数据获取失败: 未获取到标题")
         actors = [item.strip() for item in actor.split(",") if item.strip()]
         tags = [item.strip() for item in tag.split(",") if item.strip()]
         return CrawlerData(

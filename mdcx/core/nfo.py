@@ -27,7 +27,10 @@ from .tag_priority import prioritize_nfo_tags
 
 def get_external_id_tag_name(site: Website | str) -> str:
     site_name = re.sub(r"^\d+", "", str(site))
-    return f"{site_name or 'site'}id"
+    # 确保 site_name 非空，兜底使用 site 的原始字符串
+    if not site_name:
+        site_name = str(site)
+    return f"{site_name}id"
 
 
 async def write_nfo(file_info: FileInfo, data: CrawlersResult, nfo_file: Path, output_dir: Path, update=False) -> bool:
@@ -262,21 +265,19 @@ async def write_nfo(file_info: FileInfo, data: CrawlersResult, nfo_file: Path, o
                 write_text_element(code, "type", "Actor", indent="    ")
             if actor_tmdb_ids:
                 # 查找原始演员名对应的 tmdbid
-                tmdbid = None
                 # 优先通过 original_actors 建立原名→映射名对照
                 if data.original_actors and len(data.original_actors) == len(data.actors):
                     for i, orig_name in enumerate(data.original_actors):
-                        if i < len(data.actors) and data.actors[i] == actor and data.actor_tmdb_ids.get(orig_name):
-                            tmdbid = data.actor_tmdb_ids[orig_name]
-                            break
+                        if i < len(data.actors) and data.actors[i].strip() == orig_name.strip():
+                            if tmdbid := data.actor_tmdb_ids.get(orig_name):
+                                write_text_element(code, "tmdbid", str(tmdbid), indent="    ")
+                                break
                 # 兼容读取模式：actor_tmdb_ids 的 key 可能是映射名
-                if tmdbid is None:
+                else:
                     for orig_name, tid in actor_tmdb_ids.items():
                         if orig_name in [a.strip() for a in data.actors]:
-                            tmdbid = tid
+                            write_text_element(code, "tmdbid", str(tid), indent="    ")
                             break
-                    if tmdbid:
-                        write_text_element(code, "tmdbid", str(tmdbid), indent="    ")
                 print("  </actor>", file=code)
 
         # 输出导演

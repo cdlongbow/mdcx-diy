@@ -6,7 +6,7 @@ from lxml import etree
 from parsel import Selector
 
 from ..config.models import Website
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 
 
 def getTitle(html):
@@ -191,7 +191,7 @@ class MgstageCrawler(BaseCrawler):
         actors = [item.strip() for item in actor.split(",") if item.strip()]
         title = getTitle(htmlcode).replace("\\n", "").replace("        ", "").strip(",").strip()
         if not title or not number:
-            raise CralwerException("数据获取失败: 未获取到title或番号！")
+            raise CrawlerException("数据获取失败: 未获取到title或番号！")
         cover_url = getCover(htmlcode)
         release = getRelease(htmlcode).strip(",").replace("/", "-")
         tag = getTag(htmlcode).strip(",")

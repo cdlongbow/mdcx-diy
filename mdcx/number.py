@@ -131,8 +131,8 @@ def get_number_letters(number: str) -> str:
         return "CW3D2D"
     if re.search(r"MCB3D[BD]*-\d{2,}", number_upper):
         return "MCB3D"
-    if re.findall(r"(H4610|C0930|H0930)-[A-Z]+\d{4,}", number_upper):
-        return re.findall(r"(H4610|C0930|H0930)-[A-Z]+\d{4,}", number_upper)[0]
+    if matches := re.findall(r"(H4610|C0930|H0930)-[A-Z]+\d{4,}", number_upper):
+        return matches[0]
     result = re.search(r"(\d*[A-Za-z]+)\d*", number)
     return result[1] if result else "未知车牌"
 
@@ -183,8 +183,9 @@ def get_file_number(filepath: str, escape_string_list: list[str]) -> str:
 
     # 提取番号
     if "MYWIFE" in filename and re.search(r"NO\.\d*", filename):  # 提取 mywife No.1111
-        temp_num = re.findall(r"NO\.(\d*)", filename)[0]
-        return f"Mywife No.{temp_num}"
+        temp_nums = re.findall(r"NO\.(\d*)", filename)
+        if temp_nums:
+            return f"Mywife No.{temp_nums[0]}"
 
     elif r := re.search(r"CW3D2D?BD-?\d{2,}", filename):  # 提取番号 CW3D2DBD-11
         file_number = r.group()

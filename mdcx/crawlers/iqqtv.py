@@ -6,7 +6,7 @@ from lxml import etree
 
 from ..config.enums import Website
 from ..config.manager import manager
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 
 _SUPPORTED_LANGUAGES = {"zh_cn", "zh_tw", "jp"}
 _OUTLINE_PREFIX_PATTERN = re.compile(r"^(?:简介|簡介|介绍|介紹|紹介)\s*[:：]?\s*")
@@ -183,26 +183,26 @@ class IqqtvCrawler(BaseCrawler):
             ctx.debug_info.search_urls.append(url_search)
             html_search, error = await self.async_client.get_text(url_search)
             if html_search is None:
-                raise CralwerException(f"网络请求错误: {error}")
+                raise CrawlerException(f"网络请求错误: {error}")
             html = etree.fromstring(html_search, etree.HTMLParser())
             real_url = html.xpath('//a[@class="ga_click"]/@href')
             if real_url:
                 real_url_tmp = get_real_url(html, number)
                 real_url = iqqtv_url + real_url_tmp.replace("/cn/", "").replace("/jp/", "").replace("&cat=19", "")
             else:
-                raise CralwerException("搜索结果: 未匹配到番号！")
+                raise CrawlerException("搜索结果: 未匹配到番号！")
         else:
             real_url = iqqtv_url + re.sub(r".*player", "player", appoint_url)
 
         ctx.debug(f"番号地址: {real_url}")
         html_content, error = await self.async_client.get_text(real_url)
         if html_content is None:
-            raise CralwerException(f"网络请求错误: {error}")
+            raise CrawlerException(f"网络请求错误: {error}")
         html_info = etree.fromstring(html_content, etree.HTMLParser())
 
         title = get_title(html_info)
         if not title:
-            raise CralwerException("数据获取失败: 未获取到title！")
+            raise CrawlerException("数据获取失败: 未获取到title！")
         web_number = getWebNumber(title, number)
         title = title.replace(f" {web_number}", "").strip()
         actor = getActor(html_info)

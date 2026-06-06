@@ -9,7 +9,7 @@ from lxml import etree
 from ..config.enums import Website
 from ..config.manager import manager
 from ..signals import signal
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 
 
 def get_web_number(html):
@@ -96,11 +96,11 @@ def get_series(html):
 async def retry_request(client, real_url):
     html_content, error = await client.get_text(real_url)
     if html_content is None:
-        raise CralwerException(f"网络请求错误: {error}")
+        raise CrawlerException(f"网络请求错误: {error}")
     html_info = etree.fromstring(html_content, etree.HTMLParser())
     title = get_title(html_info)
     if not title:
-        raise CralwerException("数据获取失败: 未获取到title！")
+        raise CrawlerException("数据获取失败: 未获取到title！")
     web_number = get_web_number(html_info)
     for prefix in (f"[{web_number}]", web_number):
         if prefix:
@@ -165,14 +165,14 @@ class AiravCcCrawler(BaseCrawler):
             ctx.debug_info.search_urls = [search_url]
             html_search, error = await self.async_client.get_text(search_url)
             if html_search is None:
-                raise CralwerException(f"网络请求错误: {error}")
+                raise CrawlerException(f"网络请求错误: {error}")
             html = etree.fromstring(html_search, etree.HTMLParser())
             real_urls = html.xpath('//div[@class="col oneVideo"]//a[@href]/@href')
             if not real_urls:
-                raise CralwerException("搜索结果: 未匹配到番号！")
+                raise CrawlerException("搜索结果: 未匹配到番号！")
             real_url = real_urls[0] if len(real_urls) == 1 else get_real_url(html, number)
             if not real_url:
-                raise CralwerException("搜索结果: 未匹配到番号！")
+                raise CrawlerException("搜索结果: 未匹配到番号！")
 
         real_url = urllib.parse.urljoin(airav_url, real_url) if real_url.startswith("/") else real_url
         ctx.debug(f"番号地址: {real_url}")
@@ -187,7 +187,7 @@ class AiravCcCrawler(BaseCrawler):
             debug_info = f"{number} 请求 airav_cc 返回内容存在乱码 �"
             signal.add_log(debug_info)
             ctx.debug(debug_info)
-            raise CralwerException(debug_info)
+            raise CrawlerException(debug_info)
 
         number = get_number(html_info, number)
         release = get_release(html_info)

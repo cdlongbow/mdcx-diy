@@ -9,7 +9,7 @@ from parsel import Selector
 
 from ..config.models import Website
 from ..models.types import CrawlerInput
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 from .guochan import get_extra_info, get_number_list
 
 
@@ -86,7 +86,7 @@ class CableavCrawler(BaseCrawler):
         file_path = str(ctx.input.file_path or "")
         number, title, actor, cover_url, tag = get_detail_info(detail_page, number, file_path)
         if not title:
-            raise CralwerException("数据获取失败: 未获取到标题")
+            raise CrawlerException("数据获取失败: 未获取到标题")
         actors = [item.strip() for item in actor.split(",") if item.strip()]
         tags = [item.strip() for item in tag.split(",") if item.strip()]
         return CrawlerData(

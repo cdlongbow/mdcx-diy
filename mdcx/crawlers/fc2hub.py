@@ -8,7 +8,7 @@ from lxml import etree
 from ..config.enums import FieldRule, Website
 from ..config.manager import manager
 from ..signals import signal
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 
 
 def getTitle(html):  # 获取标题
@@ -133,29 +133,29 @@ class Fc2hubCrawler(BaseCrawler):
             ctx.debug_info.search_urls = [search_url]
             html_search, error = await self.async_client.get_text(search_url)
             if html_search is None:
-                raise CralwerException(f"网络请求错误: {error}")
+                raise CrawlerException(f"网络请求错误: {error}")
             html = etree.fromstring(html_search, etree.HTMLParser())
             real_urls = html.xpath("//link[contains(@href, $number)]/@href", number="id" + number)
             if not real_urls:
-                raise CralwerException("搜索结果: 未匹配到番号！")
+                raise CrawlerException("搜索结果: 未匹配到番号！")
             language_not_jp = ["/tw/", "/ko/", "/en/"]
             for url in real_urls:
                 if all(la not in url for la in language_not_jp):
                     real_url = url
                     break
             if not real_url:
-                raise CralwerException("搜索结果: 未匹配到日文详情页！")
+                raise CrawlerException("搜索结果: 未匹配到日文详情页！")
 
         ctx.debug(f"番号地址: {real_url}")
         ctx.debug_info.detail_urls = [real_url]
         html_content, error = await self.async_client.get_text(real_url)
         if html_content is None:
-            raise CralwerException(f"网络请求错误: {error}")
+            raise CrawlerException(f"网络请求错误: {error}")
         html_info = etree.fromstring(html_content, etree.HTMLParser())
 
         title = getTitle(html_info)
         if not title:
-            raise CralwerException("数据获取失败: 未获取到title！")
+            raise CrawlerException("数据获取失败: 未获取到title！")
         tag = getTag(html_info)
         studio = getStudio(html_info)
         trailer = await getTrailer(self.async_client, html_info, number)

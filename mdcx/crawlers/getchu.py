@@ -10,7 +10,7 @@ from lxml import etree
 
 from ..config.enums import Website
 from . import getchu_dl
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 
 
 def normalize_detail_url(url: str) -> str:
@@ -186,7 +186,7 @@ class GetchuCrawler(BaseCrawler):
 
             html_search, error = await self.async_client.get_text(search_url, encoding="euc-jp")
             if html_search is None:
-                raise CralwerException(f"网络请求错误: {error}")
+                raise CrawlerException(f"网络请求错误: {error}")
             html = etree.fromstring(html_search, etree.HTMLParser())
             url_list = html.xpath("//a[@class='blueb']/@href")
             title_list = html.xpath("//a[@class='blueb']/text()")
@@ -207,7 +207,7 @@ class GetchuCrawler(BaseCrawler):
         ctx.debug_info.detail_urls = [real_url]
         html_content, error = await self.async_client.get_text(real_url, encoding="euc-jp")
         if html_content is None:
-            raise CralwerException(f"网络请求错误: {error}")
+            raise CrawlerException(f"网络请求错误: {error}")
         html_info = etree.fromstring(html_content, etree.HTMLParser())
         continue_url = get_attestation_continue_url(html_info)
         if continue_url:
@@ -216,12 +216,12 @@ class GetchuCrawler(BaseCrawler):
             ctx.debug_info.detail_urls.append(real_url)
             html_content, error = await self.async_client.get_text(real_url, encoding="euc-jp")
             if html_content is None:
-                raise CralwerException(f"网络请求错误: {error}")
+                raise CrawlerException(f"网络请求错误: {error}")
             html_info = etree.fromstring(html_content, etree.HTMLParser())
 
         title = get_title(html_info)
         if not title:
-            raise CralwerException("数据获取失败: 未获取到title！")
+            raise CrawlerException("数据获取失败: 未获取到title！")
         release = get_release(html_info)
         mosaic = "里番" if "18禁" in html_content else "动漫"
         mosaic = get_mosaic(html_info, mosaic)

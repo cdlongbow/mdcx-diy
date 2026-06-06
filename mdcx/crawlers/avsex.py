@@ -9,7 +9,7 @@ from parsel import Selector
 from ..config.manager import manager
 from ..config.models import Website
 from ..models.types import CrawlerInput
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 
 
 def get_web_number(html, number):
@@ -178,7 +178,7 @@ class AvsexCrawler(BaseCrawler):
             ctx.debug_info.detail_urls = [ctx.detail_url]
             data = await self._detail(ctx, [ctx.detail_url])
             if not data:
-                raise CralwerException("获取详情页数据失败")
+                raise CrawlerException("获取详情页数据失败")
             data.source = self.site().value
             return await self.post_process(ctx, data.to_result())
         return await super()._run(ctx)
@@ -202,7 +202,7 @@ class AvsexCrawler(BaseCrawler):
         detail_page = etree.fromstring(html.get(), etree.HTMLParser())
         title = get_title(detail_page)
         if not title:
-            raise CralwerException("数据获取失败: 未获取到title！")
+            raise CrawlerException("数据获取失败: 未获取到title！")
         number = get_web_number(detail_page, ctx.number)
         release = get_release(detail_page)
         studio = get_studio(detail_page).replace("N/A", "")

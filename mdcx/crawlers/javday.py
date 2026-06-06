@@ -9,7 +9,7 @@ from parsel import Selector
 from ..config.manager import manager
 from ..config.models import Website
 from ..models.types import CrawlerInput
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 from .guochan import get_actor_list, get_lable_list, get_number_list
 
 
@@ -174,7 +174,7 @@ class JavdayCrawler(BaseCrawler):
         html_info = etree.fromstring(html.get(), etree.HTMLParser())
         title = get_title(html_info)
         if not title:
-            raise CralwerException("数据获取失败: 未获取到title！")
+            raise CrawlerException("数据获取失败: 未获取到title！")
         series, tag, actor = get_some_info(html_info, title, ctx.file_path_text)
         cover_url = get_cover(html_info, self.base_url)
         studio = get_studio(series, tag, ctx.label_list)

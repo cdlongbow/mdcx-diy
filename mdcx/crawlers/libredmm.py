@@ -7,7 +7,7 @@ from lxml import etree
 from ..base.web import check_url, is_dmm_image_url, normalize_media_url
 from ..config.enums import Website
 from ..config.manager import manager
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 
 
 def is_not_found(html):
@@ -276,7 +276,7 @@ class LibredmmCrawler(BaseCrawler):
         # 如果直接 URL 返回 404，尝试通过搜索查找
         if html_content is None:
             if "404" not in str(error):
-                raise CralwerException(f"网络请求错误: {error}")
+                raise CrawlerException(f"网络请求错误: {error}")
 
             # 直接 URL 不存在，尝试搜索（搜索会重定向到匹配的详情页）
             search_url = f"{self.base_url}/search?q={number}"
@@ -285,7 +285,7 @@ class LibredmmCrawler(BaseCrawler):
 
             html_content, error = await self.async_client.get_text(search_url)
             if html_content is None:
-                raise CralwerException("搜索结果: 未匹配到番号！")
+                raise CrawlerException("搜索结果: 未匹配到番号！")
 
             # 搜索成功重定向到详情页，更新 real_url
             # 注意：搜索重定向后，详情页 URL 不再是直接构造的 URL
@@ -294,13 +294,13 @@ class LibredmmCrawler(BaseCrawler):
 
         # 双重检查：确认不是 404 页面（某些情况下可能返回 200 但内容是 404）
         if is_not_found(html_info):
-            raise CralwerException("搜索结果: 未匹配到番号！")
+            raise CrawlerException("搜索结果: 未匹配到番号！")
 
         # 解析页面数据
         web_number = get_number(html_info)
         title = get_title(html_info)
         if not title:
-            raise CralwerException("数据获取失败: 未获取到 title")
+            raise CrawlerException("数据获取失败: 未获取到 title")
 
         # 使用网页上的番号，若无则使用输入番号
         number = web_number or number

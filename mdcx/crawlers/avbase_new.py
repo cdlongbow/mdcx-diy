@@ -13,7 +13,7 @@ from ..config.enums import DownloadableFile
 from ..config.manager import manager
 from ..config.models import Website
 from ..signals import signal
-from .base import BaseCrawler, CralwerException, CrawlerData
+from .base import BaseCrawler, CrawlerException, CrawlerData
 
 SEARCH_FIRST_RESULT_ID_XPATH = "/html/body/div/div/main/div/div[2]/div[2]/div/div/div[1]/div[1]/div[1]/div"
 
@@ -37,7 +37,7 @@ class AvbaseCrawler(BaseCrawler):
     async def _generate_search_url(self, ctx) -> list[str] | str | None:
         number = ctx.input.number.strip()
         if not number:
-            raise CralwerException("番号为空")
+            raise CrawlerException("番号为空")
         return f"{self.base_url}/works?q={quote(number)}"
 
     @override
@@ -62,16 +62,16 @@ class AvbaseCrawler(BaseCrawler):
     async def _parse_detail_page(self, ctx, html: Selector, detail_url: str) -> CrawlerData | None:
         next_data_text = html.xpath('//script[@id="__NEXT_DATA__"]/text()').get(default="")
         if not next_data_text:
-            raise CralwerException("详情页缺少 __NEXT_DATA__")
+            raise CrawlerException("详情页缺少 __NEXT_DATA__")
 
         try:
             next_data = json.loads(next_data_text)
         except json.JSONDecodeError as error:
-            raise CralwerException(f"__NEXT_DATA__ 解析失败: {error}") from error
+            raise CrawlerException(f"__NEXT_DATA__ 解析失败: {error}") from error
 
         work = ((next_data.get("props") or {}).get("pageProps") or {}).get("work") or {}
         if not work:
-            raise CralwerException("详情页 __NEXT_DATA__ 中缺少 work 数据")
+            raise CrawlerException("详情页 __NEXT_DATA__ 中缺少 work 数据")
 
         products = [product_item for product_item in (work.get("products") or []) if isinstance(product_item, dict)]
         product = self._pick_product(products)

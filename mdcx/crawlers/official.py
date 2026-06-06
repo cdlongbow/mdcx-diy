@@ -7,7 +7,7 @@ from lxml import etree
 from ..config.enums import Website
 from ..config.manager import manager
 from ..number import get_number_letters
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 from .prestige import PrestigeCrawler
 
 DIRECTOR_PLACEHOLDER_CHARS = frozenset("-—－ー―‐~～·•. ")
@@ -122,7 +122,7 @@ class OfficialCrawler(BaseCrawler):
         number = ctx.input.number
         official_url = manager.computed.official_websites.get(get_number_letters(number))
         if not official_url:
-            raise CralwerException("不在官网番号前缀列表中")
+            raise CrawlerException("不在官网番号前缀列表中")
         if official_url == "https://www.prestige-av.com":
             return await PrestigeCrawler(client=self.async_client, base_url=official_url)._run(ctx)
 
@@ -136,23 +136,23 @@ class OfficialCrawler(BaseCrawler):
             ctx.debug_info.search_urls = [search_url]
             html_search, error = await self.async_client.get_text(search_url)
             if html_search is None:
-                raise CralwerException(f"网络请求错误: {error}")
+                raise CrawlerException(f"网络请求错误: {error}")
 
             html = etree.fromstring(html_search, etree.HTMLParser())
             real_url, poster = get_real_url(html, number)
             if not real_url:
-                raise CralwerException("搜索结果: 未匹配到番号！")
+                raise CrawlerException("搜索结果: 未匹配到番号！")
 
         ctx.debug(f"番号地址: {real_url}")
         ctx.debug_info.detail_urls = [real_url]
         html_content, error = await self.async_client.get_text(real_url)
         if html_content is None:
-            raise CralwerException(f"网络请求错误: {error}")
+            raise CrawlerException(f"网络请求错误: {error}")
 
         html_info = etree.fromstring(html_content, etree.HTMLParser())
         title = get_title(html_info)
         if not title:
-            raise CralwerException("数据获取失败: 未获取到title！")
+            raise CrawlerException("数据获取失败: 未获取到title！")
         cover_url, extrafanart = get_cover(html_info)
         outline = get_outline(html_info)
         actor = get_actor(html_info)

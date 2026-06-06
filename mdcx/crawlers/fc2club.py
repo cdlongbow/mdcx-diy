@@ -6,7 +6,7 @@ from lxml import etree
 
 from ..config.manager import manager
 from ..config.models import Website
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 
 
 def getTitle(html, number):  # 获取标题
@@ -110,12 +110,12 @@ class Fc2clubCrawler(BaseCrawler):
 
         html_content, error = await self.async_client.get_text(real_url)
         if html_content is None:
-            raise CralwerException(f"网络请求错误: {error}")
+            raise CrawlerException(f"网络请求错误: {error}")
         html_info = etree.fromstring(html_content, etree.HTMLParser())
 
         title = getTitle(html_info, number)
         if not title:
-            raise CralwerException("数据获取失败: 未获取到title！")
+            raise CrawlerException("数据获取失败: 未获取到title！")
 
         cover_url, extrafanart = getCover(html_info)
         tag = getTag(html_info)

@@ -7,7 +7,7 @@ from parsel import Selector
 from ..config.models import Website
 from ..number import get_file_number, is_uncensored, normalize_uncensored_digit_number
 from ..signals import signal
-from .base import BaseCrawler, CralwerException, CrawlerData, DetailPageParser, extract_all_texts, extract_text
+from .base import BaseCrawler, CrawlerException, CrawlerData, DetailPageParser, extract_all_texts, extract_text
 
 
 class Parser(DetailPageParser):
@@ -539,7 +539,7 @@ class MissavCrawler(BaseCrawler):
     async def _generate_search_url(self, ctx) -> list[str] | str | None:
         number = ctx.input.number.strip()
         if not number:
-            raise CralwerException("番号为空")
+            raise CrawlerException("番号为空")
 
         if self._should_use_uncensored_search(number, ctx.input.mosaic):
             search_url = self._build_search_url(number)
@@ -583,7 +583,7 @@ class MissavCrawler(BaseCrawler):
     @override
     async def _parse_detail_page(self, ctx, html: Selector, detail_url: str) -> CrawlerData | None:
         if self._is_soft_404_page(html):
-            raise CralwerException(f"MissAV 详情页不存在或已下架: {detail_url}")
+            raise CrawlerException(f"MissAV 详情页不存在或已下架: {detail_url}")
 
         canonical_url = extract_text(html, "//meta[@property='og:url']/@content")
         final_detail_url = canonical_url or detail_url
@@ -594,7 +594,7 @@ class MissavCrawler(BaseCrawler):
         data_code = self._code_from_value(data.number)
         target_code = canonical_code or data_code
         if input_code and target_code and input_code != target_code:
-            raise CralwerException(
+            raise CrawlerException(
                 f"直达跳转结果与输入番号不一致: input={ctx.input.number}, target={data.number or self._extract_slug(final_detail_url)}"
             )
 
@@ -606,7 +606,7 @@ class MissavCrawler(BaseCrawler):
             expected_keyword = self._normalize_uncensored_keyword(ctx.input.number)
             detail_slug = self._extract_slug(final_detail_url).lower().replace("_", "-")
             if expected_keyword and expected_keyword not in detail_slug:
-                raise CralwerException(f"无码搜索详情页校验失败: input={ctx.input.number}, detail={final_detail_url}")
+                raise CrawlerException(f"无码搜索详情页校验失败: input={ctx.input.number}, detail={final_detail_url}")
 
         if data.number:
             data.external_id = data.number

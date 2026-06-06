@@ -7,7 +7,7 @@ from parsel import Selector
 
 from ..config.models import Website
 from ..models.types import CrawlerInput
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 
 
 def get_web_number(html, number):
@@ -160,7 +160,7 @@ class Love6Crawler(BaseCrawler):
         actors = [item.strip() for item in actor.split(",") if item.strip()]
         title = get_title(html_info, ctx.search_title, number, actors)
         if not title:
-            raise CralwerException("数据获取失败: 未获取到标题")
+            raise CrawlerException("数据获取失败: 未获取到标题")
         tag = get_tag(html_info)
         release = get_release(html_info)
         return CrawlerData(

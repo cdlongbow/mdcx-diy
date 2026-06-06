@@ -3,7 +3,7 @@ import re
 from typing import override
 
 from ..config.models import Website
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 
 
 def get_actor(page_data):
@@ -80,21 +80,21 @@ class PrestigeCrawler(BaseCrawler):
             ctx.debug_info.search_urls = [search_url]
             html_search, error = await self.async_client.get_json(search_url)
             if html_search is None:
-                raise CralwerException(f"网络请求错误: {error}")
+                raise CrawlerException(f"网络请求错误: {error}")
             real_url = get_real_url(html_search, ctx.input.number)
             if not real_url:
-                raise CralwerException("搜索结果: 未匹配到番号！")
+                raise CrawlerException("搜索结果: 未匹配到番号！")
 
         detail_url = real_url.replace("api/product", "goods")
         ctx.debug(f"番号地址: {detail_url}")
         ctx.debug_info.detail_urls = [detail_url]
         page_data, error = await self.async_client.get_json(real_url)
         if page_data is None:
-            raise CralwerException(f"网络请求错误: {error}")
+            raise CrawlerException(f"网络请求错误: {error}")
 
         title = page_data["title"].replace("【配信専用】", "")
         if not title:
-            raise CralwerException("数据获取失败: 未获取到 title！")
+            raise CrawlerException("数据获取失败: 未获取到 title！")
         release = ""
         try:
             release = page_data["sku"][0]["salesStartAt"][:10]

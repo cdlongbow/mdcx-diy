@@ -1,4 +1,5 @@
 import os
+import os
 import re
 import shutil
 import traceback
@@ -189,8 +190,10 @@ async def move_movie(other: OtherInfo, file_info: FileInfo, file_path: Path, fil
             if file_info.cd_part:
                 temp_folder, temp_file = split_path(str(file_new_path))
                 if temp_file not in await aiofiles.os.listdir(temp_folder):
-                    await move_file_async(str(file_path), str(file_new_path) + ".MDCx.tmp")
-                    await move_file_async(str(file_new_path) + ".MDCx.tmp", str(file_new_path))
+                    tmp_path = str(file_new_path) + ".MDCx.tmp"
+                    await move_file_async(str(file_path), tmp_path)
+                    # 使用 aiofiles.os.rename 实现原子替换（同文件系统内）
+                    await asyncio.to_thread(os.rename, tmp_path, str(file_new_path))
             LogBuffer.log().write(f"\n 🍀 Movie done! \n 🙉 [Movie] {file_new_path}")
             file_info.file_path = file_new_path
             return True

@@ -111,6 +111,20 @@ class _Flags:
         self.json_data_dic = {}
         self.img_path = ""
         self.stop_requested = False
+        self.stop_other = True
+        self.scrape_start_time = 0.0
+        self.success_list = set()
+        self.next_start_time = 0.0
+        self.total_kills = 0
+        self.now_kill = 0
+        self.success_save_time = 0.0
+        self.rest_time_convert = 0
+        self.rest_time_convert_ = 0
+        self.rest_next_begin_time = 0.0
+        self.single_file_path = Path()
+        self.actor_numbers_dic = {}
+        self.local_number_set = set()
+        self.local_number_cnword_set = set()
 
 
 Flags = _Flags()

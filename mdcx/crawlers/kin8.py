@@ -6,7 +6,7 @@ from lxml import etree
 from parsel import Selector
 
 from ..config.models import Website
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 
 seesaawiki_request_fail_flag = False
 
@@ -140,18 +140,18 @@ class Kin8Crawler(BaseCrawler):
             key = re.findall(r"KIN8(TENGOKU)?-?(\d{3,})", number.upper())
             key = key[0][1] if key else ""
             if not key:
-                raise CralwerException(f"番号中未识别到 KIN8 番号: {number}")
+                raise CrawlerException(f"番号中未识别到 KIN8 番号: {number}")
             number = f"KIN8-{key}"
             detail_url = f"{self.base_url}/moviepages/{key}/index.html"
 
         ctx.debug_info.detail_urls = [detail_url]
         html_content, error = await self.async_client.get_text(detail_url)
         if html_content is None:
-            raise CralwerException(f"网络请求错误: {error}")
+            raise CrawlerException(f"网络请求错误: {error}")
 
         data = await self._parse_detail_page(ctx, Selector(text=html_content), detail_url)
         if not data:
-            raise CralwerException("获取详情页数据失败")
+            raise CrawlerException("获取详情页数据失败")
         data.number = number
         data.source = self.site().value
         return await self.post_process(ctx, data.to_result())
@@ -169,7 +169,7 @@ class Kin8Crawler(BaseCrawler):
         html_info = etree.fromstring(html.get(), etree.HTMLParser())
         title = get_title(html_info)
         if not title:
-            raise CralwerException("数据获取失败: 未获取到title！")
+            raise CrawlerException("数据获取失败: 未获取到title！")
         actor = get_actor(html_info)
         actors = [item.strip() for item in actor.split(",") if item.strip()]
         release = get_release(html_info)

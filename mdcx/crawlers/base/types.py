@@ -74,7 +74,7 @@ class CrawlerData:
         return result
 
 
-class CralwerException(Exception): ...
+class CrawlerException(Exception): ...
 
 
 @dataclass

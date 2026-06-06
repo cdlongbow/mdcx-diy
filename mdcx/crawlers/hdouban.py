@@ -7,7 +7,7 @@ import zhconv
 
 from ..config.enums import Website
 from ..config.manager import manager
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 
 
 def get_api_actor(actor_list):
@@ -207,11 +207,11 @@ class HdoubanCrawler(BaseCrawler):
                 ctx.debug_info.search_urls.append(search_url)
                 html_search, error = await self.async_client.get_json(search_url)
                 if html_search is None:
-                    raise CralwerException(f"网络请求错误: {error}")
+                    raise CrawlerException(f"网络请求错误: {error}")
                 try:
                     result = html_search["data"]["list"]
                 except Exception:
-                    raise CralwerException(f"搜索结果解析错误: {html_search}")
+                    raise CrawlerException(f"搜索结果解析错误: {html_search}")
 
                 temp_number = candidate.upper().replace("-", "").strip()
                 for each in result:
@@ -224,18 +224,18 @@ class HdoubanCrawler(BaseCrawler):
                 if real_url:
                     break
             else:
-                raise CralwerException("搜索结果: 未匹配到番号！")
+                raise CrawlerException("搜索结果: 未匹配到番号！")
 
         ctx.debug(f"番号地址: {real_url}")
         ctx.debug_info.detail_urls = [real_url]
         detail_id = re.findall(r"moviedetail/(\d+)", real_url)
         if not detail_id:
-            raise CralwerException(f"详情页链接中未获取到详情页 ID: {detail_id}")
+            raise CrawlerException(f"详情页链接中未获取到详情页 ID: {detail_id}")
 
         detail_url = "https://api.6dccbca.com/api/movie/detail"
         response, error = await self.async_client.post_json(detail_url, data={"id": str(detail_id[0])})
         if response is None:
-            raise CralwerException(f"网络请求错误: {error}")
+            raise CrawlerException(f"网络请求错误: {error}")
 
         res = response["data"]
         number = res["number"]
@@ -243,7 +243,7 @@ class HdoubanCrawler(BaseCrawler):
             number = number.upper()
         title = res["name"].replace(number, "").strip()
         if not title:
-            raise CralwerException("数据获取失败: 未获取到title！")
+            raise CrawlerException("数据获取失败: 未获取到title！")
 
         actors = get_api_actor(res["actors"])
         tags = get_api_tag(res["labels"])

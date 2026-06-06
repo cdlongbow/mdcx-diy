@@ -8,7 +8,7 @@ from parsel import Selector
 
 from ..config.models import Website
 from ..models.types import CrawlerInput
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 
 
 def get_web_number(html, number):
@@ -150,7 +150,7 @@ class LulubarCrawler(BaseCrawler):
         detail_page = etree.fromstring(html.get(), etree.HTMLParser())
         title, number = get_title(detail_page)
         if not title:
-            raise CralwerException("数据获取失败: 未获取到 title！")
+            raise CrawlerException("数据获取失败: 未获取到 title！")
         actor = get_actor(detail_page)
         actors = [item.strip() for item in actor.split(",") if item.strip()]
         tag = get_tag(detail_page)

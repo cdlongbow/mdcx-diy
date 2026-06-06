@@ -6,7 +6,7 @@ from lxml import etree
 
 from ..base.web import check_url
 from ..config.enums import Website
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 
 seesaawiki_request_fail_flag = False
 
@@ -130,7 +130,7 @@ class MywifeCrawler(BaseCrawler):
                 if int(key) >= 1450:
                     real_url = f"{self.base_url}/teigaku/model/no/{key}"
         if not key:
-            raise CralwerException(f"番号中未识别到三位及以上数字: {number}")
+            raise CrawlerException(f"番号中未识别到三位及以上数字: {number}")
 
         actor = ""
         poster = ""
@@ -166,7 +166,7 @@ class MywifeCrawler(BaseCrawler):
             ctx.debug_info.search_urls = [search_url]
             html_content, error = await self.async_client.get_text(search_url)
             if html_content is None:
-                raise CralwerException(f"网络请求错误: {error}")
+                raise CrawlerException(f"网络请求错误: {error}")
             html_info = etree.fromstring(html_content, etree.HTMLParser())
             first_url = get_first_url(html_info, key)
 
@@ -174,11 +174,11 @@ class MywifeCrawler(BaseCrawler):
                 ctx.debug(f"中间页地址: {first_url}")
                 html_content, error = await self.async_client.get_text(first_url)
                 if html_content is None:
-                    raise CralwerException(f"网络请求错误: {error}")
+                    raise CrawlerException(f"网络请求错误: {error}")
                 html_info = etree.fromstring(html_content, etree.HTMLParser())
                 real_url = get_second_url(html_info)
                 if not real_url:
-                    raise CralwerException(f"中间页未获取到详情页地址！ {first_url}")
+                    raise CrawlerException(f"中间页未获取到详情页地址！ {first_url}")
             else:
                 ctx.debug(f"搜索页未获取到匹配数据！ {search_url}")
                 ctx.debug("尝试拼接番号地址")
@@ -188,11 +188,11 @@ class MywifeCrawler(BaseCrawler):
         ctx.debug_info.detail_urls = [real_url]
         html_content, error = await self.async_client.get_text(real_url)
         if html_content is None:
-            raise CralwerException(f"网络请求错误: {error}")
+            raise CrawlerException(f"网络请求错误: {error}")
         html_info = etree.fromstring(html_content, etree.HTMLParser())
         number, title = get_title(html_info)
         if not title:
-            raise CralwerException("数据获取失败: 未获取到title！")
+            raise CrawlerException("数据获取失败: 未获取到title！")
         if not actor:
             actor = get_actor(html_info)
         cover_url, trailer = get_cover(html_info)

@@ -8,7 +8,7 @@ import aiofiles.os
 from PyQt6.QtWidgets import QMessageBox
 
 from ..base.file import (
-    _clean_empty_fodlers,
+    _clean_empty_folders,
     check_file,
     copy_trailer_to_theme_videos,
     get_movie_list,
@@ -241,7 +241,7 @@ class Scraper:
                 path_settings if media_path == movie_path else get_movie_path_setting(movie_path_override=media_path)
             )
             clean_path = current_paths.softlink_path if manager.config.scrape_softlink_path else media_path
-            await _clean_empty_fodlers(clean_path, file_mode)
+            await _clean_empty_folders(clean_path, file_mode)
         end_time = time.time()
         used_time = str(round((end_time - Flags.start_time), 2))
         average_time = str(round((end_time - Flags.start_time) / task_count, 2)) if task_count else used_time

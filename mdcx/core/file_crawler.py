@@ -113,7 +113,8 @@ def classify_scrape_task(task_input: CrawlTask, config: "Config", use_fixed_type
             return ScrapeClassification(FixedScrapingType.FC2, "auto", sites=config.website_fc2)
         if not use_fixed_type:
             return ScrapeClassification(FixedScrapingType.AUTO, "auto")
-        raise Exception(f"未识别的 FC2 番号: {file_number}")
+        # 固定 FC2 模式但番号格式不识别时，返回空站点列表而非抛异常，让上层正常处理"无结果"
+        return ScrapeClassification(FixedScrapingType.FC2, "fixed", sites=[])
 
     if re.search(r"[^.]+\.\d{2}\.\d{2}\.\d{2}", file_number) or (
         "欧美" in file_path_str and "东欧美" not in file_path_str
@@ -618,7 +619,7 @@ class FileScraper:
         res.number = number  # 此处设置
         apply_scrape_classification(res, classification)
 
-        # 从res获取mosaic
+        # 从 res 获取 mosaic（res.number 已在上方设置，此处取 file_number 保持一致）
         res.mosaic = normalize_mosaic(res.mosaic)
         if is_plain_uncensored_mosaic(res.mosaic):
             wuma = True

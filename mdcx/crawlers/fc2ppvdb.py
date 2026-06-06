@@ -4,7 +4,7 @@ from typing import Any, override
 
 from ..config.manager import manager
 from ..config.models import Website
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 
 
 def get_title(data):  # 获取标题
@@ -209,11 +209,11 @@ class Fc2ppvdbCrawler(BaseCrawler):
             use_proxy=use_proxy,
         )
         if html_info is None:
-            raise CralwerException(f"XHR 请求失败: {error}")
+            raise CrawlerException(f"XHR 请求失败: {error}")
 
         title = get_title(html_info)
         if not title:
-            raise CralwerException("数据获取失败: 未获取到title！")
+            raise CrawlerException("数据获取失败: 未获取到title！")
         cover_url = get_cover(html_info)
         if "http" not in cover_url:
             ctx.debug("数据获取失败: 未获取到cover！")

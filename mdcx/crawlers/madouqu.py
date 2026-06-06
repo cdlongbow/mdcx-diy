@@ -10,7 +10,7 @@ from parsel import Selector
 
 from ..config.models import Website
 from ..models.types import CrawlerInput
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 from .guochan import get_extra_info, get_number_list
 
 
@@ -146,7 +146,7 @@ class MadouquCrawler(BaseCrawler):
         number = ctx.matched_number or ctx.input.number
         number, title, actor, detail_cover_url, studio, release, year = get_detail_info(detail_page, number, file_path)
         if not title:
-            raise CralwerException("数据获取失败: 未获取到标题")
+            raise CrawlerException("数据获取失败: 未获取到标题")
         actors = [item.strip() for item in actor.split(",") if item.strip()]
         return CrawlerData(
             number=number,

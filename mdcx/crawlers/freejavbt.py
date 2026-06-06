@@ -8,7 +8,7 @@ from lxml.html import soupparser
 
 from ..base.web import get_dmm_trailer
 from ..config.models import Website
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 
 
 def get_title(html):
@@ -360,17 +360,17 @@ class FreejavbtCrawler(BaseCrawler):
 
         html_info, error = await self.async_client.get_text(real_url)
         if html_info is None:
-            raise CralwerException(f"请求错误: {error}")
+            raise CrawlerException(f"请求错误: {error}")
         if not html_info:
-            raise CralwerException("未匹配到番号！")
+            raise CrawlerException("未匹配到番号！")
 
         html_detail = parse_detail_html(html_info)
         if html_detail is None:
-            raise CralwerException("HTML 解析失败")
+            raise CrawlerException("HTML 解析失败")
 
         title, number = get_title(html_detail)
         if not title or "single-video-info col-12" not in html_info:
-            raise CralwerException("数据获取失败: 番号标题不存在！")
+            raise CrawlerException("数据获取失败: 番号标题不存在！")
 
         actor, all_actor = get_actor(html_detail)
         release = get_release(html_detail)

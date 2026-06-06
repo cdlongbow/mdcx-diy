@@ -8,7 +8,7 @@ from parsel import Selector
 from mdcx.config.models import Website
 from mdcx.models.types import CrawlerInput, CrawlerResponse, CrawlerResult
 
-from .types import Context, CralwerException, CrawlerData
+from .types import Context, CrawlerException, CrawlerData
 
 if TYPE_CHECKING:
     from mdcx.web_async import AsyncWebClient
@@ -98,7 +98,7 @@ class GenericBaseCrawler[T: Context = Context](ABC):
         if not ctx.input.appoint_url:
             search_urls = await self._generate_search_url(ctx)
             if not search_urls:
-                raise CralwerException("生成搜索页 URL 失败")
+                raise CrawlerException("生成搜索页 URL 失败")
             if isinstance(search_urls, str):
                 search_urls = [search_urls]
             ctx.debug(f"搜索页 URL: {search_urls}")
@@ -106,7 +106,7 @@ class GenericBaseCrawler[T: Context = Context](ABC):
 
             detail_urls = await self._search(ctx, search_urls)
             if not detail_urls:
-                raise CralwerException("搜索失败")
+                raise CrawlerException("搜索失败")
         else:
             detail_urls = [ctx.input.appoint_url]
             ctx.debug(f"使用指定详情页 URL: {ctx.input.appoint_url}")
@@ -114,7 +114,7 @@ class GenericBaseCrawler[T: Context = Context](ABC):
         ctx.debug_info.detail_urls = detail_urls
         data = await self._detail(ctx, detail_urls)
         if not data:
-            raise CralwerException("获取详情页数据失败")
+            raise CrawlerException("获取详情页数据失败")
         data.source = self.site().value  # todo use Enum directly
         data = data.to_result()
         return await self.post_process(ctx, data)

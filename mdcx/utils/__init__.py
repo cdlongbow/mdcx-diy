@@ -1,4 +1,5 @@
 import asyncio
+import atexit
 import concurrent
 import concurrent.futures
 import contextlib
@@ -190,16 +191,21 @@ class AsyncBackgroundExecutor:
             loop.call_soon_threadsafe(loop.stop)
         thread.join(timeout=5.0)
 
-    def __del__(self):
-        """析构函数，确保资源被释放"""
+    def _cleanup(self) -> None:
+        """清理资源，通过 atexit 注册，避免解释器关闭时 __del__ 访问已清理的全局状态。"""
         try:
             self.cancel()
             self._stop_background_thread()
         except Exception:
-            pass  # 忽略析构时的异常
+            pass
+
+    def __del__(self):
+        """析构函数，确保资源被释放（fallback，优先使用 atexit 注册的 _cleanup）。"""
+        self._cleanup()
 
 
 executor = AsyncBackgroundExecutor()  # 全局执行器
+atexit.register(executor._cleanup)
 _INLINE_SCRIPT_SPLIT_RE = re.compile(r'"\]\)\s*</script>\s*<script>\s*self\.__next_f\.push\(\[\d+,\s*"', re.IGNORECASE)
 _TEXT_URL_RE = re.compile(r'(?<!["\'=])(https?://[^\s"\'<>]+)', re.IGNORECASE)
 

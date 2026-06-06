@@ -6,7 +6,7 @@ from lxml import etree
 from parsel import Selector
 
 from ..config.models import Website
-from .base import BaseCrawler, Context, CralwerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerException, CrawlerData
 
 
 def get_web_number(html, number):
@@ -152,7 +152,7 @@ class GigaCrawler(BaseCrawler):
         detail_page = etree.fromstring(html_content, etree.HTMLParser())
         title = get_title(detail_page)
         if not title:
-            raise CralwerException("数据获取失败: 未获取到title！")
+            raise CrawlerException("数据获取失败: 未获取到title！")
         number = get_web_number(detail_page, ctx.input.number)
         actor = get_actor(detail_page)
         actors = [item.strip() for item in actor.split(",") if item.strip()]

@@ -24,7 +24,7 @@ from mdcx.web_async import AsyncWebClient
 
 from ..base import (
     Context,
-    CralwerException,
+    CrawlerException,
     CrawlerData,
     DetailPageParser,
     GenericBaseCrawler,
@@ -563,7 +563,7 @@ class DmmCrawler(GenericBaseCrawler[DMMContext]):
     @override
     async def _parse_search_page(self, ctx, html, search_url) -> list[str] | None:
         if "404 Not Found" in html.css("span.d-txten::text").get(""):
-            raise CralwerException("404! 页面地址错误！")
+            raise CrawlerException("404! 页面地址错误！")
 
         url_list = self._extract_search_detail_urls(html, search_url)
         if not url_list:
