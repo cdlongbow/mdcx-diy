@@ -7,7 +7,7 @@ from lxml import etree
 
 from ..config.models import Website
 from ..models.types import CrawlerResult
-from .base import BaseCrawler, CrawlerException, CrawlerData
+from .base import BaseCrawler, CrawlerData, CrawlerException
 from .guochan import get_number_list
 
 

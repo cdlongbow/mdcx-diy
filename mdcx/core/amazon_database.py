@@ -22,6 +22,7 @@ class AsinRecord(TypedDict, total=False):
 def _get_default_excel_path() -> Path:
     """获取默认的 Excel 文件路径，位于 userdata 目录下（与 mapping、watermark 等同目录）"""
     from ..config.manager import manager
+
     userdata_dir = manager.data_folder / "userdata"
     userdata_dir.mkdir(parents=True, exist_ok=True)
     return userdata_dir / "amazon_asin_database.xlsx"

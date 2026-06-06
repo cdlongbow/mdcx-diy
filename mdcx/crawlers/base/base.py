@@ -8,7 +8,7 @@ from parsel import Selector
 from mdcx.config.models import Website
 from mdcx.models.types import CrawlerInput, CrawlerResponse, CrawlerResult
 
-from .types import Context, CrawlerException, CrawlerData
+from .types import Context, CrawlerData, CrawlerException
 
 if TYPE_CHECKING:
     from mdcx.web_async import AsyncWebClient

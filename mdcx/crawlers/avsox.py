@@ -9,7 +9,7 @@ from parsel import Selector
 from ..base.web import get_avsox_domain
 from ..config.models import Website
 from ..models.types import CrawlerInput
-from .base import Context, CrawlerException, CrawlerData, GenericBaseCrawler
+from .base import Context, CrawlerData, CrawlerException, GenericBaseCrawler
 
 
 def get_actor(html):

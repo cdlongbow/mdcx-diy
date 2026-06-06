@@ -11,7 +11,7 @@ from mdcx.config.models import Website
 from mdcx.models.types import CrawlerResult
 from mdcx.signals import signal
 
-from .base import CrawlerException, CrawlerData
+from .base import CrawlerData, CrawlerException
 from .dmm_new import DMMContext, DmmCrawler
 
 

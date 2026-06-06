@@ -7,7 +7,7 @@ from parsel import Selector
 from ..config.models import Website
 from ..number import get_file_number, is_uncensored, normalize_uncensored_digit_number
 from ..signals import signal
-from .base import BaseCrawler, CrawlerException, CrawlerData, DetailPageParser, extract_all_texts, extract_text
+from .base import BaseCrawler, CrawlerData, CrawlerException, DetailPageParser, extract_all_texts, extract_text
 
 
 class Parser(DetailPageParser):

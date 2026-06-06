@@ -8,7 +8,7 @@ from lxml import etree
 from ..config.enums import FieldRule, Website
 from ..config.manager import manager
 from ..signals import signal
-from .base import BaseCrawler, Context, CrawlerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerData, CrawlerException
 
 
 def getTitle(html):  # 获取标题

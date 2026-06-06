@@ -10,7 +10,7 @@ from parsel import Selector
 from ..config.manager import manager
 from ..config.models import Website
 from ..models.types import CrawlerResult
-from .base import BaseCrawler, CrawlerException, CrawlerData, DetailPageParser, extract_all_texts, extract_text
+from .base import BaseCrawler, CrawlerData, CrawlerException, DetailPageParser, extract_all_texts, extract_text
 
 
 class Parser(DetailPageParser):

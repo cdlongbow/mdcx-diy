@@ -7,7 +7,7 @@ from lxml import etree
 from ..base.web import check_url, is_dmm_image_url, normalize_media_url
 from ..config.enums import Website
 from ..config.manager import manager
-from .base import BaseCrawler, Context, CrawlerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerData, CrawlerException
 
 
 def is_not_found(html):

@@ -7,16 +7,14 @@
 - 日文原名(jp)、中文名(zh_cn)、繁体名(zh_tw)、别名(keyword)、链接(href)、tmdbid、tmdb url
 """
 
-import time
+import asyncio
 from pathlib import Path
-
-from .web import AsyncWebClient
 
 from ..config.manager import manager
 from ..config.resources import resources
 from ..log import LogBuffer
 from ..utils import norm_name
-from ..utils.text import is_japanese
+from .web import AsyncWebClient
 
 
 def is_japan_place(place: str) -> bool:
@@ -27,20 +25,89 @@ def is_japan_place(place: str) -> bool:
         "japan",
         "日本",
         # 都道府县
-        "北海道", "青森", "岩手", "宫城", "秋田", "山形", "福岛",
-        "茨城", "栃木", "群马", "埼玉", "千叶", "东京", "神奈川",
-        "新潟", "富山", "石川", "福井", "山梨", "长野", "岐阜", "静冈", "爱知",
-        "三重", "滋贺", "京都", "大阪", "兵库", "奈良", "和歌山",
-        "鸟取", "岛根", "冈山", "广岛", "山口",
-        "德岛", "香川", "爱媛", "高知",
-        "福冈", "佐贺", "长崎", "熊本", "大分", "宫崎", "鹿儿岛", "冲绳",
+        "北海道",
+        "青森",
+        "岩手",
+        "宫城",
+        "秋田",
+        "山形",
+        "福岛",
+        "茨城",
+        "栃木",
+        "群马",
+        "埼玉",
+        "千叶",
+        "东京",
+        "神奈川",
+        "新潟",
+        "富山",
+        "石川",
+        "福井",
+        "山梨",
+        "长野",
+        "岐阜",
+        "静冈",
+        "爱知",
+        "三重",
+        "滋贺",
+        "京都",
+        "大阪",
+        "兵库",
+        "奈良",
+        "和歌山",
+        "鸟取",
+        "岛根",
+        "冈山",
+        "广岛",
+        "山口",
+        "德岛",
+        "香川",
+        "爱媛",
+        "高知",
+        "福冈",
+        "佐贺",
+        "长崎",
+        "熊本",
+        "大分",
+        "宫崎",
+        "鹿儿岛",
+        "冲绳",
         # 主要城市
-        "横滨", "札幌", "神户", "川崎", "仙台", "町田", "八王子",
+        "横滨",
+        "札幌",
+        "神户",
+        "川崎",
+        "仙台",
+        "町田",
+        "八王子",
         # 东京区名
-        "品川", "涩谷", "新宿", "池袋", "浅草", "秋叶原", "原宿", "六本木", "银座", "上野",
-        "下北泽", "吉祥寺", "武藏野", "国分寺", "立川", "日野", "多摩", "青梅",
+        "品川",
+        "涩谷",
+        "新宿",
+        "池袋",
+        "浅草",
+        "秋叶原",
+        "原宿",
+        "六本木",
+        "银座",
+        "上野",
+        "下北泽",
+        "吉祥寺",
+        "武藏野",
+        "国分寺",
+        "立川",
+        "日野",
+        "多摩",
+        "青梅",
         # 常见日语地名后缀
-        "都", "道", "府", "县", "市", "町", "村", "区",
+        "都",
+        "道",
+        "府",
+        "县",
+        "市",
+        "町",
+        "村",
+        "区",
     ]
     return any(kw in p for kw in japan_keywords)
 
@@ -194,9 +261,9 @@ async def update_actor_db_row(
                     column=COL_TMDB_URL + 1,
                     value=f"https://www.themoviedb.org/person/{tmdbid}",
                 )
-                ws.cell(row=existing_row, column=COL_TMDB_URL + 1).hyperlink = (
-                    f"https://www.themoviedb.org/person/{tmdbid}"
-                )
+                ws.cell(
+                    row=existing_row, column=COL_TMDB_URL + 1
+                ).hyperlink = f"https://www.themoviedb.org/person/{tmdbid}"
         else:
             # 新增行
             ws.append([jp, zh_cn, zh_tw, keyword, href, tmdbid or "", ""])
@@ -208,9 +275,7 @@ async def update_actor_db_row(
                     column=COL_TMDB_URL + 1,
                     value=f"https://www.themoviedb.org/person/{tmdbid}",
                 )
-                ws.cell(row=last_row, column=COL_TMDB_URL + 1).hyperlink = (
-                    f"https://www.themoviedb.org/person/{tmdbid}"
-                )
+                ws.cell(row=last_row, column=COL_TMDB_URL + 1).hyperlink = f"https://www.themoviedb.org/person/{tmdbid}"
 
         # 自动列宽
         for col in ws.columns:
@@ -400,9 +465,9 @@ async def migrate_xml_to_xlsx() -> bool:
                             column=COL_TMDB_URL + 1,
                             value=f"https://www.themoviedb.org/person/{tmdbid}",
                         )
-                        ws.cell(row=last_row, column=COL_TMDB_URL + 1).hyperlink = (
-                            f"https://www.themoviedb.org/person/{tmdbid}"
-                        )
+                        ws.cell(
+                            row=last_row, column=COL_TMDB_URL + 1
+                        ).hyperlink = f"https://www.themoviedb.org/person/{tmdbid}"
 
                 from openpyxl.utils import get_column_letter
 
@@ -420,9 +485,7 @@ async def migrate_xml_to_xlsx() -> bool:
 # ============= TMDB API 查询 =============
 
 
-async def fetch_actor_tmdb_ids(
-    actors: list[str], client: AsyncWebClient
-) -> dict[str, int]:
+async def fetch_actor_tmdb_ids(actors: list[str], client: AsyncWebClient) -> dict[str, int]:
     if not actors:
         return {}
 
@@ -489,23 +552,24 @@ async def fetch_actor_tmdb_ids(
                 )
 
                 LogBuffer.log().write(
-                    f"  ✅ [TMDB] {actor_name} -> tmdbid={tmdbid}"
-                    f"{f' (中文:{zh_cn})' if zh_cn else ''}"
+                    f"  ✅ [TMDB] {actor_name} -> tmdbid={tmdbid}{f' (中文:{zh_cn})' if zh_cn else ''}"
                 )
             else:
-                LogBuffer.log().write(
-                    f"  ⚠️ [TMDB] {actor_name} 未找到匹配的 TMDB 演员"
-                )
+                LogBuffer.log().write(f"  ⚠️ [TMDB] {actor_name} 未找到匹配的 TMDB 演员")
         except Exception as e:
-            LogBuffer.log().write(
-                f"  ❌ [TMDB] {actor_name} 查询失败: {e}"
-            )
+            LogBuffer.log().write(f"  ❌ [TMDB] {actor_name} 查询失败: {e}")
         await asyncio.sleep(0.5)
 
     # 查询完成后重新加载演员数据库
     resources.reload_actor_db()
 
-    matched = len(result) - len([a for a in actors if a.strip() in (resources.actor_db or {}) and (resources.actor_db or {})[a.strip()].get("tmdbid")])
+    matched = len(result) - len(
+        [
+            a
+            for a in actors
+            if a.strip() in (resources.actor_db or {}) and (resources.actor_db or {})[a.strip()].get("tmdbid")
+        ]
+    )
     LogBuffer.log().write(
         f" 🎬 [TMDB] 查询完成: 缓存命中 {len(actors) - len(need_query)} 个, "
         f"本次匹配 {len(result)} 个, 共 {len(result)} 个"
@@ -513,9 +577,7 @@ async def fetch_actor_tmdb_ids(
     return result
 
 
-async def _query_single_actor(
-    actor_name: str, base_url: str, api_key: str, client: AsyncWebClient
-) -> dict | None:
+async def _query_single_actor(actor_name: str, base_url: str, api_key: str, client: AsyncWebClient) -> dict | None:
     """
     查询单个演员的 TMDB 信息。
     返回: {"pid": int, "translations": {"zh_cn": str, "zh_tw": str}, "also_known_as": list} 或 None
@@ -623,9 +685,7 @@ async def _query_single_actor(
     return matched[0]
 
 
-async def _fetch_person_translations(
-    pid: int, base_url: str, api_key: str, client: AsyncWebClient
-) -> dict:
+async def _fetch_person_translations(pid: int, base_url: str, api_key: str, client: AsyncWebClient) -> dict:
     """
     从 TMDB translations API 获取演员的多语言翻译。
     返回: {"zh_cn": str, "zh_tw": str}

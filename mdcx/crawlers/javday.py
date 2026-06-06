@@ -9,7 +9,7 @@ from parsel import Selector
 from ..config.manager import manager
 from ..config.models import Website
 from ..models.types import CrawlerInput
-from .base import BaseCrawler, Context, CrawlerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerData, CrawlerException
 from .guochan import get_actor_list, get_lable_list, get_number_list
 
 

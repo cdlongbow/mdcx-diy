@@ -10,7 +10,7 @@ from lxml import etree
 
 from ..config.enums import Website
 from . import getchu_dl
-from .base import BaseCrawler, Context, CrawlerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerData, CrawlerException
 
 
 def normalize_detail_url(url: str) -> str:

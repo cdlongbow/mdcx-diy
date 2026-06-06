@@ -9,7 +9,7 @@ from lxml import etree
 from ..config.enums import Website
 from ..config.manager import manager
 from ..signals import signal
-from .base import BaseCrawler, Context, CrawlerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerData, CrawlerException
 
 
 def get_web_number(html):

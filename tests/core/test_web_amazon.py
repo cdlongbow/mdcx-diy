@@ -1,5 +1,3 @@
-import re
-import urllib.parse
 from pathlib import Path
 
 import numpy as np
@@ -8,11 +6,10 @@ from PIL import Image
 
 from mdcx.config.enums import DownloadableFile, FixedScrapingType, HDPicSource
 from mdcx.config.manager import manager
-from mdcx.core.image import cut_thumb_to_poster
 from mdcx.core.amazon import (
-    _convert_to_target_size,
     _normalize_amazon_image_url,
 )
+from mdcx.core.image import cut_thumb_to_poster
 from mdcx.core.web import (
     PosterCandidate,
     _beam_search_amazon_ean13_from_ranked_digits,
@@ -31,7 +28,6 @@ from mdcx.models.types import CrawlersResult, OtherInfo
 
 def test_normalize_amazon_image_url_converts_to_sl1500():
     """测试亚马逊图片 URL 转换为 SL1500 尺寸"""
-    from mdcx.core.amazon import _normalize_amazon_image_url
 
     assert _normalize_amazon_image_url("https://m.media-amazon.com/images/I/81test._AC_UL320_.jpg") == (
         "https://m.media-amazon.com/images/I/81test.SL1500_.jpg"

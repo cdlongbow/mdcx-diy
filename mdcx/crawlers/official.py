@@ -7,7 +7,7 @@ from lxml import etree
 from ..config.enums import Website
 from ..config.manager import manager
 from ..number import get_number_letters
-from .base import BaseCrawler, Context, CrawlerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerData, CrawlerException
 from .prestige import PrestigeCrawler
 
 DIRECTOR_PLACEHOLDER_CHARS = frozenset("-—－ー―‐~～·•. ")

@@ -2,15 +2,12 @@
 
 这些测试不依赖完整项目导入，直接测试修复的逻辑。
 """
+
 import asyncio
 import shutil
-import tempfile
-import textwrap
-import ast
-import os
 import sys
+import tempfile
 from pathlib import Path
-
 
 REPO = Path("/workspace")
 
@@ -24,9 +21,9 @@ def test_operator_precedence_fix():
     """验证 show_movie_info 中 OUTLINE/ORIGINALPLOT 的截断条件正确加括号。"""
     source = (REPO / "mdcx/core/utils.py").read_text()
     # 检查修复后的代码包含括号
-    assert "(key == CrawlerResultFields.OUTLINE or key == CrawlerResultFields.ORIGINALPLOT) and len(value) > 100" in source, (
-        "运算符优先级未修复：括号缺失"
-    )
+    assert (
+        "(key == CrawlerResultFields.OUTLINE or key == CrawlerResultFields.ORIGINALPLOT) and len(value) > 100" in source
+    ), "运算符优先级未修复：括号缺失"
 
 
 def test_operator_precedence_logic():
@@ -102,9 +99,7 @@ def test_no_blocking_sleep_in_async_scraper():
         elif in_async_context and line.strip().startswith("async def "):
             in_async_context = False
         if in_async_context and "time.sleep(" in line and "asyncio" not in line:
-            raise AssertionError(
-                f"scraper.py:{i+1} 异步函数中使用同步 time.sleep: {line.strip()}"
-            )
+            raise AssertionError(f"scraper.py:{i + 1} 异步函数中使用同步 time.sleep: {line.strip()}")
 
 
 def test_no_blocking_sleep_in_async_tmdb_actor():
@@ -120,9 +115,7 @@ def test_no_blocking_sleep_in_async_tmdb_actor():
         elif in_async_context and line.strip().startswith("def "):
             in_async_context = False
         if in_async_context and "time.sleep(" in line and "asyncio" not in line:
-            raise AssertionError(
-                f"tmdb_actor.py:{i+1} 异步函数中使用同步 time.sleep: {line.strip()}"
-            )
+            raise AssertionError(f"tmdb_actor.py:{i + 1} 异步函数中使用同步 time.sleep: {line.strip()}")
 
 
 def test_asyncio_sleep_used():
@@ -146,9 +139,7 @@ def test_no_blocking_rmtree_in_async():
     for i, line in enumerate(lines):
         stripped = line.strip()
         if "shutil.rmtree" in stripped and not stripped.startswith("#"):
-            assert "asyncio.to_thread" in stripped, (
-                f"file.py:{i+1} 同步调用 shutil.rmtree: {stripped}"
-            )
+            assert "asyncio.to_thread" in stripped, f"file.py:{i + 1} 同步调用 shutil.rmtree: {stripped}"
 
 
 def test_rmtree_async_nonblocking():
@@ -206,14 +197,10 @@ def test_file_done_dic_safe_access():
         stripped = line.strip()
         # 只检查 elif p := 模式下的直接索引访问（读取），排除 .update() 写入
         if "Flags.file_done_dic" in stripped and "[number][" in stripped:
-            raise AssertionError(
-                f"file.py:{i+1} 直接索引访问 Flags.file_done_dic[number][...]: {stripped}"
-            )
+            raise AssertionError(f"file.py:{i + 1} 直接索引访问 Flags.file_done_dic[number][...]: {stripped}")
         # 验证修复后的 .get() 模式存在
     for field in ["local_poster", "local_thumb", "local_fanart"]:
-        assert f'.get(number, {{}}).get("{field}")' in source, (
-            f"file.py 中缺少安全的 .get() 访问模式: {field}"
-        )
+        assert f'.get(number, {{}}).get("{field}")' in source, f"file.py 中缺少安全的 .get() 访问模式: {field}"
 
 
 # ============================================================
@@ -224,9 +211,7 @@ def test_file_done_dic_safe_access():
 def test_definition_none_safety():
     """验证 definition 字段在 None 时不会抛出 AttributeError。"""
     source = (REPO / "mdcx/core/naming/fields.py").read_text()
-    assert '(file_info.definition or "").replace("UHD8", "UHD")' in source, (
-        "definition 未做 None 防护"
-    )
+    assert '(file_info.definition or "").replace("UHD8", "UHD")' in source, "definition 未做 None 防护"
 
 
 # ============================================================
@@ -240,18 +225,13 @@ def test_nfo_exception_logging():
     lines = source.split("\n")
 
     # 检查 score 部分的 except
-    in_score_except = False
     for i, line in enumerate(lines):
         if "except Exception:" in line:
             # 检查下一行
             if i + 1 < len(lines):
                 next_line = lines[i + 1].strip()
-                assert next_line != "pass", (
-                    f"nfo.py:{i+1} except 块使用 pass 静默吞异常"
-                )
-                assert "print(traceback" not in next_line, (
-                    f"nfo.py:{i+1} except 块使用 print 输出 traceback"
-                )
+                assert next_line != "pass", f"nfo.py:{i + 1} except 块使用 pass 静默吞异常"
+                assert "print(traceback" not in next_line, f"nfo.py:{i + 1} except 块使用 print 输出 traceback"
 
 
 # ============================================================
@@ -270,9 +250,7 @@ def test_start_new_scrape_exception_bound():
         elif in_function and line.strip().startswith("def "):
             in_function = False
         if in_function and "except Exception" in line:
-            assert "as e" in line, (
-                f"scraper.py:{i+1} except 未绑定异常对象: {line.strip()}"
-            )
+            assert "as e" in line, f"scraper.py:{i + 1} except 未绑定异常对象: {line.strip()}"
 
 
 # ============================================================
@@ -297,11 +275,10 @@ def test_no_dead_code_in_core_files():
             for line in source.split("\n"):
                 stripped = line.strip()
                 if stripped.startswith("#") and pattern in stripped:
-                    raise AssertionError(
-                        f"{file_path} 中存在死代码: {stripped}"
-                    )
+                    raise AssertionError(f"{file_path} 中存在死代码: {stripped}")
 
 
 if __name__ == "__main__":
     import pytest as _pytest
+
     sys.exit(_pytest.main([__file__, "-v"]))

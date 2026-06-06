@@ -620,7 +620,7 @@ class Scraper:
                 all_actors = [a.strip() for a in (res.actor or "").split(",") if a.strip()]
                 missing_actors = [a for a in all_actors if a not in existing_tmdb_ids]
                 if missing_actors:
-                    from .tmdb_actor import search_actor_db_reverse, update_actor_db_row, _query_single_actor
+                    from .tmdb_actor import _query_single_actor, search_actor_db_reverse, update_actor_db_row
 
                     # 用 xlsx 反向搜索：从 NFO 中的演员名（可能是中文名/日文名/繁体名）查找 tmdbid 和日文原名
                     for actor_name in missing_actors:
@@ -660,7 +660,9 @@ class Scraper:
                                         continue  # 无法找到日文原名，跳过
 
                                     try:
-                                        query_result = await _query_single_actor(jp_name, base_url, tmdb_api_key, client)
+                                        query_result = await _query_single_actor(
+                                            jp_name, base_url, tmdb_api_key, client
+                                        )
                                         if query_result:
                                             tmdbid = query_result["pid"]
                                             existing_tmdb_ids[actor_name] = tmdbid
@@ -675,7 +677,9 @@ class Scraper:
                                                 tmdbid=tmdbid,
                                                 append_keyword=True,
                                             )
-                                            LogBuffer.log().write(f"  ✅ [TMDB] {actor_name} -> tmdbid={tmdbid} (读取模式补充)")
+                                            LogBuffer.log().write(
+                                                f"  ✅ [TMDB] {actor_name} -> tmdbid={tmdbid} (读取模式补充)"
+                                            )
                                             await asyncio.sleep(0.5)
                                         else:
                                             LogBuffer.log().write(f"  ⚠️ [TMDB] {actor_name} 未找到匹配的 TMDB 演员")

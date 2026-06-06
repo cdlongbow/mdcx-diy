@@ -61,13 +61,13 @@ def _normalize_amazon_image_url(pic_url: str, *, target_size: str = "SL1500") ->
         return pic_url
 
     if re.search(r"\._[A-Z0-9_]+_\.", pic_url, flags=re.IGNORECASE):
-        return re.sub(rf"\._[A-Z0-9_]+\.", f".{target_size}.", pic_url, flags=re.IGNORECASE)
+        return re.sub(r"\._[A-Z0-9_]+\.", f".{target_size}.", pic_url, flags=re.IGNORECASE)
 
     if not pic_url.lower().endswith(".jpg"):
         return pic_url
 
     if re.search(r"\._[A-Z0-9]+\.jpg$", pic_url, flags=re.IGNORECASE):
-        return re.sub(rf"\._[A-Z0-9]+\.jpg$", f".{target_size}.jpg", pic_url, flags=re.IGNORECASE)
+        return re.sub(r"\._[A-Z0-9]+\.jpg$", f".{target_size}.jpg", pic_url, flags=re.IGNORECASE)
 
     return f"{pic_url[:-4]}.{target_size}.jpg"
 
@@ -106,9 +106,7 @@ async def _save_asin_record(
     if existing_records:
         existing = existing_records[0]
         if existing.get("poster_url"):
-            LogBuffer.log().write(
-                f"\n 📚 Amazon ASIN 数据库：{result.number} 已有完整记录，跳过保存"
-            )
+            LogBuffer.log().write(f"\n 📚 Amazon ASIN 数据库：{result.number} 已有完整记录，跳过保存")
             return
         # 已有记录但缺少 poster_url，原地更新
         await amazon_database.update_asin_record(number=result.number, poster_url=poster_url)
@@ -159,18 +157,18 @@ async def _check_asin_cache(number: str) -> dict | None:
 def _get_image_url_from_asin(asin: str) -> str | None:
     """
     从 ASIN 生成图片 URL
-    
+
     Amazon 图片 URL 格式：https://m.media-amazon.com/images/I/{ASIN}.01.SL1500.jpg
-    
+
     Args:
         asin: ASIN 编号
-        
+
     Returns:
         图片 URL，如果生成失败则返回 None
     """
     if not asin or len(asin) != 10:
         return None
-    
+
     # 生成可能的图片 URL 格式
     # 注意：这不是 100% 准确，因为 ASIN 和图片 ID 不一定相同
     # 但在很多情况下可以工作，特别是对于数字商品
@@ -778,13 +776,13 @@ async def get_big_pic_by_amazon(
 ) -> str:
     """
     从 Amazon 获取高清封面图片
-    
+
     优化：
     1. 优先从 ASIN 数据库缓存查询，避免重复搜索
     2. 去重逻辑：如果相同番号已有高置信度记录，则不保存新记录
     """
     _set_amazon_match_state(result, is_hard=False, reason="", url="")
-    
+
     # 改进 2：缓存查询 - 先检查数据库中是否已有 ASIN
     cache_hit = await _check_asin_cache(result.number)
     if cache_hit:
@@ -792,7 +790,7 @@ async def get_big_pic_by_amazon(
 
         poster_url = cache_hit.get("poster_url", "")
         if poster_url:
-            LogBuffer.log().write(f"  使用缓存的封面 URL")
+            LogBuffer.log().write("  使用缓存的封面 URL")
             _set_amazon_match_state(
                 result,
                 is_hard=False,
@@ -801,8 +799,8 @@ async def get_big_pic_by_amazon(
             )
             return _convert_to_target_size(poster_url)
         else:
-            LogBuffer.log().write(f"  缓存无封面 URL，回退搜索获取")
-    
+            LogBuffer.log().write("  缓存无封面 URL，回退搜索获取")
+
     if not originaltitle_amazon and not originaltitle_amazon_raw:
         return ""
     hd_pic_url = ""
@@ -1952,7 +1950,7 @@ async def get_big_pic_by_amazon(
                         asin=asin,
                         title=str(each_candidate["pic_title"]),
                         poster_url=str(each_candidate["url"]),
-                        search_keyword=str(current_title if 'current_title' in locals() else ""),
+                        search_keyword=str(current_title if "current_title" in locals() else ""),
                         detail_url=detail_url_str,
                     )
                     return str(each_candidate["url"])
@@ -1967,14 +1965,16 @@ async def get_big_pic_by_amazon(
                 )
                 detail_url_str = str(best_fallback_candidate.get("detail_url", ""))
                 asin = normalize_detail_url(detail_url_str).split("/dp/")[-1] if detail_url_str else ""
-                asyncio.create_task(_save_asin_record(
-                    result,
-                    asin=asin,
-                    title=str(best_fallback_candidate["pic_title"]),
-                    poster_url=str(best_fallback_candidate["url"]),
-                    search_keyword=str(current_title if 'current_title' in locals() else ""),
-                    detail_url=detail_url_str,
-                ))
+                asyncio.create_task(
+                    _save_asin_record(
+                        result,
+                        asin=asin,
+                        title=str(best_fallback_candidate["pic_title"]),
+                        poster_url=str(best_fallback_candidate["url"]),
+                        search_keyword=str(current_title if "current_title" in locals() else ""),
+                        detail_url=detail_url_str,
+                    )
+                )
                 LogBuffer.log().write(
                     f"\n 🟡 Amazon命中低清图：标题置信度 ({float(best_fallback_candidate['title_confidence']):.2f}) "
                     f"番号命中 ({candidate_number_match(best_fallback_candidate)}) "

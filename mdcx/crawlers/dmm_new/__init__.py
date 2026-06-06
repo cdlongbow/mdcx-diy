@@ -24,8 +24,8 @@ from mdcx.web_async import AsyncWebClient
 
 from ..base import (
     Context,
-    CrawlerException,
     CrawlerData,
+    CrawlerException,
     DetailPageParser,
     GenericBaseCrawler,
     is_valid,

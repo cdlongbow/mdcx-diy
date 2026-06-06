@@ -3,7 +3,7 @@ import re
 from typing import override
 
 from ..config.models import Website
-from .base import BaseCrawler, Context, CrawlerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerData, CrawlerException
 
 
 def get_actor(page_data):

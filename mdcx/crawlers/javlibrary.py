@@ -8,7 +8,7 @@ from lxml import etree
 from ..config.enums import Language, Website
 from ..config.manager import manager
 from ..gen.field_enums import CrawlerResultFields
-from .base import BaseCrawler, Context, CrawlerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerData, CrawlerException
 
 
 def get_real_url(html, number, domain_2):

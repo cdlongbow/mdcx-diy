@@ -10,7 +10,7 @@ from parsel import Selector
 
 from ..config.models import Website
 from ..models.types import CrawlerInput
-from .base import BaseCrawler, Context, CrawlerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerData, CrawlerException
 from .guochan import get_extra_info, get_number_list
 
 

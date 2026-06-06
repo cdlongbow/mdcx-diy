@@ -10,7 +10,7 @@ from ..base.number import remove_escape_string
 from ..config.enums import Switch, Website
 from ..config.manager import manager
 from ..number import long_name
-from .base import BaseCrawler, Context, CrawlerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerData, CrawlerException
 
 TheporndbKind = Literal["scenes", "movies"]
 

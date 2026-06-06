@@ -8,7 +8,7 @@ from lxml.html import soupparser
 
 from ..base.web import get_dmm_trailer
 from ..config.models import Website
-from .base import BaseCrawler, Context, CrawlerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerData, CrawlerException
 
 
 def get_title(html):

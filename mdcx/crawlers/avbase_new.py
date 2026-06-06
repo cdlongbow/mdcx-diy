@@ -13,7 +13,7 @@ from ..config.enums import DownloadableFile
 from ..config.manager import manager
 from ..config.models import Website
 from ..signals import signal
-from .base import BaseCrawler, CrawlerException, CrawlerData
+from .base import BaseCrawler, CrawlerData, CrawlerException
 
 SEARCH_FIRST_RESULT_ID_XPATH = "/html/body/div/div/main/div/div[2]/div[2]/div/div/div[1]/div[1]/div[1]/div"
 

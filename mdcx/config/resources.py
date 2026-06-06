@@ -5,7 +5,6 @@ import traceback
 from pathlib import Path
 
 import zhconv
-from lxml import etree
 from PyQt6.QtGui import QFontDatabase
 
 from ..consts import IS_PYINSTALLER, MAIN_PATH
@@ -184,7 +183,9 @@ class Resources:
                     info_data["zh_tw"] = (row.get("zh_tw") or info).replace("删除", "")
                     info_data["jp"] = (row.get("jp") or info).replace("删除", "")
                     kw = row.get("keyword") or ""
-                    info_data["keyword"] = [k.strip() for k in kw.split(",") if k.strip()] if kw else [row.get("jp") or info]
+                    info_data["keyword"] = (
+                        [k.strip() for k in kw.split(",") if k.strip()] if kw else [row.get("jp") or info]
+                    )
                     info_data["has_name"] = True
                     return info_data
         return info_data
@@ -301,12 +302,14 @@ class Resources:
                 jp = str(row[0] or "").strip()
                 if not jp:
                     continue
-                db.append({
-                    "jp": jp,
-                    "zh_cn": str(row[1] or "").strip() if len(row) > 1 else "",
-                    "zh_tw": str(row[2] or "").strip() if len(row) > 2 else "",
-                    "keyword": str(row[3] or "").strip() if len(row) > 3 else "",
-                })
+                db.append(
+                    {
+                        "jp": jp,
+                        "zh_cn": str(row[1] or "").strip() if len(row) > 1 else "",
+                        "zh_tw": str(row[2] or "").strip() if len(row) > 2 else "",
+                        "keyword": str(row[3] or "").strip() if len(row) > 3 else "",
+                    }
+                )
             wb.close()
             self.info_db = db
         except Exception:

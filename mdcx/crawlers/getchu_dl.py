@@ -6,7 +6,7 @@ import urllib.parse
 
 from lxml import etree
 
-from .base import Context, CrawlerException, CrawlerData
+from .base import Context, CrawlerData, CrawlerException
 
 
 def get_title(html):

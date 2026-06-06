@@ -7,7 +7,7 @@ import zhconv
 
 from ..config.enums import Website
 from ..config.manager import manager
-from .base import BaseCrawler, Context, CrawlerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerData, CrawlerException
 
 
 def get_api_actor(actor_list):

@@ -7,7 +7,7 @@ from parsel import Selector
 
 from ..config.models import Website
 from ..number import is_uncensored
-from .base import BaseCrawler, CrawlerException, CrawlerData
+from .base import BaseCrawler, CrawlerData, CrawlerException
 from .guochan import get_extra_info
 
 

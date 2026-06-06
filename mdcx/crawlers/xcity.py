@@ -6,7 +6,7 @@ from lxml import etree
 from parsel import Selector
 
 from ..config.models import Website
-from .base import BaseCrawler, Context, CrawlerException, CrawlerData
+from .base import BaseCrawler, Context, CrawlerData, CrawlerException
 
 
 def getTitle(html):

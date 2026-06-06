@@ -11,8 +11,8 @@ from ..config.models import Website
 from ..models.types import CrawlerInput
 from .base import (
     Context,
-    CrawlerException,
     CrawlerData,
+    CrawlerException,
     DetailPageParser,
     GenericBaseCrawler,
     extract_all_texts,

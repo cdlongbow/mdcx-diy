@@ -13,7 +13,7 @@ from ..config.enums import DownloadableFile
 from ..config.manager import manager
 from ..config.models import Website
 from ..models.types import CrawlerResult
-from .base import BaseCrawler, CrawlerException, CrawlerData
+from .base import BaseCrawler, CrawlerData, CrawlerException
 
 type ImageLogFn = Callable[[str], None] | None
 
