@@ -37,9 +37,7 @@ class Resources:
         self._userdata_base.mkdir(parents=True, exist_ok=True)  # 确保用户数据目录存在
 
         # 获取资源路径
-        self.actor_map_backup_path = self.r("mapping_table/mapping_actor.xml")  # 内置演员映射表 XML（仅用于老用户迁移）
         self.actor_db_backup_path = self.r("userdata/actor_database.xlsx")  # 内置演员数据库 xlsx
-        self.info_map_backup_path = self.r("mapping_table/mapping_info.xml")  # 内置信息映射表 XML（仅用于老用户迁移）
         self.info_db_backup_path = self.r("userdata/info_database.xlsx")  # 内置信息映射数据库 xlsx
 
         self.icon_ico = self.qtr("Img/MDCx.ico")  # 任务栏图标

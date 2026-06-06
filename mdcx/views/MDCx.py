@@ -10873,10 +10873,10 @@ class Ui_MDCx(object):
 "                                不过，通过演员名映射翻译表可以解决这些问题，使刮削后的演员名整齐统一。<br>\n"
 "                                实现逻辑：刮削网站获取演员名后，通过查询映射表中的匹配词来映射对应输出词。\n"
 "                                <br>\n"
-"                                演员名映射翻译表文件名为：mapping_actor.xml<br>\n"
+"                                演员名映射翻译表文件名为：actor_database.xlsx<br>\n"
 "                                ·\n"
-"                                Windows位置：\\配置文件目录\\userdata\\mapping_actor.xml（配置文件目录在「设置」-「其他」中设置）<br>\n"
-"                                · Mac位置：/配置文件目录/userdata/mapping_actor.xml<br>\n"
+"                                Windows位置：\\配置文件目录\\userdata\\actor_database.xlsx（配置文件目录在「设置」-「其他」中设置）<br>\n"
+"                                · Mac位置：/配置文件目录/userdata/actor_database.xlsx<br>\n"
 "                                你可使用文件编辑工具打开该文件自定义修改添加。映射表中的字段含义如下：<br>\n"
 "                                1、keyword：匹配词（每个名字前后都要有逗号）。刮削网站获取演员名后，会在 keyword 的名字中进行匹配。<br>\n"
 "                                2、zh_cn/zh_tw/jp：输出词。当 keyword 匹配到演员名时，可输出对应语言的名字。</p>"))

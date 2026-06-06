@@ -82,7 +82,7 @@ def _get_mapping_nodes():
 
 
 def get_priority_tag_names() -> frozenset[str]:
-    """Build prioritized content tag names from mapping_info.xml output names."""
+    """Build prioritized content tag names from info_database.xlsx output names."""
     global _priority_tag_names_cache
 
     mapping_id, nodes = _get_mapping_nodes()
