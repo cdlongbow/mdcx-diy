@@ -558,8 +558,6 @@ class Scraper:
         # 检查文件大小
         result = await check_file(file_path, file_escape_size)
         if not result:
-            # res.outline = split_path(file_path)[1]
-            # res.tag = file_path
             return None, None
 
         is_nfo_existed = False
@@ -678,7 +676,7 @@ class Scraper:
                                                 append_keyword=True,
                                             )
                                             LogBuffer.log().write(f"  ✅ [TMDB] {actor_name} -> tmdbid={tmdbid} (读取模式补充)")
-                                            time.sleep(0.5)
+                                            await asyncio.sleep(0.5)
                                         else:
                                             LogBuffer.log().write(f"  ⚠️ [TMDB] {actor_name} 未找到匹配的 TMDB 演员")
                                     except Exception as e:
@@ -864,12 +862,10 @@ class Scraper:
                         folder_old_path,
                         folder_new_path,
                         file_path,
-                        # file_new_path,
                         thumb_new_path_with_filename,
                         poster_new_path_with_filename,
                         fanart_new_path_with_filename,
                         nfo_new_path,
-                        # file_ex,
                         poster_final_path,
                         thumb_final_path,
                         fanart_final_path,
@@ -887,12 +883,10 @@ class Scraper:
             folder_old_path,
             folder_new_path,
             file_path,
-            # file_new_path,
             thumb_new_path_with_filename,
             poster_new_path_with_filename,
             fanart_new_path_with_filename,
             nfo_new_path,
-            # file_ex,
             poster_final_path,
             thumb_final_path,
             fanart_final_path,
@@ -941,7 +935,6 @@ class Scraper:
             await move_sub(folder_old_path, folder_new_path, file_name, sub_list, naming_rule)
         await move_torrent(folder_old_path, folder_new_path, file_name, movie_number, naming_rule)
         await move_bif(folder_old_path, folder_new_path, file_name, naming_rule)
-        # self.move_trailer_video(folder_old_path, folder_new_path, file_name, naming_rule)
         await move_other_file(res.number, folder_old_path, folder_new_path, file_name, naming_rule)
 
         # 移动文件
@@ -1002,9 +995,10 @@ def start_new_scrape(file_mode: FileMode, movie_list: list[Path] | None = None) 
             )
         scraper = Scraper(crawler_provider)
         executor.submit(scraper.run(file_mode, movie_list))
-    except Exception:
+    except Exception as e:
         signal.show_traceback_log(traceback.format_exc())
         signal.show_log_text(traceback.format_exc())
+        LogBuffer.error().write(f"start_new_scrape error: {e}")
 
 
 def get_remain_list() -> bool:

@@ -87,7 +87,7 @@ def build_naming_context(
     youma = file_info.youma
     moword = destroyed + leak + wuma + youma
     cnword = file_info.c_word
-    definition = file_info.definition.replace("UHD8", "UHD")
+    definition = (file_info.definition or "").replace("UHD8", "UHD")
 
     number = data.number
     title = data.title

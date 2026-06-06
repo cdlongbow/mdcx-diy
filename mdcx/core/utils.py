@@ -56,7 +56,6 @@ def replace_special_word(json_data: BaseCrawlerResult):
     ]
     for key, value in ManualConfig.SPECIAL_WORD.items():
         for each in all_key_word:
-            # json_data[each] = json_data[each].replace(key, value)
             setattr(json_data, each, getattr(json_data, each).replace(key, value))
 
 
@@ -138,7 +137,7 @@ def show_movie_info(file_info: FileInfo, result: CrawlersResult):
         value = getattr(result, key, getattr(file_info, key, ""))
         if not value:
             continue
-        if key == CrawlerResultFields.OUTLINE or key == CrawlerResultFields.ORIGINALPLOT and len(value) > 100:
+        if (key == CrawlerResultFields.OUTLINE or key == CrawlerResultFields.ORIGINALPLOT) and len(value) > 100:
             value = str(value)[:98] + "……（略）"
         elif key == "has_sub":
             value = "中文字幕"

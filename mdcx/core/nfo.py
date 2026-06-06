@@ -294,14 +294,14 @@ async def write_nfo(file_info: FileInfo, data: CrawlersResult, nfo_file: Path, o
                 if NfoInclude.CRITICRATING in nfo_include_new:
                     print("  <criticrating>" + str(int(score * 10)) + "</criticrating>", file=code)
         except Exception:
-            print(traceback.format_exc())
+            LogBuffer.log().write(traceback.format_exc())
 
         # 输出我想看人数
         try:
             if data.wanted and NfoInclude.WANTED in nfo_include_new:
                 print("  <votes>" + data.wanted + "</votes>", file=code)
         except Exception:
-            pass
+            LogBuffer.log().write(traceback.format_exc())
 
         # 输出年代
         if str(year) and NfoInclude.YEAR in nfo_include_new:
@@ -579,7 +579,6 @@ async def get_nfo_data(file_path: Path, movie_number: str) -> tuple[CrawlersResu
     json_data.series = series
     json_data.studio = studio
     json_data.publisher = publisher
-    # json_data.website = website
     json_data.thumb = cover
     if cover:
         json_data.thumb_list.append(("local", cover))

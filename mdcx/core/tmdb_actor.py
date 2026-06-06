@@ -500,7 +500,7 @@ async def fetch_actor_tmdb_ids(
             LogBuffer.log().write(
                 f"  ❌ [TMDB] {actor_name} 查询失败: {e}"
             )
-        time.sleep(0.5)
+        await asyncio.sleep(0.5)
 
     # 查询完成后重新加载演员数据库
     resources.reload_actor_db()

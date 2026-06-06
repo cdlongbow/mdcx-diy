@@ -1,4 +1,4 @@
-import os
+import asyncio
 import os
 import re
 import shutil
@@ -678,10 +678,11 @@ async def get_file_info_v2(file_path: Path, copy_sub: bool = True) -> FileInfo:
                 file_show_name += c_word
         file_show_name += cd_part
 
-    except Exception:
+    except Exception as e:
         signal.show_traceback_log(file_path)
         signal.show_traceback_log(traceback.format_exc())
         signal.show_log_text(traceback.format_exc())
+        LogBuffer.error().write(f"get_file_info_v2 error: {e}")
         LogBuffer.log().write("\n" + str(file_path))
         LogBuffer.log().write("\n" + traceback.format_exc())
 
@@ -718,12 +719,10 @@ async def deal_old_files(
     folder_old_path: Path,
     folder_new_path: Path,
     file_path: Path,
-    # file_new_path: Path,
     thumb_new_path_with_filename: Path,
     poster_new_path_with_filename: Path,
     fanart_new_path_with_filename: Path,
     nfo_new_path: Path,
-    # file_ex: str,
     poster_final_path: Path,
     thumb_final_path: Path,
     fanart_final_path: Path,
@@ -796,7 +795,7 @@ async def deal_old_files(
                 await delete_file_async(each)
         for each in folder_path_list:
             if await aiofiles.os.path.isdir(each):
-                shutil.rmtree(each, ignore_errors=True)
+                await asyncio.to_thread(shutil.rmtree, each, ignore_errors=True)
         return False, False
 
     # 非视频模式，将本地已有的图片、剧照等文件按命名规则迁移到目标位置。
@@ -888,7 +887,7 @@ async def deal_old_files(
                 poster_final_path
             ).lower() and await aiofiles.os.path.exists(poster_new_path_with_filename):
                 await delete_file_async(poster_new_path_with_filename)
-        elif p := Flags.file_done_dic[number]["local_poster"]:
+        elif p := Flags.file_done_dic.get(number, {}).get("local_poster"):
             await copy_file_async(p, poster_final_path)
 
     except Exception:
@@ -937,7 +936,7 @@ async def deal_old_files(
                 thumb_final_path
             ).lower() and await aiofiles.os.path.exists(thumb_new_path_with_filename):
                 await delete_file_async(thumb_new_path_with_filename)
-        elif p := Flags.file_done_dic[number]["local_thumb"]:
+        elif p := Flags.file_done_dic.get(number, {}).get("local_thumb"):
             await copy_file_async(p, thumb_final_path)
 
     except Exception:
@@ -986,7 +985,7 @@ async def deal_old_files(
                 fanart_new_path_with_filename
             ):
                 await delete_file_async(fanart_new_path_with_filename)
-        elif p := Flags.file_done_dic[number]["local_fanart"]:
+        elif p := Flags.file_done_dic.get(number, {}).get("local_fanart"):
             await copy_file_async(p, fanart_final_path)
 
     except Exception:
@@ -1034,7 +1033,7 @@ async def deal_old_files(
         if trailer_old_folder_path != trailer_new_folder_path and await aiofiles.os.path.exists(
             trailer_old_folder_path
         ):
-            shutil.rmtree(trailer_old_folder_path, ignore_errors=True)
+            await asyncio.to_thread(shutil.rmtree, trailer_old_folder_path, ignore_errors=True)
         # 删除带文件名文件，用不到了
         if await aiofiles.os.path.exists(trailer_old_file_path_with_filename):
             await delete_file_async(trailer_old_file_path_with_filename)
@@ -1066,11 +1065,11 @@ async def deal_old_files(
             Flags.file_done_dic[number].update({"local_trailer": trailer_new_file_path_with_filename})
             # 删除旧、新文件夹，用不到了(分集使用local trailer复制即可)
             if await aiofiles.os.path.exists(trailer_old_folder_path):
-                shutil.rmtree(trailer_old_folder_path, ignore_errors=True)
+                await asyncio.to_thread(shutil.rmtree, trailer_old_folder_path, ignore_errors=True)
             if trailer_new_folder_path != trailer_old_folder_path and await aiofiles.os.path.exists(
                 trailer_new_folder_path
             ):
-                shutil.rmtree(trailer_new_folder_path, ignore_errors=True)
+                await asyncio.to_thread(shutil.rmtree, trailer_new_folder_path, ignore_errors=True)
             # 删除带文件名旧文件，用不到了
             if (
                 trailer_old_file_path_with_filename != trailer_new_file_path_with_filename
@@ -1090,7 +1089,7 @@ async def deal_old_files(
                 if str(extrafanart_old_path).lower() != str(
                     extrafanart_new_path
                 ).lower() and await aiofiles.os.path.exists(extrafanart_old_path):
-                    shutil.rmtree(extrafanart_old_path, ignore_errors=True)
+                    await asyncio.to_thread(shutil.rmtree, extrafanart_old_path, ignore_errors=True)
             elif await aiofiles.os.path.exists(extrafanart_old_path):
                 await move_file_async(extrafanart_old_path, extrafanart_new_path)
         except Exception:
@@ -1102,7 +1101,7 @@ async def deal_old_files(
                 if str(extrafanart_copy_old_path).lower() != str(
                     extrafanart_copy_new_path
                 ).lower() and await aiofiles.os.path.exists(extrafanart_copy_old_path):
-                    shutil.rmtree(extrafanart_copy_old_path, ignore_errors=True)
+                    await asyncio.to_thread(shutil.rmtree, extrafanart_copy_old_path, ignore_errors=True)
             elif await aiofiles.os.path.exists(extrafanart_copy_old_path):
                 await move_file_async(extrafanart_copy_old_path, extrafanart_copy_new_path)
         except Exception:
@@ -1113,7 +1112,7 @@ async def deal_old_files(
             if str(theme_videos_old_path).lower() != str(
                 theme_videos_new_path
             ).lower() and await aiofiles.os.path.exists(theme_videos_old_path):
-                shutil.rmtree(theme_videos_old_path, ignore_errors=True)
+                await asyncio.to_thread(shutil.rmtree, theme_videos_old_path, ignore_errors=True)
         elif await aiofiles.os.path.exists(theme_videos_old_path):
             await move_file_async(theme_videos_old_path, theme_videos_new_path)
 
@@ -1122,7 +1121,7 @@ async def deal_old_files(
             if str(extrafanart_extra_old_path).lower() != str(
                 extrafanart_extra_new_path
             ).lower() and await aiofiles.os.path.exists(extrafanart_extra_old_path):
-                shutil.rmtree(extrafanart_extra_old_path, ignore_errors=True)
+                await asyncio.to_thread(shutil.rmtree, extrafanart_extra_old_path, ignore_errors=True)
         elif await aiofiles.os.path.exists(extrafanart_extra_old_path):
             await move_file_async(extrafanart_extra_old_path, extrafanart_extra_new_path)
 

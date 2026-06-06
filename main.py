@@ -46,8 +46,7 @@ if platform.system() != "Windows":
     app.setWindowIcon(QIcon("resources/Img/MDCx.ico"))  # 设置任务栏图标
 ui = MyMAinWindow()
 ui.show()
-app.installEventFilter(ui)
-# newWin2 = CutWindow()
+ app.installEventFilter(ui)
 try:
     sys.exit(app.exec())
 except Exception as e:
