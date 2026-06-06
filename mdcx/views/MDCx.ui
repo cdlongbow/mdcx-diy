@@ -16969,51 +16969,23 @@
                                 </property>
                               </widget>
                             </item>
-                            <item>
-                              <widget class="QCheckBox" name="checkBox_nfo_all_actor">
-                                <property name="text">
-                                  <string>写入男女演员（不勾选，则仅写入女演员）</string>
-                                </property>
-                              </widget>
-                            </item>
-                          </layout>
+                             <item>
+                               <widget class="QCheckBox" name="checkBox_nfo_all_actor">
+                                 <property name="text">
+                                   <string>写入男女演员（不勾选，则仅写入女演员）</string>
+                                 </property>
+                               </widget>
+                             </item>
+                             <item>
+                               <widget class="QCheckBox" name="checkBox_nfo_actor_tmdbid">
+                                 <property name="text">
+                                   <string>为演员写入 TMDB ID（需配置 TMDB API）</string>
+                                 </property>
+                               </widget>
+                             </item>
+                           </layout>
                         </item>
-                        <item row="8" column="1">
-                          <layout class="QHBoxLayout" name="horizontalLayout_147">
-                            <item>
-                              <widget class="QLabel" name="label_403">
-                                <property name="sizePolicy">
-                                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                  </sizepolicy>
-                                </property>
-                                <property name="minimumSize">
-                                  <size>
-                                    <width>20</width>
-                                    <height>0</height>
-                                  </size>
-                                </property>
-                                <property name="layoutDirection">
-                                  <enum>Qt::LeftToRight</enum>
-                                </property>
-                                <property name="text">
-                                  <string />
-                                </property>
-                                <property name="alignment">
-                                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                                </property>
-                              </widget>
-                            </item>
-                            <item>
-                              <widget class="QCheckBox" name="checkBox_nfo_actor_tmdbid">
-                                <property name="text">
-                                  <string>为演员写入 TMDB ID（需配置 TMDB API）</string>
-                                </property>
-                              </widget>
-                            </item>
-                          </layout>
-                        </item>
+
                         <item row="9" column="0">
                           <widget class="QLabel" name="label_391">
                             <property name="sizePolicy">
@@ -17606,7 +17578,7 @@
                             </item>
                           </layout>
                         </item>
-                        <item row="9" column="0">
+                        <item row="21" column="0">
                           <widget class="QLabel" name="label_390">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -17631,7 +17603,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="9" column="1">
+                        <item row="21" column="1">
                           <layout class="QHBoxLayout" name="horizontalLayout_139">
                             <item>
                               <widget class="QCheckBox" name="checkBox_nfo_score">
@@ -21421,14 +21393,14 @@
                       </layout>
                     </widget>
                   </widget>
-                  <widget class="QGroupBox" name="groupBox_14">
-                    <property name="geometry">
-                      <rect>
-                        <x>30</x>
-                        <y>870</y>
-                        <width>701</width>
-                        <height>181</height>
-                      </rect>
+                   <widget class="QGroupBox" name="groupBox_14">
+                     <property name="geometry">
+                       <rect>
+                         <x>30</x>
+                         <y>870</y>
+                         <width>701</width>
+                         <height>270</height>
+                       </rect>
                     </property>
                     <property name="styleSheet">
                       <string notr="true">font:&quot;Courier&quot;;</string>
@@ -21596,7 +21568,7 @@
                       <property name="geometry">
                         <rect>
                           <x>120</x>
-                          <y>90</y>
+                          <y>165</y>
                           <width>561</width>
                           <height>41</height>
                         </rect>
@@ -21638,7 +21610,7 @@
                       <property name="geometry">
                         <rect>
                           <x>160</x>
-                          <y>130</y>
+                          <y>210</y>
                           <width>441</width>
                           <height>43</height>
                         </rect>
