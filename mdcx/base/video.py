@@ -1,3 +1,4 @@
+import asyncio
 import shutil
 from pathlib import Path
 
@@ -38,7 +39,7 @@ async def add_del_extras(mode: str) -> None:
         count += 1
         if mode == "add":
             if not await aiofiles.os.path.exists(extrafanart_copy_folder_path):
-                shutil.copytree(extrafanart_folder_path, extrafanart_copy_folder_path)
+                await asyncio.to_thread(shutil.copytree, extrafanart_folder_path, extrafanart_copy_folder_path)
                 filelist = await aiofiles.os.listdir(extrafanart_copy_folder_path)
                 for file in filelist:
                     file_new_name = file.replace("jpg", "mp4")
@@ -51,7 +52,7 @@ async def add_del_extras(mode: str) -> None:
                 signal.show_log_text(f" {count} old extras: \n  {extrafanart_copy_folder_path}")
         else:
             if await aiofiles.os.path.exists(extrafanart_copy_folder_path):
-                shutil.rmtree(extrafanart_copy_folder_path, ignore_errors=True)
+                await asyncio.to_thread(shutil.rmtree, extrafanart_copy_folder_path, ignore_errors=True)
                 signal.show_log_text(f" {count} del extras: \n  {extrafanart_copy_folder_path}")
                 new_count += 1
 
@@ -96,7 +97,7 @@ async def add_del_theme_videos(mode: str) -> None:
                 signal.show_log_text(f" {count} old theme video: \n  {theme_video}")
         else:
             if await aiofiles.os.path.exists(theme_video_dir):
-                shutil.rmtree(theme_video_dir, ignore_errors=True)
+                await asyncio.to_thread(shutil.rmtree, theme_video_dir, ignore_errors=True)
                 signal.show_log_text(f" {count} del theme video: \n  {theme_video_dir}")
                 new_count += 1
 

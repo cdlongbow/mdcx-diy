@@ -132,7 +132,7 @@ async def copy_trailer_to_theme_videos(folder_new_path: Path, naming_rule: str) 
     # 不保留不下载主题视频时，删除
     if theme_videos_policy.should_remove_existing:
         if await aiofiles.os.path.exists(theme_videos_folder_path):
-            shutil.rmtree(theme_videos_folder_path, ignore_errors=True)
+            await asyncio.to_thread(shutil.rmtree, theme_videos_folder_path, ignore_errors=True)
         return
 
     # 保留主题视频并存在时返回
@@ -173,7 +173,7 @@ async def copy_trailer_to_theme_videos(folder_new_path: Path, naming_rule: str) 
     if trailer_policy.should_remove_existing:
         await delete_file_async(trailer_file_path)
         if trailer_name and trailer_folder:
-            shutil.rmtree(trailer_folder, ignore_errors=True)
+            await asyncio.to_thread(shutil.rmtree, trailer_folder, ignore_errors=True)
         LogBuffer.log().write("\n 🍀 Trailer delete done!")
 
 

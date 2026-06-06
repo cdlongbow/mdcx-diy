@@ -1,3 +1,4 @@
+import asyncio
 import shutil
 import time
 import traceback
@@ -35,7 +36,7 @@ async def extrafanart_copy2(folder_path: Path):
     # 如果不保留，不下载，删除返回
     if extrafanart_copy_policy.should_remove_existing:
         if await aiofiles.os.path.exists(extrafanart_copy_path):
-            shutil.rmtree(extrafanart_copy_path, ignore_errors=True)
+            await asyncio.to_thread(shutil.rmtree, extrafanart_copy_path, ignore_errors=True)
         return
 
     # 如果保留，并且存在，返回
@@ -51,8 +52,8 @@ async def extrafanart_copy2(folder_path: Path):
         return
 
     if await aiofiles.os.path.exists(extrafanart_copy_path):
-        shutil.rmtree(extrafanart_copy_path, ignore_errors=True)
-    shutil.copytree(extrafanart_path, extrafanart_copy_path)
+        await asyncio.to_thread(shutil.rmtree, extrafanart_copy_path, ignore_errors=True)
+    await asyncio.to_thread(shutil.copytree, extrafanart_path, extrafanart_copy_path)
 
     filelist = await aiofiles.os.listdir(extrafanart_copy_path)
     for each in filelist:
@@ -71,15 +72,15 @@ async def extrafanart_extras_copy(folder_path: Path):
 
     if DownloadableFile.EXTRAFANART_EXTRAS not in download_files:
         if await aiofiles.os.path.exists(extrafanart_extra_path):
-            shutil.rmtree(extrafanart_extra_path, ignore_errors=True)
+            await asyncio.to_thread(shutil.rmtree, extrafanart_extra_path, ignore_errors=True)
         return True
 
     if not await aiofiles.os.path.exists(extrafanart_path):
         return False
 
     if await aiofiles.os.path.exists(extrafanart_extra_path):
-        shutil.rmtree(extrafanart_extra_path)
-    shutil.copytree(extrafanart_path, extrafanart_extra_path)
+        await asyncio.to_thread(shutil.rmtree, extrafanart_extra_path)
+    await asyncio.to_thread(shutil.copytree, extrafanart_path, extrafanart_extra_path)
     filelist = await aiofiles.os.listdir(extrafanart_extra_path)
     for each in filelist:
         file_new_name = each.replace("jpg", "mp4")
@@ -249,14 +250,14 @@ async def add_del_extrafanart_copy(mode: str) -> None:
         count += 1
         if mode == "add":
             if not await aiofiles.os.path.exists(extrafanart_copy_folder_path):
-                shutil.copytree(extrafanart_folder_path, extrafanart_copy_folder_path)
+                await asyncio.to_thread(shutil.copytree, extrafanart_folder_path, extrafanart_copy_folder_path)
                 signal.show_log_text(f" {count} new copy: \n  {extrafanart_copy_folder_path}")
                 new_count += 1
             else:
                 signal.show_log_text(f" {count} old copy: \n  {extrafanart_copy_folder_path}")
         else:
             if await aiofiles.os.path.exists(extrafanart_copy_folder_path):
-                shutil.rmtree(extrafanart_copy_folder_path, ignore_errors=True)
+                await asyncio.to_thread(shutil.rmtree, extrafanart_copy_folder_path, ignore_errors=True)
                 signal.show_log_text(f" {count} del copy: \n  {extrafanart_copy_folder_path}")
                 new_count += 1
 

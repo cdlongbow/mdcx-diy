@@ -3324,17 +3324,19 @@ class MyMAinWindow(QMainWindow):
     # region 自动刮削
     def auto_scrape(self):
         if Switch.TIMED_SCRAPE in manager.config.switch_on and self.Ui.pushButton_start_cap.text() == "开始":
-            time.sleep(0.1)
-            timed_interval = manager.config.timed_interval
-            self.atuo_scrape_count += 1
+            QTimer.singleShot(100, self._auto_scrape_do_work)
+
+    def _auto_scrape_do_work(self):
+        timed_interval = manager.config.timed_interval
+        self.atuo_scrape_count += 1
+        signal_qt.show_log_text(
+            f"\n\n 🍔 已启用「循环刮削」！间隔时间：{timed_interval}！即将开始第 {self.atuo_scrape_count} 次循环刮削！"
+        )
+        if Flags.scrape_start_time:
             signal_qt.show_log_text(
-                f"\n\n 🍔 已启用「循环刮削」！间隔时间：{timed_interval}！即将开始第 {self.atuo_scrape_count} 次循环刮削！"
+                " ⏰ 上次刮削时间: " + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(Flags.scrape_start_time))
             )
-            if Flags.scrape_start_time:
-                signal_qt.show_log_text(
-                    " ⏰ 上次刮削时间: " + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(Flags.scrape_start_time))
-                )
-            start_new_scrape(FileMode.Default)
+        start_new_scrape(FileMode.Default)
 
     def auto_start(self):
         if Switch.AUTO_START in manager.config.switch_on:
