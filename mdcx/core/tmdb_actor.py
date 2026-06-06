@@ -1,10 +1,7 @@
 """
-演员 TMDB ID 查询模块
+演员 TMDB ID 查询模块。
 
 通过 TMDB API 搜索日本成人演员，获取 tmdbid 及多语言翻译，统一管理演员数据库 xlsx。
-
-演员数据库 xlsx 格式（actor_database.xlsx）：
-- 日文原名(jp)、中文名(zh_cn)、繁体名(zh_tw)、别名(keyword)、链接(href)、tmdbid、tmdb url
 """
 
 import asyncio
@@ -49,14 +46,13 @@ async def _tmdb_request(client: Any, method: str, url: str, **kwargs) -> _TmdbRe
     return None
 
 
-# ============= 演员数据库 xlsx 管理 =============
+def is_japan_place(place: str) -> bool:
     if not place:
         return False
     p = place.lower()
     japan_keywords = [
         "japan",
         "日本",
-        # 都道府县
         "北海道",
         "青森",
         "岩手",
@@ -104,7 +100,6 @@ async def _tmdb_request(client: Any, method: str, url: str, **kwargs) -> _TmdbRe
         "宫崎",
         "鹿儿岛",
         "冲绳",
-        # 主要城市
         "横滨",
         "札幌",
         "神户",
@@ -112,7 +107,6 @@ async def _tmdb_request(client: Any, method: str, url: str, **kwargs) -> _TmdbRe
         "仙台",
         "町田",
         "八王子",
-        # 东京区名
         "品川",
         "涩谷",
         "新宿",
@@ -154,14 +148,13 @@ async def _tmdb_request(client: Any, method: str, url: str, **kwargs) -> _TmdbRe
 
 # ============= 演员数据库 xlsx 管理 =============
 
-# 列索引常量
-COL_JP = 0  # 日文原名
-COL_ZH_CN = 1  # 中文名
-COL_ZH_TW = 2  # 繁体名
-COL_KEYWORD = 3  # 别名
-COL_HREF = 4  # 链接
-COL_TMDBID = 5  # tmdbid
-COL_TMDB_URL = 6  # tmdb url
+COL_JP = 0
+COL_ZH_CN = 1
+COL_ZH_TW = 2
+COL_KEYWORD = 3
+COL_HREF = 4
+COL_TMDBID = 5
+COL_TMDB_URL = 6
 
 DB_HEADERS = ["日文原名", "中文名", "繁体名", "别名", "链接", "tmdbid", "tmdb url"]
 
@@ -231,13 +224,7 @@ async def update_actor_db_row(
     append_keyword: bool = False,
 ) -> None:
     """
-    更新或添加演员数据库行。
-
-    策略：已有值不覆盖，TMDB 只填补空白。
-    - jp: 必须提供（主键）
-    - zh_cn/zh_tw: 已有值不覆盖，空则填入
-    - keyword: append_keyword=True 时追加（去重），否则已有值不覆盖
-    - tmdbid: 已有值不覆盖，空则填入
+    更新或添加演员数据库行。已有值不覆盖，仅填空白；keyword 在 append_keyword=True 时追加去重。
     """
     db_path = _get_db_path()
     db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -261,7 +248,6 @@ async def update_actor_db_row(
         if ws.title != "演员数据库":
             ws.title = "演员数据库"
 
-        # 查找现有行
         existing_row = None
         for row_idx, row in enumerate(ws.iter_rows(min_col=1, max_col=7, values_only=True), start=1):
             if row_idx == 1:
@@ -271,17 +257,14 @@ async def update_actor_db_row(
                 break
 
         if existing_row:
-            # 更新已有行：只填空白
             if not ws.cell(row=existing_row, column=COL_ZH_CN + 1).value and zh_cn:
                 ws.cell(row=existing_row, column=COL_ZH_CN + 1, value=zh_cn)
             if not ws.cell(row=existing_row, column=COL_ZH_TW + 1).value and zh_tw:
                 ws.cell(row=existing_row, column=COL_ZH_TW + 1, value=zh_tw)
 
-            # keyword 处理
             if keyword:
                 existing_kw = str(ws.cell(row=existing_row, column=COL_KEYWORD + 1).value or "").strip()
                 if append_keyword:
-                    # 追加别名，去重
                     new_kws = set(keyword.split(","))
                     existing_kws_set = set()
                     if existing_kw:
@@ -305,7 +288,6 @@ async def update_actor_db_row(
                     row=existing_row, column=COL_TMDB_URL + 1
                 ).hyperlink = f"https://www.themoviedb.org/person/{tmdbid}"
         else:
-            # 新增行
             ws.append([jp, zh_cn, zh_tw, keyword, href, tmdbid or "", ""])
             last_row = ws.max_row
             if tmdbid:
@@ -315,9 +297,8 @@ async def update_actor_db_row(
                     column=COL_TMDB_URL + 1,
                     value=f"https://www.themoviedb.org/person/{tmdbid}",
                 )
-                ws.cell(row=last_row, column=COL_TMDB_URL + 1).hyperlink = f"https://www.themoviedb.org/person/{tmdbid}"
+                ws.cell(row=last_row, column=COL_TMDB_URL + 1                ).hyperlink = f"https://www.themoviedb.org/person/{tmdbid}"
 
-        # 自动列宽
         for col in ws.columns:
             max_length = 0
             column = col[0].column_letter
@@ -330,7 +311,6 @@ async def update_actor_db_row(
             adjusted_width = min(max_length, 50)
             ws.column_dimensions[column].width = adjusted_width
 
-        # 自动筛选
         ws.auto_filter.ref = f"A1:{get_column_letter(len(DB_HEADERS))}1"
 
         wb.save(db_path)
@@ -345,9 +325,7 @@ async def update_actor_db_row(
 
 def search_actor_db_reverse(query_name: str) -> dict | None:
     """
-    反向搜索演员数据库：用任意语言的演员名搜索。
-    返回匹配的整行数据，或 None。
-    搜索列：日文原名、中文名、繁体名、别名
+    反向搜索演员数据库：用任意语言的演员名搜索。返回匹配的整行数据，或 None。
     """
     actor_db = resources.actor_db
     if not actor_db:
@@ -355,24 +333,19 @@ def search_actor_db_reverse(query_name: str) -> dict | None:
 
     target = norm_name(query_name)
 
-    # 精确匹配
     for jp, data in actor_db.items():
-        # 匹配日文原名
         if target in _norm_name_set([jp]):
             data_copy = dict(data)
             data_copy["jp"] = jp
             return data_copy
-        # 匹配中文名
         if data.get("zh_cn") and target in _norm_name_set([data["zh_cn"]]):
             data_copy = dict(data)
             data_copy["jp"] = jp
             return data_copy
-        # 匹配繁体名
         if data.get("zh_tw") and target in _norm_name_set([data["zh_tw"]]):
             data_copy = dict(data)
             data_copy["jp"] = jp
             return data_copy
-        # 匹配别名
         if data.get("keyword"):
             for kw in data["keyword"].split(","):
                 if kw.strip() and target in _norm_name_set([kw.strip()]):
@@ -380,7 +353,6 @@ def search_actor_db_reverse(query_name: str) -> dict | None:
                     data_copy["jp"] = jp
                     return data_copy
 
-    # 全半角不敏感匹配（与原 XML 搜索逻辑一致）
     def full_to_half(s):
         result = []
         for ch in s:
@@ -424,14 +396,13 @@ async def migrate_xml_to_xlsx() -> bool:
     """
     db_path = _get_db_path()
     if db_path.exists():
-        return True  # 已有数据库文件，无需迁移
+        return True
 
     xml_path = manager.data_folder / "userdata" / "mapping_actor.xml"
     old_tmdb_path = manager.data_folder / "userdata" / "actor_tmdbid.xlsx"
 
     migrated = False
     try:
-        # 读取 XML
         if xml_path.exists():
             parser = None
             try:
@@ -446,7 +417,6 @@ async def migrate_xml_to_xlsx() -> bool:
                 xml_data = etree.HTML(content.encode("utf-8"), parser)
                 actor_objects = xml_data.xpath("//a")
 
-                # 读取旧的 tmdbid xlsx（如果有）
                 old_tmdb_cache = {}
                 if old_tmdb_path.exists():
                     try:
@@ -466,7 +436,6 @@ async def migrate_xml_to_xlsx() -> bool:
                     except Exception:
                         pass
 
-                # 写入新 xlsx
                 import openpyxl
 
                 wb = openpyxl.Workbook()
@@ -485,7 +454,6 @@ async def migrate_xml_to_xlsx() -> bool:
                     keyword = ob.get("keyword") or ""
                     href = ob.get("href") or ""
 
-                    # 从 keyword 中找第一个作为日文原名（如果 jp 为空）
                     if not jp and keyword:
                         first_kw = keyword.strip(",").split(",")[0]
                         jp = first_kw
@@ -493,7 +461,6 @@ async def migrate_xml_to_xlsx() -> bool:
                     if not jp:
                         continue
 
-                    # 查找旧 tmdbid 缓存中的匹配
                     tmdbid = old_tmdb_cache.get(jp)
 
                     ws.append([jp, zh_cn, zh_tw, keyword, href, tmdbid or "", ""])
@@ -548,7 +515,6 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: AsyncWebClient) -> dic
 
     base_url = f"{protocol}{tmdb_api_base}"
 
-    # 从演员数据库 xlsx 读取缓存
     actor_db = resources.actor_db or {}
     result: dict[str, int] = {}
     need_query: list[str] = []
@@ -574,14 +540,12 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: AsyncWebClient) -> dic
                 tmdbid = query_result["pid"]
                 result[actor_name] = tmdbid
 
-                # 获取翻译数据
                 translations = query_result.get("translations", {})
                 zh_cn = translations.get("zh_cn", "")
                 zh_tw = translations.get("zh_tw", "")
                 aka = query_result.get("also_known_as", [])
                 keyword_str = ",".join(aka) if aka else ""
 
-                # 更新演员数据库 xlsx
                 await update_actor_db_row(
                     jp=actor_name,
                     zh_cn=zh_cn,
@@ -600,7 +564,6 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: AsyncWebClient) -> dic
             LogBuffer.log().write(f"  ❌ [TMDB] {actor_name} 查询失败: {e}")
         await asyncio.sleep(0.5)
 
-    # 查询完成后重新加载演员数据库
     old_db = dict(resources.actor_db) if resources.actor_db else {}
     resources.reload_actor_db()
 
@@ -616,8 +579,7 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: AsyncWebClient) -> dic
 
 async def _query_single_actor(actor_name: str, base_url: str, api_key: str, client: Any) -> dict | None:
     """
-    查询单个演员的 TMDB 信息。
-    返回: {"pid": int, "translations": {"zh_cn": str, "zh_tw": str}, "also_known_as": list} 或 None
+    查询单个演员的 TMDB 信息。返回匹配结果或 None。
     """
     search_url = f"{base_url}/3/search/person"
     target = norm_name(actor_name)
@@ -685,7 +647,6 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
         known_for_count = len(detail.get("known_for", [])) if "known_for" in detail else 0
         place_has_japan = "japan" in place.lower() or "日本" in place
 
-        # 获取翻译数据
         translations = await _fetch_person_translations(pid, base_url, api_key, client)
 
         candidates.append(
@@ -724,7 +685,6 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
 async def _fetch_person_translations(pid: int, base_url: str, api_key: str, client: Any) -> dict:
     """
     从 TMDB translations API 获取演员的多语言翻译。
-    返回: {"zh_cn": str, "zh_tw": str}
     """
     result = {"zh_cn": "", "zh_tw": ""}
     try:
@@ -817,7 +777,6 @@ async def migrate_info_xml_to_xlsx() -> bool:
 
         ws.auto_filter.ref = f"A1:{get_column_letter(len(headers))}1"
 
-        # 自动列宽
         for col in ws.columns:
             max_length = 0
             column = col[0].column_letter
