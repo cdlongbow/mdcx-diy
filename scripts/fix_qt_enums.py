@@ -128,6 +128,68 @@ MIGRATIONS = {
         ('Shadow', 'Raised'),
         ('Shadow', 'Plain'),
     ],
+    'QAbstractItemView': [
+        # EditTrigger
+        ('EditTrigger', 'AnyKeyPressed'),
+        ('EditTrigger', 'EditKeyPressed'),
+        ('EditTrigger', 'SelectedClicked'),
+        ('EditTrigger', 'CurrentChanged'),
+        ('EditTrigger', 'DoubleClicked'),
+        ('EditTrigger', 'NoEditTriggers'),
+        # SelectionMode
+        ('SelectionMode', 'ExtendedSelection'),
+        ('SelectionMode', 'MultiSelection'),
+        ('SelectionMode', 'ContiguousSelection'),
+        ('SelectionMode', 'SingleSelection'),
+        ('SelectionMode', 'NoSelection'),
+        # SelectionBehavior
+        ('SelectionBehavior', 'SelectRows'),
+        ('SelectionBehavior', 'SelectColumns'),
+        ('SelectionBehavior', 'SelectItems'),
+        # ScrollHint
+        ('ScrollHint', 'ScrollPerIndexChange'),
+        ('ScrollHint', 'ScrollPerItem'),
+    ],
+    'QAbstractScrollArea': [
+        # SizeAdjustPolicy
+        ('SizeAdjustPolicy', 'AdjustToContentsOnFirstShow'),
+        ('SizeAdjustPolicy', 'AdjustToContents'),
+        ('SizeAdjustPolicy', 'AdjustIgnored'),
+    ],
+    'QTabWidget': [
+        # TabPosition
+        ('TabPosition', 'North'),
+        ('TabPosition', 'South'),
+        ('TabPosition', 'West'),
+        ('TabPosition', 'East'),
+        # TabShape
+        ('TabShape', 'Rounded'),
+        ('TabShape', 'Triangular'),
+    ],
+    'QLCDNumber': [
+        # LCDNumberValueMode
+        ('LCDNumberValueMode', 'Hex'),
+        ('LCDNumberValueMode', 'Dec'),
+        ('LCDNumberValueMode', 'Oct'),
+        ('LCDNumberValueMode', 'Bin'),
+    ],
+    'QLayout': [
+        # SizeConstraint
+        ('SizeConstraint', 'SetDefaultConstraint'),
+        ('SizeConstraint', 'SetFixedSize'),
+        ('SizeConstraint', 'SetMaximumSize'),
+        ('SizeConstraint', 'SetMinimumSize'),
+    ],
+    'QSizePolicy': [
+        # Policy
+        ('Policy', 'MinimumExpanding'),
+        ('Policy', 'Minimum'),
+        ('Policy', 'Maximum'),
+        ('Policy', 'Preferred'),
+        ('Policy', 'Expanding'),
+        ('Policy', 'Ignored'),
+        ('Policy', 'Fixed'),
+    ],
 }
 
 
