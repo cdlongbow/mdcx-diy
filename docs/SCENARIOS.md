@@ -1038,7 +1038,7 @@ crontab -e
 
 - **快速上手**：参见 [用户使用手册](USER_GUIDE.md)
 - **功能详解**：参见 [功能特色](FEATURES.md)
-- **配置说明**：参见 [配置说明](docs/configuration.md)
+- **配置说明**：参见 [配置说明](configuration.md)
 - **常见问题**：参见 [FAQ](FAQ.md)
 - **技术文档**：参见 [Code Wiki](CODE_WIKI.md)
 

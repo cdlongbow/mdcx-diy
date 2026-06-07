@@ -542,7 +542,7 @@ elif main_mode == 3:
 
 ## 相关文档
 
-- [配置说明](docs/configuration.md) - 详细的配置项说明
-- [命名系统](docs/naming-system.md) - 命名规则详解
+- [配置说明](configuration.md) - 详细的配置项说明
+- [命名系统](naming-system.md) - 命名规则详解
 - [使用场景](SCENARIOS.md) - 实际使用案例
 - [用户使用手册](USER_GUIDE.md) - 完整的使用指南

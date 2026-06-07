@@ -89,7 +89,7 @@ mdcx/
 └── main.py               # 程序入口
 ```
 
-详细架构说明请参阅 [架构设计文档](docs/architecture.md)。
+详细架构说明请参阅 [架构设计文档](architecture.md)。
 
 ## 开发流程
 
@@ -361,10 +361,10 @@ Closes #123
 
 代码变更时同步更新文档：
 
-- API 变更 → 更新 [API 文档](docs/api-documentation.md)
+- API 变更 → 更新 [API 文档](api-documentation.md)
 - 新功能 → 更新 [用户手册](USER_GUIDE.md)
-- 架构变更 → 更新 [架构文档](docs/architecture.md)
-- 配置变更 → 更新 [配置说明](docs/configuration.md)
+- 架构变更 → 更新 [架构文档](architecture.md)
+- 配置变更 → 更新 [配置说明](configuration.md)
 
 ### 文档位置
 
@@ -465,12 +465,12 @@ import pdb; pdb.set_trace()
 
 ## 相关文档
 
-- [架构设计](docs/architecture.md)
-- [核心模块](docs/core-modules.md)
-- [API 文档](docs/api-documentation.md)
+- [架构设计](architecture.md)
+- [核心模块](core-modules.md)
+- [API 文档](api-documentation.md)
 - [代码规范](docs/CODE_REVIEW_STANDARDS.md)
 - [测试指南](docs/TEST_COVERAGE_SUMMARY.md)
-- [迁移指南](docs/crawler-migration.md)
+- [迁移指南](crawler-migration.md)
 
 ## 联系方式
 

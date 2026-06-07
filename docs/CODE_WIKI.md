@@ -5,41 +5,41 @@
 ## 目录
 
 1. [项目概述](#项目概述)
-2. [项目架构](#项目架构) → [独立文档](docs/architecture.md)
-3. [核心模块](#核心模块) → [独立文档](docs/core-modules.md)
-4. [数据模型](#数据模型) → [独立文档](docs/data-models.md)
-5. [配置系统](#配置系统) → [独立文档](docs/configuration.md)
-6. [爬虫系统](#爬虫系统) → [独立文档](docs/crawler-system.md)
-7. [工具模块](#工具模块) → [独立文档](docs/tools.md)
-8. [命名系统](#命名系统) → [独立文档](docs/naming-system.md)
+2. [项目架构](#项目架构) → [独立文档](architecture.md)
+3. [核心模块](#核心模块) → [独立文档](core-modules.md)
+4. [数据模型](#数据模型) → [独立文档](data-models.md)
+5. [配置系统](#配置系统) → [独立文档](configuration.md)
+6. [爬虫系统](#爬虫系统) → [独立文档](crawler-system.md)
+7. [工具模块](#工具模块) → [独立文档](tools.md)
+8. [命名系统](#命名系统) → [独立文档](naming-system.md)
 9. [项目运行方式](#项目运行方式)
-10. [依赖关系](#依赖关系) → [独立文档](docs/dependencies.md)
+10. [依赖关系](#依赖关系) → [独立文档](dependencies.md)
 
 ### 附录
 
-A. [PyQt6 迁移指南](#pyqt6-迁移指南) → [独立文档](docs/pyqt6-migration.md)
-B. [爬虫迁移指南](#爬虫迁移指南) → [独立文档](docs/crawler-migration.md)
+A. [PyQt6 迁移指南](#pyqt6-迁移指南) → [独立文档](pyqt6-migration.md)
+B. [爬虫迁移指南](#爬虫迁移指南) → [独立文档](crawler-migration.md)
 
 ---
 
 ## 快速链接
 
 - [docs/README.md](docs/README.md) - 文档中心入口
-- [docs/architecture.md](docs/architecture.md) - 项目架构详解
-- [docs/core-modules.md](docs/core-modules.md) - 核心模块详解
-- [docs/data-models.md](docs/data-models.md) - 数据模型详解
-- [docs/configuration.md](docs/configuration.md) - 配置系统详解
-- [docs/crawler-system.md](docs/crawler-system.md) - 爬虫系统详解
-- [docs/tools.md](docs/tools.md) - 工具模块详解
-- [docs/naming-system.md](docs/naming-system.md) - 命名系统详解
-- [docs/dependencies.md](docs/dependencies.md) - 依赖关系详解
-- [docs/api-documentation.md](docs/api-documentation.md) - API 文档参考
+- [docs/architecture.md](architecture.md) - 项目架构详解
+- [docs/core-modules.md](core-modules.md) - 核心模块详解
+- [docs/data-models.md](data-models.md) - 数据模型详解
+- [docs/configuration.md](configuration.md) - 配置系统详解
+- [docs/crawler-system.md](crawler-system.md) - 爬虫系统详解
+- [docs/tools.md](tools.md) - 工具模块详解
+- [docs/naming-system.md](naming-system.md) - 命名系统详解
+- [docs/dependencies.md](dependencies.md) - 依赖关系详解
+- [docs/api-documentation.md](api-documentation.md) - API 文档参考
 - [docs/TEST_COVERAGE_SUMMARY.md](docs/TEST_COVERAGE_SUMMARY.md) - 测试覆盖率
 
 ### 迁移指南
 
-- [docs/pyqt6-migration.md](docs/pyqt6-migration.md) - PyQt6 迁移方案
-- [docs/crawler-migration.md](docs/crawler-migration.md) - 爬虫新版框架迁移指南
+- [docs/pyqt6-migration.md](pyqt6-migration.md) - PyQt6 迁移方案
+- [docs/crawler-migration.md](crawler-migration.md) - 爬虫新版框架迁移指南
 
 ### 代码质量
 
@@ -1379,7 +1379,7 @@ sys.exit(app.exec())
 
 ## 附录 A：PyQt6 迁移指南
 
-详细的 PyQt6 迁移方案请参考：[docs/pyqt6-migration.md](docs/pyqt6-migration.md)
+详细的 PyQt6 迁移方案请参考：[docs/pyqt6-migration.md](pyqt6-migration.md)
 
 ### 主要差异
 
@@ -1398,7 +1398,7 @@ sys.exit(app.exec())
 
 ## 附录 B：爬虫迁移指南
 
-详细的刮削器新版框架迁移指南请参考：[docs/crawler-migration.md](docs/crawler-migration.md)
+详细的刮削器新版框架迁移指南请参考：[docs/crawler-migration.md](crawler-migration.md)
 
 ### 迁移目标
 

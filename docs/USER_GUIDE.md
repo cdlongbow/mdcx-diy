@@ -227,6 +227,6 @@ export QT_QPA_PLATFORM=xcb
 
 ## 下一步
 
-- 查看 [配置说明](docs/configuration.md) 了解详细配置
+- 查看 [配置说明](configuration.md) 了解详细配置
 - 阅读 [FAQ](FAQ.md) 解决常见问题
 - 了解 [开发文档](DEVELOPMENT.md) 参与贡献

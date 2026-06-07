@@ -9,17 +9,17 @@
 如果您是第一次使用 MDCx，建议按以下顺序阅读：
 
 1. 📖 [快速开始](#快速开始) - 5 分钟快速上手
-2. 📗 [用户使用手册](../USER_GUIDE.md) - 完整的使用指南
-3. 🎬 [使用场景和案例](../SCENARIOS.md) - 实际操作案例
-4. ❓ [FAQ](../FAQ.md) - 常见问题解答
+2. 📗 [用户使用手册](USER_GUIDE.md) - 完整的使用指南
+3. 🎬 [使用场景和案例](SCENARIOS.md) - 实际操作案例
+4. ❓ [FAQ](FAQ.md) - 常见问题解答
 
 ### ⭐ 功能特色
 
 详细了解 MDCx 的强大功能：
 
-- ⭐ [功能特色](../FEATURES.md) - 详细的功能介绍和技术亮点
-- 📋 [完整功能列表](../COMPLETE_FEATURES.md) - 所有功能的完整列表（42 个网站）
-- 🔄 [刮削模式详解](../SCRAPING_MODES.md) - 正常模式、更新模式、读取模式详细说明
+- ⭐ [功能特色](FEATURES.md) - 详细的功能介绍和技术亮点
+- 📋 [完整功能列表](COMPLETE_FEATURES.md) - 所有功能的完整列表（42 个网站）
+- 🔄 [刮削模式详解](SCRAPING_MODES.md) - 正常模式、更新模式、读取模式详细说明
 - 🎬 [智能刮削系统](#智能刮削) - 42 个网站爬虫支持
 - 🖼️ [图片处理](#图片处理) - 人脸裁剪、水印、高清封面
 - 🌐 [多语言翻译](#多语言翻译) - 5 大翻译引擎
@@ -30,10 +30,10 @@
 
 面向开发者和高级用户的技术文档：
 
-- 📗 [Code Wiki](../CODE_WIKI.md) - 完整的技术文档（1,150+ 行）
+- 📗 [Code Wiki](CODE_WIKI.md) - 完整的技术文档（1,150+ 行）
 - 🏗️ [架构设计](architecture.md) - 系统架构和设计模式
 - 📖 [API 文档](api-documentation.md) - 核心模块 API 参考
-- 🔧 [开发指南](../DEVELOPMENT.md) - 开发环境搭建和最佳实践
+- 🔧 [开发指南](DEVELOPMENT.md) - 开发环境搭建和最佳实践
 
 ### 📋 配置参考
 
@@ -48,7 +48,7 @@
 
 高级功能和自动化：
 
-- 🎬 [使用场景和案例](../SCENARIOS.md) - 8 个详细的使用场景
+- 🎬 [使用场景和案例](SCENARIOS.md) - 8 个详细的使用场景
 - 🔄 [自动化工作流](#自动化) - 定时任务和完全自动化
 - 🛠️ [工具模块](tools.md) - 内置工具使用指南
 
@@ -58,7 +58,7 @@
 
 - 🔄 [PyQt6 迁移](pyqt6-migration.md) - 从 PyQt5 迁移到 PyQt6
 - 🔄 [爬虫迁移](crawler-migration.md) - 爬虫系统重构和迁移
-- 📝 [变更日志](../changelog.md) - 版本更新历史
+- 📝 [变更日志](changelog.md) - 版本更新历史
 
 ### ✅ 代码质量
 
@@ -129,17 +129,17 @@
 ### 按用户类型查找
 
 **新手用户**
-- [用户使用手册](../USER_GUIDE.md) - 从零开始
-- [使用场景](../SCENARIOS.md) - 实际案例
-- [FAQ](../FAQ.md) - 常见问题
+- [用户使用手册](USER_GUIDE.md) - 从零开始
+- [使用场景](SCENARIOS.md) - 实际案例
+- [FAQ](FAQ.md) - 常见问题
 
 **高级用户**
-- [功能特色](../FEATURES.md) - 深入了解功能
+- [功能特色](FEATURES.md) - 深入了解功能
 - [配置说明](configuration.md) - 高级配置
 - [自动化工作流](../SCENARIOS.md#自动化工作流) - 自动化
 
 **开发者**
-- [开发指南](../DEVELOPMENT.md) - 开发环境
+- [开发指南](DEVELOPMENT.md) - 开发环境
 - [架构设计](architecture.md) - 系统架构
 - [API 文档](api-documentation.md) - API 参考
 
@@ -169,7 +169,7 @@
    - 选择要刮削的文件
    - 点击开始刮削
 
-详细步骤请参阅 [用户使用手册](../USER_GUIDE.md)。
+详细步骤请参阅 [用户使用手册](USER_GUIDE.md)。
 
 ---
 
@@ -217,8 +217,8 @@
 ### 文档资源
 
 - 📖 [完整文档列表](#文档导航)
-- ❓ [FAQ](../FAQ.md) - 常见问题
-- 🎬 [使用场景](../SCENARIOS.md) - 实际案例
+- ❓ [FAQ](FAQ.md) - 常见问题
+- 🎬 [使用场景](SCENARIOS.md) - 实际案例
 
 ### 社区支持
 
@@ -254,7 +254,7 @@
 - 🏠 [项目主页](https://github.com/cdlongbow/mdcx)
 - 📦 [Release 页面](https://github.com/cdlongbow/mdcx/releases)
 - 📝 [许可证](../LICENSE)
-- 🤝 [贡献指南](../CONTRIBUTING.md)
+- 🤝 [贡献指南](CONTRIBUTING.md)
 
 ---
 

@@ -254,33 +254,33 @@ MDCx 专为以下用户和场景打造：
 ### 快速链接
 
 - 📖 [文档中心](docs/README.md) - 所有文档的入口
-- 📗 [Code Wiki](CODE_WIKI.md) - 完整的技术文档
-- ⭐ [功能特色](FEATURES.md) - 详细的功能介绍和特色说明
-- 📋 [完整功能列表](COMPLETE_FEATURES.md) - 所有功能的完整列表和详细说明
-- 🎬 [使用场景](SCENARIOS.md) - 8 个详细的使用场景和案例
-- 🔧 [开发指南](DEVELOPMENT.md) - 开发者文档
-- ❓ [FAQ](FAQ.md) - 常见问题解答
+- 📗 [Code Wiki](docs/CODE_WIKI.md) - 完整的技术文档
+- ⭐ [功能特色](docs/FEATURES.md) - 详细的功能介绍和特色说明
+- 📋 [完整功能列表](docs/COMPLETE_FEATURES.md) - 所有功能的完整列表和详细说明
+- 🎬 [使用场景](docs/SCENARIOS.md) - 8 个详细的使用场景和案例
+- 🔧 [开发指南](docs/DEVELOPMENT.md) - 开发者文档
+- ❓ [FAQ](docs/FAQ.md) - 常见问题解答
 
 ### 详细文档
 
 #### 用户文档
 
-- 📗 [用户使用手册](USER_GUIDE.md) - 完整的用户指南，包含安装、配置和使用说明
-- ⭐ [功能特色](FEATURES.md) - 详细的功能介绍、技术亮点和使用场景
-- 📋 [完整功能列表](COMPLETE_FEATURES.md) - 所有 42 个网站爬虫和功能的完整列表
-- 🔄 [刮削模式详解](SCRAPING_MODES.md) - 正常模式、更新模式、读取模式详细说明
-- 🎬 [使用场景和案例](SCENARIOS.md) - 8 个实际使用场景的详细操作指南
+- 📗 [用户使用手册](docs/USER_GUIDE.md) - 完整的用户指南，包含安装、配置和使用说明
+- ⭐ [功能特色](docs/FEATURES.md) - 详细的功能介绍、技术亮点和使用场景
+- 📋 [完整功能列表](docs/COMPLETE_FEATURES.md) - 所有 42 个网站爬虫和功能的完整列表
+- 🔄 [刮削模式详解](docs/SCRAPING_MODES.md) - 正常模式、更新模式、读取模式详细说明
+- 🎬 [使用场景和案例](docs/SCENARIOS.md) - 8 个实际使用场景的详细操作指南
 - 📋 [配置说明](docs/configuration.md) - 详细的配置项说明
-- 📦 [安装指南](INSTALL.md) - 安装步骤和系统要求
-- ❓ [FAQ](FAQ.md) - 常见问题解答
+- 📦 [安装指南](docs/INSTALL.md) - 安装步骤和系统要求
+- ❓ [FAQ](docs/FAQ.md) - 常见问题解答
 
 #### 开发者文档
 
-- 🔧 [开发指南](DEVELOPMENT.md) - 开发环境搭建、代码规范和最佳实践
+- 🔧 [开发指南](docs/DEVELOPMENT.md) - 开发环境搭建、代码规范和最佳实践
 - 🏗️ [架构设计](docs/architecture.md) - 系统架构和设计模式
 - 📖 [API 文档](docs/api-documentation.md) - 核心模块 API 参考
-- 🤝 [贡献指南](CONTRIBUTING.md) - 如何为项目做贡献
-- 📚 [Code Wiki](CODE_WIKI.md) - 技术文档和代码说明
+- 🤝 [贡献指南](docs/CONTRIBUTING.md) - 如何为项目做贡献
+- 📚 [Code Wiki](docs/CODE_WIKI.md) - 技术文档和代码说明
 
 #### 迁移指南
 
@@ -473,7 +473,7 @@ uv run ruff check . --fix
 
 ### 贡献指南
 
-欢迎贡献代码！请参考 [CONTRIBUTING.md](CONTRIBUTING.md) 了解详细的贡献流程。
+欢迎贡献代码！请参考 [CONTRIBUTING.md](docs/CONTRIBUTING.md) 了解详细的贡献流程。
 
 ## 授权许可
 

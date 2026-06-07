@@ -112,7 +112,7 @@
 
 ## 配置
 
-首次运行时，程序会自动创建配置文件。详细配置说明请参阅 [配置说明文档](docs/configuration.md)。
+首次运行时，程序会自动创建配置文件。详细配置说明请参阅 [配置说明文档](configuration.md)。
 
 ## 常见问题
 
@@ -160,7 +160,7 @@ pip install -r requirements.txt --upgrade
 ## 下一步
 
 - 阅读 [用户使用手册](USER_GUIDE.md) 了解如何使用程序
-- 查看 [配置说明](docs/configuration.md) 了解各项配置选项
+- 查看 [配置说明](configuration.md) 了解各项配置选项
 - 遇到问题时查看 [FAQ](FAQ.md)
 
 ## 获取帮助
