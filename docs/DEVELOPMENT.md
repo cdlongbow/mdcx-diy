@@ -271,7 +271,7 @@ def test_rate_limit():
     assert actor._rate_limiter.rate == 3.5
 ```
 
-详细测试说明请参阅 [测试文档](docs/TEST_COVERAGE_SUMMARY.md)。
+详细测试说明请参阅 [测试文档](TEST_COVERAGE_SUMMARY.md)。
 
 ## 提交规范
 
@@ -376,7 +376,7 @@ Closes #123
 
 ### 审查检查清单
 
-使用 [代码审查检查清单](docs/CODE_REVIEW_CHECKLIST.md) 确保代码质量。
+使用 [代码审查检查清单](CODE_REVIEW_CHECKLIST.md) 确保代码质量。
 
 ### 审查要点
 
@@ -386,7 +386,7 @@ Closes #123
 - 是否有性能问题
 - 是否有安全隐患
 
-详细说明请参阅 [代码审查指南](docs/CODE_REVIEW_GUIDE.md)。
+详细说明请参阅 [代码审查指南](CODE_REVIEW_GUIDE.md)。
 
 ## 性能优化
 
@@ -468,8 +468,8 @@ import pdb; pdb.set_trace()
 - [架构设计](architecture.md)
 - [核心模块](core-modules.md)
 - [API 文档](api-documentation.md)
-- [代码规范](docs/CODE_REVIEW_STANDARDS.md)
-- [测试指南](docs/TEST_COVERAGE_SUMMARY.md)
+- [代码规范](CODE_REVIEW_STANDARDS.md)
+- [测试指南](TEST_COVERAGE_SUMMARY.md)
 - [迁移指南](crawler-migration.md)
 
 ## 联系方式

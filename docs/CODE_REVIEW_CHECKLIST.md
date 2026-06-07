@@ -137,4 +137,4 @@
 
 - [代码审查指南](CODE_REVIEW_GUIDE.md)
 - [代码审查标准](CODE_REVIEW_STANDARDS.md)
-- [开发指南](../DEVELOPMENT.md)
+- [开发指南](DEVELOPMENT.md)

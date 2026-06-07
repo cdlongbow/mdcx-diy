@@ -91,4 +91,3 @@ tests/
 
 - [架构设计](architecture.md) - 系统架构
 - [核心模块](core-modules.md) - 核心模块说明
-- [CI/CD 测试](ci-testing.md) - CI/CD 测试配置

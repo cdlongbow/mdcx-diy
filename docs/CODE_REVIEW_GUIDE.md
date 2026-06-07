@@ -168,4 +168,4 @@ A: 不可以，所有代码都需要经过审查。
 
 - [代码审查检查清单](CODE_REVIEW_CHECKLIST.md)
 - [代码审查标准](CODE_REVIEW_STANDARDS.md)
-- [开发指南](../DEVELOPMENT.md)
+- [开发指南](DEVELOPMENT.md)

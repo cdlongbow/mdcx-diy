@@ -24,7 +24,7 @@ B. [爬虫迁移指南](#爬虫迁移指南) → [独立文档](crawler-migratio
 
 ## 快速链接
 
-- [docs/README.md](docs/README.md) - 文档中心入口
+- [docs/README.md](README.md) - 文档中心入口
 - [docs/architecture.md](architecture.md) - 项目架构详解
 - [docs/core-modules.md](core-modules.md) - 核心模块详解
 - [docs/data-models.md](data-models.md) - 数据模型详解
@@ -34,7 +34,7 @@ B. [爬虫迁移指南](#爬虫迁移指南) → [独立文档](crawler-migratio
 - [docs/naming-system.md](naming-system.md) - 命名系统详解
 - [docs/dependencies.md](dependencies.md) - 依赖关系详解
 - [docs/api-documentation.md](api-documentation.md) - API 文档参考
-- [docs/TEST_COVERAGE_SUMMARY.md](docs/TEST_COVERAGE_SUMMARY.md) - 测试覆盖率
+- [docs/TEST_COVERAGE_SUMMARY.md](TEST_COVERAGE_SUMMARY.md) - 测试覆盖率
 
 ### 迁移指南
 
@@ -43,9 +43,9 @@ B. [爬虫迁移指南](#爬虫迁移指南) → [独立文档](crawler-migratio
 
 ### 代码质量
 
-- [docs/CODE_REVIEW_CHECKLIST.md](docs/CODE_REVIEW_CHECKLIST.md) - 代码审查检查清单
-- [docs/CODE_REVIEW_GUIDE.md](docs/CODE_REVIEW_GUIDE.md) - 代码审查指南
-- [docs/CODE_REVIEW_STANDARDS.md](docs/CODE_REVIEW_STANDARDS.md) - 代码审查标准
+- [docs/CODE_REVIEW_CHECKLIST.md](CODE_REVIEW_CHECKLIST.md) - 代码审查检查清单
+- [docs/CODE_REVIEW_GUIDE.md](CODE_REVIEW_GUIDE.md) - 代码审查指南
+- [docs/CODE_REVIEW_STANDARDS.md](CODE_REVIEW_STANDARDS.md) - 代码审查标准
 
 ---
 
@@ -1164,7 +1164,7 @@ class EmbyActorImage:
 
 - [用户使用手册 - Emby 集成](USER_GUIDE.md#embyjellyfin-集成)
 - [FAQ - Emby 问题](FAQ.md#embyjellyfin-集成)
-- [API 文档 - Emby 模块](docs/api-documentation.md#emby-模块)
+- [Emby 集成](#emby-集成)
 
 ---
 

@@ -190,4 +190,4 @@
 
 - [代码审查检查清单](CODE_REVIEW_CHECKLIST.md)
 - [代码审查指南](CODE_REVIEW_GUIDE.md)
-- [开发指南](../DEVELOPMENT.md)
+- [开发指南](DEVELOPMENT.md)

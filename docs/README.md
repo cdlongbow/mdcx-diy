@@ -107,7 +107,7 @@
 - [番号识别](#番号识别) - 智能番号识别
 
 **演员相关**
-- [演员数据库](tools.md#演员数据库) - Excel 数据库管理
+- [演员数据库](tools.md) - Excel 数据库管理
 - [TMDB 集成](CODE_WIKI.md#tmdb-数据流) - TMDB API 查询
 - [Emby 演员](CODE_WIKI.md#emby-集成) - Emby 演员信息同步
 
@@ -136,7 +136,7 @@
 **高级用户**
 - [功能特色](FEATURES.md) - 深入了解功能
 - [配置说明](configuration.md) - 高级配置
-- [自动化工作流](../SCENARIOS.md#自动化工作流) - 自动化
+- [自动化工作流](SCENARIOS.md#场景-8自动化工作流) - 自动化
 
 **开发者**
 - [开发指南](DEVELOPMENT.md) - 开发环境
