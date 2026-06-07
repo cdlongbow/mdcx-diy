@@ -108,8 +108,8 @@
 
 **演员相关**
 - [演员数据库](tools.md#演员数据库) - Excel 数据库管理
-- [TMDB 集成](../CODE_WIKI.md#tmdb-集成) - TMDB API 查询
-- [Emby 演员](../CODE_WIKI.md#emby-集成) - Emby 演员信息同步
+- [TMDB 集成](CODE_WIKI.md#tmdb-数据流) - TMDB API 查询
+- [Emby 演员](CODE_WIKI.md#emby-集成) - Emby 演员信息同步
 
 **翻译相关**
 - [翻译引擎](#翻译引擎) - 4 大翻译引擎配置
