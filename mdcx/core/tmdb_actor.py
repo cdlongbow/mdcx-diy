@@ -6,6 +6,7 @@
 
 import asyncio
 import json
+import time
 from pathlib import Path
 from typing import Any
 
@@ -13,6 +14,34 @@ from ..config.manager import manager
 from ..config.resources import resources
 from ..log import LogBuffer
 from ..utils import norm_name
+
+
+# ============= 速率限制器 =============
+
+class _TmdbRateLimiter:
+    """令牌桶限流器，控制 TMDB API 请求速率。"""
+
+    def __init__(self, rate: float = 3.5, burst: int = 10):
+        self.rate = rate
+        self._tokens = float(burst)
+        self._max_tokens = float(burst)
+        self._last = time.monotonic()
+        self._lock = asyncio.Lock()
+
+    async def acquire(self) -> None:
+        async with self._lock:
+            now = time.monotonic()
+            self._tokens = min(self._max_tokens, self._tokens + (now - self._last) * self.rate)
+            self._last = now
+            if self._tokens < 1:
+                delay = (1 - self._tokens) / self.rate
+                await asyncio.sleep(delay)
+                self._tokens = 0
+            else:
+                self._tokens -= 1
+
+
+_tmdb_rate_limiter = _TmdbRateLimiter()
 
 
 # ============= HTTP 适配器 =============
@@ -33,6 +62,7 @@ async def _tmdb_request(client: Any, method: str, url: str, **kwargs) -> _TmdbRe
     Unified HTTP request for both curl_cffi AsyncWebClient and aiohttp ClientSession.
     Returns _TmdbResponse or None on failure.
     """
+    await _tmdb_rate_limiter.acquire()
     params = kwargs.get("params")
     if hasattr(client, "request"):
         resp, err = await client.request(method, url, params=params)
@@ -161,6 +191,69 @@ DB_HEADERS = ["日文原名", "中文名", "繁体名", "别名", "链接", "tmd
 
 def _get_db_path() -> Path:
     return manager.data_folder / "userdata" / "actor_database.xlsx"
+
+
+def _format_db_worksheet(ws) -> None:
+    """格式化演员数据库工作表：固定表头、自动筛选、列宽、边框、超链接、表头样式。"""
+    try:
+        import openpyxl
+        from openpyxl.utils import get_column_letter
+
+        # 固定表头
+        ws.freeze_panes = "A2"
+
+        # 自动筛选
+        last_col = get_column_letter(len(DB_HEADERS))
+        ws.auto_filter.ref = f"A1:{last_col}{ws.max_row}"
+
+        # 表头样式
+        header_fill = openpyxl.styles.PatternFill("solid", fgColor="F2F2F2")
+        header_font = openpyxl.styles.Font(bold=True, size=11)
+        header_align = openpyxl.styles.Alignment(horizontal="center", vertical="center", wrap_text=True)
+        for cell in ws[1]:
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = header_align
+
+        # 表格边框
+        thin = openpyxl.styles.Side(style="thin", color="D0D0D0")
+        border = openpyxl.styles.Border(left=thin, right=thin, top=thin, bottom=thin)
+        for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=len(DB_HEADERS)):
+            for cell in row:
+                cell.border = border
+
+        # 链接列和 tmdb url 列超链接：每次保存都校验并修复
+        for row in ws.iter_rows(min_row=2, values_only=False):
+            href_cell = row[COL_HREF]
+            tmdb_cell = row[COL_TMDB_URL]
+            href_val = str(href_cell.value or "").strip()
+            if href_val and href_val.startswith("http"):
+                existing_target = href_cell.hyperlink.target if href_cell.hyperlink else None
+                if existing_target != href_val:
+                    href_cell.hyperlink = href_val
+                    href_cell.style = "Hyperlink"
+            tmdb_val = str(tmdb_cell.value or "").strip()
+            if tmdb_val and tmdb_val.startswith("http"):
+                existing_target = tmdb_cell.hyperlink.target if tmdb_cell.hyperlink else None
+                if existing_target != tmdb_val:
+                    tmdb_cell.hyperlink = tmdb_val
+                    tmdb_cell.style = "Hyperlink"
+
+        # 自动列宽
+        caps = {1: 25, 2: 15, 3: 15, 4: 60, 5: 50, 6: 12, 7: 42}
+        col_max = [0] * (len(DB_HEADERS) + 1)
+        for row in ws.iter_rows(min_row=2, values_only=True):
+            for ci, cell in enumerate(row, 1):
+                if cell is None or ci > len(DB_HEADERS):
+                    continue
+                s = str(cell)
+                width = sum(2 if "\u3040" <= c <= "\u30ff" or "\u4e00" <= c <= "\u9fff" else 1 for c in s)
+                col_max[ci] = max(col_max[ci], width)
+        for ci in range(1, len(DB_HEADERS) + 1):
+            letter = get_column_letter(ci)
+            ws.column_dimensions[letter].width = min(col_max[ci] + 2, caps.get(ci, 80))
+    except Exception:
+        pass
 
 
 def _norm_name_set(names: list[str]) -> set[str]:
@@ -299,19 +392,7 @@ async def update_actor_db_row(
                 )
                 ws.cell(row=last_row, column=COL_TMDB_URL + 1                ).hyperlink = f"https://www.themoviedb.org/person/{tmdbid}"
 
-        for col in ws.columns:
-            max_length = 0
-            column = col[0].column_letter
-            for cell in col:
-                try:
-                    if cell.value:
-                        max_length = max(max_length, len(str(cell.value)) + 2)
-                except (TypeError, AttributeError):
-                    pass
-            adjusted_width = min(max_length, 50)
-            ws.column_dimensions[column].width = adjusted_width
-
-        ws.auto_filter.ref = f"A1:{get_column_letter(len(DB_HEADERS))}1"
+        _format_db_worksheet(ws)
 
         wb.save(db_path)
         wb.close()
@@ -476,9 +557,7 @@ async def migrate_xml_to_xlsx() -> bool:
                             row=last_row, column=COL_TMDB_URL + 1
                         ).hyperlink = f"https://www.themoviedb.org/person/{tmdbid}"
 
-                from openpyxl.utils import get_column_letter
-
-                ws.auto_filter.ref = f"A1:{get_column_letter(len(DB_HEADERS))}1"
+                _format_db_worksheet(ws)
                 wb.save(db_path)
                 wb.close()
                 migrated = True
@@ -533,7 +612,7 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: AsyncWebClient) -> dic
 
     LogBuffer.log().write(f"\n 🎬 [TMDB] 开始查询 {len(need_query)} 个演员的 TMDB ID")
 
-    for actor_name in need_query:
+    async def _query_and_update(actor_name: str) -> None:
         try:
             query_result = await _query_single_actor(actor_name, base_url, tmdb_api_key, client)
             if query_result:
@@ -562,7 +641,15 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: AsyncWebClient) -> dic
                 LogBuffer.log().write(f"  ⚠️ [TMDB] {actor_name} 未找到匹配的 TMDB 演员")
         except Exception as e:
             LogBuffer.log().write(f"  ❌ [TMDB] {actor_name} 查询失败: {e}")
-        await asyncio.sleep(0.5)
+
+    semaphore = asyncio.Semaphore(3)
+
+    async def _limited_query(actor_name: str) -> None:
+        async with semaphore:
+            await _query_and_update(actor_name)
+
+    tasks = [asyncio.create_task(_limited_query(name)) for name in need_query]
+    await asyncio.gather(*tasks)
 
     old_db = dict(resources.actor_db) if resources.actor_db else {}
     resources.reload_actor_db()
@@ -606,9 +693,12 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
 
     candidates: list[dict] = []
 
-    for item in results[:10]:
+    for item in results[:5]:
         pid = item.get("id")
         if not pid:
+            continue
+
+        if not item.get("adult"):
             continue
 
         gender = item.get("gender")
