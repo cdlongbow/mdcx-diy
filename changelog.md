@@ -1,34 +1,26 @@
 ## 新增
-- 新增 libredmm 刮削源
-- 新增 Amazon ASIN 缓存功能。
-  - 添加 openpyxl 依赖，默认在运行目录生成 amazon_asin_database.xlsx
-  - 实现缓存查询功能，避免重复搜索
-  - 添加去重逻辑，保护高置信度数据
-- 新增 NFO 演员 TMDB ID 功能。
-  - 网络设置栏新增 TMDB API 地址（默认 api.tmdb.org）和 API Key 输入
-  - NFO 设置栏新增"为演员写入 TMDB ID"选项，勾选后在 <actor> 下增加 <tmdbid> 子字段
-  - 直接用日文原名搜索 TMDB API，过滤日本出生地 + 女性/未指定性别 + 精确名匹配
-  - 多候选时按 popularity 排序取最优，失败不阻塞刮削
-- 数据源统一迁移至 xlsx。
-  - actor_mapping XML + TMDB 缓存合并为统一 actor_database.xlsx
-  - mapping_info.xml 转为 info_database.xlsx
-  - 删除废弃的 actor_tmdbid.xlsx，TMDB ID 数据已整合进 actor_database.xlsx
-  - 内置 xlsx 数据库，支持表头冻结，提升数据管理效率
-- 新增不使用代理网站选择器功能。
-  - 网络设置栏"不使用代理"输入框左侧新增下拉选择器
-  - 支持从下拉框快速选择网站（40+ 个可用刮削源）
-  - 保留手动输入模式，逗号分隔多个网站
-  - 智能域名匹配：支持网站简称（如 libredmm）自动匹配完整域名
-  - 自动识别常见 TLD（.com/.net/.org/.co/.jp/.io）和子域名
-  - 默认配置 api.tmdb.org（TMDB API 不走代理）
-  - 自动去重，配置自动保存
+- 新增令牌桶限流器和并发查询优化。
+  - 新增 `_TmdbRateLimiter` 令牌桶限流器（3.5 req/s，突发 10）
+  - `fetch_actor_tmdb_ids` 支持并发 3 查询，避免触发 TMDB API 限流
+  - 搜索候选数从 10 降至 5，adult 字段为 true 的候选直接跳过
+- 新增完整的技术文档体系。
+  - 新增 `CODE_WIKI.md` 完整技术文档（1,150 行）
+  - 更新 `README.md` 项目主文档
+  - 新增 `docs/` 目录，包含 18 个独立文档
+    - 文档中心入口、项目架构、核心模块、数据模型
+    - 配置系统、爬虫系统、工具模块、命名系统
+    - 依赖关系、API 文档、测试覆盖率
+    - 代码审查检查清单/指南/标准
+    - PyQt6 迁移指南、爬虫迁移指南
+  - 所有文档提供完整的技术文档体系
+- 新增 `_format_db_worksheet` 超链接一致性校验与自动修复。
 
 ## 修改
-- Amazon 高清封面 poster 为 1500 尺寸。
-- 精简 ASIN 数据库列，移除冗余字段（记录时间、匹配类型、置信度、媒体类型、备注）。
-- 修复封面 URL 始终为空的问题，调用处传入实际 Amazon 图片 URL。
-- 修复读取模式下缺少 aiohttp 依赖导致 NameError 崩溃的问题，改为优雅降级。
-- 修复 info_database.xlsx 优先级标记缺失，恢复 tag_priority 标签排序功能。
-- 清理废弃 XML 文件（actor_mapping_fixed.xml 等）及死代码。
-- 更新 UI 文案和路径指向 xlsx 数据库。
-- 修正 .gitignore 规则，内置 xlsx 文件正确追踪。
+- 优化演员数据库管理和查询性能。
+  - 并发查询提升 TMDB ID 获取效率
+  - 令牌桶限流器保护 TMDB API 调用
+  - adult 过滤减少无效查询，提高准确率
+- 改进文档组织和可维护性。
+  - 分章节独立文档，便于查阅和维护
+  - 文档之间交叉引用，形成完整文档体系
+  - 更新 README.md 和 CODE_WIKI.md 提升项目可读性
