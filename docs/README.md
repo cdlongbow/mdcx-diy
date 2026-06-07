@@ -34,6 +34,7 @@
 - 🏗️ [架构设计](architecture.md) - 系统架构和设计模式
 - 📖 [API 文档](api-documentation.md) - 核心模块 API 参考
 - 🛒 [Amazon 缓存系统](amazon-cache.md) - Amazon 高清封面缓存详解
+- 🎬 [TMDB 缓存系统](tmdb-cache.md) - TMDB 演员 ID 缓存详解
 - 🔧 [开发指南](DEVELOPMENT.md) - 开发环境搭建和最佳实践
 
 ### 📋 配置参考
@@ -109,7 +110,7 @@
 
 **演员相关**
 - [演员数据库](tools.md) - Excel 数据库管理
-- [TMDB 集成](CODE_WIKI.md#tmdb-数据流) - TMDB API 查询
+- [TMDB 缓存系统](tmdb-cache.md) - TMDB 演员 ID 缓存详解
 - [Emby 演员](CODE_WIKI.md#emby-集成) - Emby 演员信息同步
 
 **翻译相关**
@@ -244,9 +245,9 @@
 | 文档类型 | 数量 | 总行数 |
 |---------|------|--------|
 | 用户文档 | 6 | 4,000+ |
-| 技术文档 | 19 | 4,100+ |
+| 技术文档 | 20 | 4,400+ |
 | 开发文档 | 4 | 1,500+ |
-| 总计 | 29 | 9,600+ |
+| 总计 | 30 | 9,900+ |
 
 ---
 
