@@ -162,6 +162,195 @@
 
 ---
 
+## 网络配置详解
+
+### 代理配置
+
+**配置项**
+
+| 配置项 | 类型 | 默认值 | 说明 |
+|--------|------|--------|------|
+| `use_proxy` | str | `no` | 代理类型（no/http/socks5） |
+| `proxy` | str | `""` | 代理地址（如 `http://proxy.com:8080`） |
+
+**代理类型**
+
+- `no`: 不使用代理
+- `http`: HTTP/HTTPS 代理
+- `socks5`: SOCKS5 代理
+
+**配置示例**
+
+```json
+{
+  "use_proxy": "socks5",
+  "proxy": "socks5://127.0.0.1:1080"
+}
+```
+
+### 不走代理网站配置
+
+**配置项**
+
+| 配置项 | 类型 | 默认值 | 说明 |
+|--------|------|--------|------|
+| `no_proxy_sites` | str | `api.tmdb.org` | 不使用代理的网站列表 |
+
+**配置格式**
+
+支持以下格式：
+
+1. **单个网站**
+   ```
+   api.tmdb.org
+   ```
+
+2. **多个网站**（逗号分隔）
+   ```
+   api.tmdb.org,javdb,javbus
+   ```
+
+3. **网站值**（推荐，自动匹配域名）
+   ```
+   javdb
+   tmdb
+   libredmm
+   ```
+
+**支持的网站值**
+
+系统会自动将网站值映射到对应的域名。以下是常用的网站值：
+
+| 网站值 | 自动匹配的域名 |
+|--------|--------------|
+| `javdb` | javdb.com, www.javdb.com |
+| `javbus` | javbus.com, www.javbus.com |
+| `tmdb` | api.tmdb.org |
+| `libredmm` | libredmm.com, www.libredmm.com |
+| `missav` | missav.com, www.missav.com |
+| `jav321` | jav321.com, www.jav321.com |
+| `javlibrary` | javlibrary.com, www.javlibrary.com |
+| `fc2` | fc2.com, www.fc2.com |
+| `dmm` | dmm.co.jp |
+| `mgstage` | mgstage.com, www.mgstage.com |
+| `prestige` | prestige-av.com |
+| `official` | official-av.com |
+| `avsox` | avsox.com, www.avsox.com |
+| `avsex` | avsex.cc |
+| `mmtv` | mmtv.cc |
+| `mywife` | mywife-j.com |
+| `getchu` | getchu.com |
+| `giga` | giga.tv |
+| `faleno` | faleno.jp |
+| `fantastica` | fantastica.video |
+| `dahlia` | dahlia-av.com |
+| `xcity` | xcity.jp |
+| `kin8` | kin8tengoku.com |
+| `love6` | love6.tv |
+| `avbase` | avbase.cc |
+| `cableav` | cableav.tv |
+| `freejavbt` | freejavbt.com |
+| `hscangku` | hscangku.com |
+| `iqqtv` | iqqtv.com |
+| `mdtv` | mdtv.co.jp |
+| `cnmdb` | cnmdb.com |
+| `guochan` | guochan.cc |
+| `madouqu` | madouqu.com |
+| `lulubar` | lulubar.cc |
+| `hdouban` | hdouban.com |
+| `theporndb` | theporndb.com |
+
+**使用场景**
+
+**场景 1：TMDB API 走代理速度慢**
+```json
+{
+  "use_proxy": "socks5",
+  "proxy": "socks5://127.0.0.1:1080",
+  "no_proxy_sites": "api.tmdb.org"
+}
+```
+说明：其他网站走代理，TMDB API 直连
+
+**场景 2：JavDB 使用代理无法访问**
+```json
+{
+  "use_proxy": "http",
+  "proxy": "http://proxy.com:8080",
+  "no_proxy_sites": "javdb"
+}
+```
+说明：JavDB 直连，其他网站走代理
+
+**场景 3：多个 API 服务不走代理**
+```json
+{
+  "use_proxy": "socks5",
+  "proxy": "socks5://127.0.0.1:1080",
+  "no_proxy_sites": "api.tmdb.org,theporndb,cnmdb"
+}
+```
+说明：指定多个网站不走代理
+
+**配置界面**
+
+在 MDCx 主界面：
+1. 打开"设置"
+2. 进入"网络"标签
+3. 在"不使用代理网站"输入框中输入配置
+4. 点击"应用"保存配置
+
+**注意事项**
+
+⚠️ **域名匹配规则**：
+- 支持完整域名匹配（如 `api.tmdb.org`）
+- 支持子域名匹配（如 `api.tmdb.org` 会匹配 `sub.api.tmdb.org`）
+- 网站值不区分大小写（`JavDB` 和 `javdb` 等价）
+
+⚠️ **优先级**：
+- `no_proxy_sites` 的优先级高于全局代理设置
+- 如果主机在 `no_proxy_sites` 列表中，将直接连接
+
+⚠️ **常见问题**：
+- 如果配置后仍然走代理，请检查域名是否正确
+- 可以使用开发者工具查看实际请求的域名
+- 某些网站可能需要同时配置多个域名
+
+**实现细节**
+
+系统在发起请求前会检查目标主机：
+
+```python
+def _is_no_proxy_host(self, host: str) -> bool:
+    """检查主机是否应该绕过代理"""
+    if not host or not self.no_proxy_sites:
+        return False
+
+    for no_proxy in self.no_proxy_sites:
+        no_proxy = no_proxy.strip().lower()
+
+        # 直接匹配
+        if host == no_proxy:
+            return True
+
+        # 网站值匹配域名
+        for domain_key, website_enum in WEB_DIC.items():
+            if website_enum.value == no_proxy:
+                if host == domain_key or host.endswith("." + domain_key):
+                    return True
+                # 检查常见 TLD
+                for tld in [".com", ".net", ".org", ".co", ".jp", ".io"]:
+                    if host == domain_key + tld or host.endswith("." + domain_key + tld):
+                        return True
+
+    return False
+
+# 使用代理前检查
+use_proxy = use_proxy and not self._is_no_proxy_host(host)
+```
+
+---
+
 ## 相关文档
 
 - [项目架构](architecture.md) - 项目整体架构

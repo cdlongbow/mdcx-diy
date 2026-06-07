@@ -936,6 +936,140 @@ class AmazonDatabase:
 
 ## 网络功能
 
+### 代理配置
+
+**代理类型**
+
+MDCx 支持多种代理配置：
+
+| 代理类型 | 说明 | 配置示例 |
+|---------|------|---------|
+| **不使用代理** | 直连网络 | 无需配置 |
+| **HTTP 代理** | HTTP/HTTPS 代理 | `http://proxy.example.com:8080` |
+| **SOCKS5 代理** | SOCKS5 代理 | `socks5://proxy.example.com:1080` |
+
+**代理设置**
+
+在"设置" → "网络"中配置：
+- **代理类型**：选择不使用代理、HTTP 代理或 SOCKS5 代理
+- **代理地址**：输入代理服务器地址和端口
+- **认证**：如需要，输入用户名和密码
+
+### 不走代理网站功能
+
+**功能说明**
+
+"不走代理网站"功能允许您指定某些网站不走代理，直接连接。这对于以下情况特别有用：
+
+- ✅ 某些网站使用代理会导致访问失败
+- ✅ 某些 API 服务（如 TMDB）走代理速度慢
+- ✅ 本地网络访问不需要代理
+- ✅ 某些网站需要真实 IP 地址
+
+**配置方式**
+
+在"设置" → "网络" → "不使用代理网站"中配置：
+
+```
+默认值：api.tmdb.org
+```
+
+支持以下格式：
+
+1. **网站值**（推荐）
+   ```
+   javdb
+   tmdb
+   libredmm
+   ```
+
+2. **完整域名**
+   ```
+   api.tmdb.org
+   www.javdb.com
+   libredmm.com
+   ```
+
+3. **多个网站**（逗号分隔）
+   ```
+   api.tmdb.org,javdb,libredmm.com
+   ```
+
+**支持的网站值**
+
+| 网站值 | 对应域名 | 说明 |
+|--------|---------|------|
+| `javdb` | javdb.com, www.javdb.com | JavDB 网站 |
+| `javbus` | javbus.com, www.javbus.com | JavBus 网站 |
+| `tmdb` | api.tmdb.org | TMDB API |
+| `libredmm` | libredmm.com | LibreDMM 网站 |
+| `missav` | missav.com, www.missav.com | MissAV 网站 |
+| `jav321` | jav321.com, www.jav321.com | Jav321 网站 |
+| `javlibrary` | javlibrary.com, www.javlibrary.com | JavLibrary 网站 |
+| `fc2` | fc2.com, www.fc2.com | FC2 官方网站 |
+| `dmm` | dmm.co.jp | DMM 官方网站 |
+| ... | ... | 其他支持的网站 |
+
+**使用场景**
+
+**场景 1：TMDB API 走代理速度慢**
+```
+配置：api.tmdb.org
+说明：TMDB API 直接连接，不走代理
+```
+
+**场景 2：JavDB 使用代理无法访问**
+```
+配置：javdb
+说明：JavDB 直接连接，其他网站走代理
+```
+
+**场景 3：多个网站不走代理**
+```
+配置：api.tmdb.org,javdb,javbus
+说明：这些网站直接连接，其他网站走代理
+```
+
+**实现原理** (web_async.py)
+
+系统在发起请求前会检查目标主机是否在"不走代理网站"列表中：
+
+```python
+def _is_no_proxy_host(self, host: str) -> bool:
+    """检查主机是否应该绕过代理"""
+    if not host or not self.no_proxy_sites:
+        return False
+
+    for no_proxy in self.no_proxy_sites:
+        # 直接匹配
+        if host == no_proxy:
+            return True
+
+        # 匹配网站值对应的域名
+        for domain_key, website_enum in WEB_DIC.items():
+            if website_enum.value == no_proxy:
+                if host == domain_key or host.endswith("." + domain_key):
+                    return True
+
+    return False
+
+# 使用代理前检查
+use_proxy = use_proxy and not self._is_no_proxy_host(host)
+```
+
+**注意事项**
+
+⚠️ **优先级**：不走代理列表的优先级高于全局代理设置
+
+⚠️ **大小写不敏感**：配置中的网站值不区分大小写
+
+⚠️ **域名匹配**：支持子域名匹配（如 `api.tmdb.org` 会匹配 `api.tmdb.org` 和 `sub.api.tmdb.org`）
+
+⚠️ **常见问题**：
+- 如果配置后仍然走代理，请检查域名是否正确
+- 某些网站可能需要同时配置多个域名
+- 可以使用开发者工具查看实际请求的域名
+
 ### 网络检查功能
 
 **功能模块** (network_check.py)
