@@ -243,6 +243,7 @@ MDCx 专为以下用户和场景打造：
 - 📖 [文档中心](docs/README.md) - 所有文档的入口
 - 📗 [Code Wiki](CODE_WIKI.md) - 完整的技术文档
 - ⭐ [功能特色](FEATURES.md) - 详细的功能介绍和特色说明
+- 📋 [完整功能列表](COMPLETE_FEATURES.md) - 所有功能的完整列表和详细说明
 - 🎬 [使用场景](SCENARIOS.md) - 8 个详细的使用场景和案例
 - 🔧 [开发指南](DEVELOPMENT.md) - 开发者文档
 - ❓ [FAQ](FAQ.md) - 常见问题解答
@@ -253,6 +254,7 @@ MDCx 专为以下用户和场景打造：
 
 - 📗 [用户使用手册](USER_GUIDE.md) - 完整的用户指南，包含安装、配置和使用说明
 - ⭐ [功能特色](FEATURES.md) - 详细的功能介绍、技术亮点和使用场景
+- 📋 [完整功能列表](COMPLETE_FEATURES.md) - 所有 42 个网站爬虫和功能的完整列表
 - 🎬 [使用场景和案例](SCENARIOS.md) - 8 个实际使用场景的详细操作指南
 - 📋 [配置说明](docs/configuration.md) - 详细的配置项说明
 - 📦 [安装指南](INSTALL.md) - 安装步骤和系统要求
