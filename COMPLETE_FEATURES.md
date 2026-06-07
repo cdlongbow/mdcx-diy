@@ -642,9 +642,8 @@ def detect_and_crop(image_path: str) -> str:
 | 中文名 | str | ❌ | 中文姓名 |
 | 繁体名 | str | ❌ | 繁体中文姓名 |
 | 别名 | str | ❌ | 其他名称（逗号分隔） |
-| 出生日期 | date | ❌ | 出生日期 (YYYY-MM-DD) |
+| 信息链接 | str | ❌ | 相关链接或信息（出生日期、Wikipedia 链接等） |
 | TMDB ID | int | ❌ | TMDB 数据库 ID |
-| 超链接 | url | ❌ | 相关链接 |
 
 ### TMDB 集成功能
 
