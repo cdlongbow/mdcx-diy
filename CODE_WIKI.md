@@ -840,6 +840,278 @@ FileInfo → CrawlerInput → CrawlTask
 
 ---
 
+## Emby 集成
+
+### 概述
+
+MDCx 提供与 Emby 和 Jellyfin 媒体服务器的深度集成功能，可以自动更新演员信息和图片，提升媒体库的管理体验。
+
+### 集成模块
+
+#### Emby 演员 ([mdcx/tools/emby_actor_info.py](mdcx/tools/emby_actor_info.py))
+
+**功能**：更新 Emby/Jellyfin 演员信息
+
+**数据来源**：
+- Wikipedia：获取简介、出生日期、出生地等
+- 本地数据库：获取中文名、别名等
+
+**主要功能**：
+- 自动获取演员的详细简介
+- 更新演员的出生日期、出生地等元数据
+- 支持批量更新多个演员
+
+**使用方式**：
+```python
+from mdcx.tools.emby_actor_info import EmbyActorInfo
+
+# 创建实例
+emby_info = EmbyActorInfo()
+
+# 更新演员信息
+emby_info.update_actor(actor_id, tmdb_id)
+```
+
+#### Emby 演员图片 ([mdcx/tools/emby_actor_image.py](mdcx/tools/emby_actor_image.py))
+
+**功能**：更新 Emby/Jellyfin 演员图片
+
+**图片来源**：
+- graphis.ne.jp：日本写真网站
+- Gfriends GitHub：头像库
+- 本地文件夹
+
+**主要功能**：
+- 从多个来源获取演员图片
+- 自动下载和上传图片到 Emby/Jellyfin
+- 支持图片格式转换和优化
+
+**使用方式**：
+```python
+from mdcx.tools.emby_actor_image import EmbyActorImage
+
+# 创建实例
+emby_image = EmbyActorImage()
+
+# 更新演员图片
+emby_image.update_image(actor_id, image_url)
+```
+
+### 配置说明
+
+在配置文件中添加以下配置项：
+
+```ini
+[emby]
+# 服务器类型（emby 或 jellyfin）
+server_type = emby
+
+# 服务器地址
+emby_url = http://localhost:8096
+
+# API 密钥
+api_key = your_api_key_here
+
+# 功能开关列表
+emby_on = actor_info,actor_image
+```
+
+### Emby 演员信息补全流程
+
+#### 数据流
+
+```
+1. Wikipedia API
+   ↓
+2. 提取演员信息（简介、出生日期、出生地）
+   ↓
+3. Emby/Jellyfin API
+   ↓
+4. 更新演员元数据
+```
+
+#### 配置 Emby/Jellyfin
+
+1. **获取 API Key**
+   - 登录 Emby/Jellyfin 管理界面
+   - 进入设置 > API Keys
+   - 创建新的 API Key
+
+2. **配置服务器信息**
+   - 在 MDCx 配置中填写服务器地址
+   - 填入 API Key
+   - 选择服务器类型
+
+3. **启用自动同步**
+   - 在配置中启用 `emby_on` 选项
+   - 选择需要同步的功能
+
+### Emby 演员图片补全流程
+
+#### 数据源优先级
+
+```
+1. graphis.ne.jp（优先）
+   ↓
+2. Gfriends GitHub（备选）
+   ↓
+3. 本地文件夹（兜底）
+```
+
+#### 配置图片来源
+
+```python
+# 在代码中配置图片来源
+IMAGE_SOURCES = [
+    'graphis.ne.jp',
+    'github.com/Gfriends',
+    'local'
+]
+```
+
+### 完整的 Emby 集成工作流
+
+1. **刮削视频元数据**
+   - 从 34+ 个成人视频网站获取元数据
+   - 提取演员信息
+
+2. **补全演员信息**
+   - 从 TMDB 获取演员详细信息
+   - 从 Wikipedia 获取演员简介
+   - 从本地数据库获取中文名和别名
+
+3. **更新 Emby/Jellyfin**
+   - 通过 API 更新演员信息
+   - 下载并上传演员图片
+
+4. **生成 NFO 文件**
+   - 生成符合 Kodi/Emby 规范的 NFO 文件
+
+### API 参考
+
+#### Emby 演员 API
+
+```python
+class EmbyActorInfo:
+    def __init__(self, config):
+        """初始化 Emby 演员 API"""
+        pass
+
+    def update_actor(self, actor_id, tmdb_id):
+        """
+        更新演员信息
+
+        Args:
+            actor_id: 演员 ID
+            tmdb_id: TMDB ID
+        """
+        pass
+
+    def get_actor_from_wikipedia(self, name):
+        """
+        从 Wikipedia 获取演员信息
+
+        Args:
+            name: 演员名称
+
+        Returns:
+            dict: 演员信息
+        """
+        pass
+```
+
+#### Emby 演员图片 API
+
+```python
+class EmbyActorImage:
+    def __init__(self, config):
+        """初始化 Emby 演员 API"""
+        pass
+
+    def update_image(self, actor_id, image_url):
+        """
+        更新演员图片
+
+        Args:
+            actor_id: 演员 ID
+            image_url: 图片 URL
+        """
+        pass
+
+    def download_image(self, url):
+        """
+        下载图片
+
+        Args:
+            url: 图片 URL
+
+        Returns:
+            bytes: 图片数据
+        """
+        pass
+
+    def upload_to_emby(self, actor_id, image_data):
+        """
+        上传图片到 Emby
+
+        Args:
+            actor_id: 演员 ID
+            image_data: 图片数据
+        """
+        pass
+```
+
+### 故障排除
+
+#### 问题 1：无法连接到 Emby/Jellyfin
+
+**解决方案**：
+- 检查服务器地址是否正确
+- 确认 API Key 是否有效
+- 检查网络连接
+- 确认 Emby/Jellyfin 服务是否正在运行
+
+#### 问题 2：演员信息不更新
+
+**解决方案**：
+- 检查演员是否有对应的 TMDB ID
+- 确认 Wikipedia 上是否有该演员的信息
+- 查看日志文件了解详细错误信息
+
+#### 问题 3：图片无法显示
+
+**解决方案**：
+- 检查图片 URL 是否有效
+- 确认图片格式是否支持
+- 检查 Emby/Jellyfin 的媒体路径配置
+- 尝试手动刷新媒体库
+
+### 最佳实践
+
+1. **定期同步**
+   - 设置定时任务定期同步演员信息
+   - 避免手动操作遗漏
+
+2. **批量处理**
+   - 使用批量更新功能提高效率
+   - 注意 API 速率限制
+
+3. **备份数据**
+   - 定期备份 Emby/Jellyfin 数据库
+   - 防止数据丢失
+
+4. **监控日志**
+   - 定期查看日志文件
+   - 及时发现和解决问题
+
+### 相关文档
+
+- [用户使用手册 - Emby 集成](USER_GUIDE.md#embyjellyfin-集成)
+- [FAQ - Emby 问题](FAQ.md#embyjellyfin-集成)
+- [API 文档 - Emby 模块](docs/api-documentation.md#emby-模块)
+
+---
+
 ## 命名系统
 
 ### 模块结构 ([mdcx/core/naming/](mdcx/core/naming/))
