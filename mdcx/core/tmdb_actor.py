@@ -13,7 +13,7 @@ from typing import Any
 from ..config.manager import manager
 from ..config.resources import resources
 from ..models.log_buffer import LogBuffer
-from ..utils import norm_name
+from ..utils import convert_half
 
 
 # ============= 速率限制器 =============
@@ -187,6 +187,10 @@ COL_TMDBID = 5
 COL_TMDB_URL = 6
 
 DB_HEADERS = ["日文原名", "中文名", "繁体名", "别名", "链接", "tmdbid", "tmdb url"]
+
+
+def norm_name(name: str) -> str:
+    return convert_half(name or "")
 
 
 def _get_db_path() -> Path:
