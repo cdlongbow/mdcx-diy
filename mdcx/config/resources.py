@@ -78,6 +78,7 @@ class Resources:
         self.icon_wuma_path = self.u("watermark/wuma.png")
 
         self.actor_db: dict[str, dict] | None = None  # 演员数据库（xlsx 格式）
+        self.actor_db_reverse_index: dict[str, str] | None = None  # 规范名/别名 -> jp 名索引
         self.info_db: list[dict] | None = None  # 信息映射数据库（xlsx 格式，有序列表以保持行顺序）
 
         self._get_or_generate_local_data()
@@ -246,10 +247,12 @@ class Resources:
         """重新加载演员数据库 xlsx（在刮削更新后调用）"""
         if openpyxl is None:
             self.actor_db = None
+            self.actor_db_reverse_index = None
             return
         db_path = self.u("actor_database.xlsx")
         if not db_path.exists():
             self.actor_db = None
+            self.actor_db_reverse_index = None
             return
         try:
             wb = openpyxl.load_workbook(db_path, read_only=True, data_only=True)
@@ -278,8 +281,9 @@ class Resources:
                 }
             wb.close()
             self.actor_db = db
-        except Exception:
-            self.actor_db = None
+            self.actor_db_reverse_index = None
+        except Exception as e:
+            signal.show_traceback_log(f"[演员数据库] 重载失败，保留当前缓存: {e}")
 
     def reload_info_db(self):
         """加载信息映射数据库 xlsx"""

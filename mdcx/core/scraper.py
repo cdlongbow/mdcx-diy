@@ -653,11 +653,9 @@ class Scraper:
                                 base_url = f"{protocol}{base}" if base else "https://api.tmdb.org"
 
                                 for actor_name in still_missing:
-                                    # 先从 xlsx 找日文原名
+                                    # 优先从 xlsx 找日文原名；找不到时直接使用 NFO 里的演员名查询并补录
                                     row = search_actor_db_reverse(actor_name)
-                                    jp_name = row.get("jp") if row else None
-                                    if not jp_name:
-                                        continue  # 无法找到日文原名，跳过
+                                    jp_name = row.get("jp") if row else actor_name
 
                                     try:
                                         query_result = await _query_single_actor(

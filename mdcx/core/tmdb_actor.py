@@ -312,6 +312,47 @@ def _norm_name_set(names: list[str]) -> set[str]:
     return result
 
 
+def _full_to_half(s: str) -> str:
+    result = []
+    for ch in s:
+        cp = ord(ch)
+        if cp == 0x3000:
+            result.append(" ")
+        elif 0xFF01 <= cp <= 0xFF5E:
+            result.append(chr(cp - 0xFEE0))
+        else:
+            result.append(ch)
+    return "".join(result)
+
+
+def _actor_index_keys(name: str) -> set[str]:
+    if not name:
+        return set()
+    variants = _expand_name_variants(name)
+    result = set(variants)
+    result.add(_full_to_half(norm_name(name)).upper())
+    for variant in variants:
+        result.add(_full_to_half(variant).upper())
+    return {key for key in result if key}
+
+
+def _build_actor_db_reverse_index(actor_db: dict[str, dict]) -> dict[str, str]:
+    index: dict[str, str] = {}
+    for jp, data in actor_db.items():
+        candidates = [jp]
+        if data.get("zh_cn"):
+            candidates.append(data["zh_cn"])
+        if data.get("zh_tw"):
+            candidates.append(data["zh_tw"])
+        if data.get("keyword"):
+            candidates.extend(k.strip() for k in data["keyword"].split(",") if k.strip())
+
+        for candidate in candidates:
+            for key in _actor_index_keys(candidate):
+                index.setdefault(key, jp)
+    return index
+
+
 async def load_actor_db() -> dict[str, dict]:
     """
     加载演员数据库 xlsx。
@@ -465,57 +506,17 @@ def search_actor_db_reverse(query_name: str) -> dict | None:
     if not actor_db:
         return None
 
-    target = norm_name(query_name)
+    reverse_index = getattr(resources, "actor_db_reverse_index", None)
+    if reverse_index is None:
+        reverse_index = _build_actor_db_reverse_index(actor_db)
+        resources.actor_db_reverse_index = reverse_index
 
-    for jp, data in actor_db.items():
-        if target in _norm_name_set([jp]):
-            data_copy = dict(data)
+    for key in _actor_index_keys(query_name):
+        jp = reverse_index.get(key)
+        if jp and jp in actor_db:
+            data_copy = dict(actor_db[jp])
             data_copy["jp"] = jp
             return data_copy
-        if data.get("zh_cn") and target in _norm_name_set([data["zh_cn"]]):
-            data_copy = dict(data)
-            data_copy["jp"] = jp
-            return data_copy
-        if data.get("zh_tw") and target in _norm_name_set([data["zh_tw"]]):
-            data_copy = dict(data)
-            data_copy["jp"] = jp
-            return data_copy
-        if data.get("keyword"):
-            for kw in data["keyword"].split(","):
-                if kw.strip() and target in _norm_name_set([kw.strip()]):
-                    data_copy = dict(data)
-                    data_copy["jp"] = jp
-                    return data_copy
-
-    def full_to_half(s):
-        result = []
-        for ch in s:
-            cp = ord(ch)
-            if cp == 0x3000:
-                result.append(" ")
-            elif 0xFF01 <= cp <= 0xFF5E:
-                result.append(chr(cp - 0xFEE0))
-            else:
-                result.append(ch)
-        return "".join(result)
-
-    query_norm = full_to_half(target).upper()
-
-    for jp, data in actor_db.items():
-        candidates = [jp]
-        if data.get("zh_cn"):
-            candidates.append(data["zh_cn"])
-        if data.get("zh_tw"):
-            candidates.append(data["zh_tw"])
-        if data.get("keyword"):
-            candidates.extend(k.strip() for k in data["keyword"].split(",") if k.strip())
-
-        for name in candidates:
-            name_norm = full_to_half(norm_name(name)).upper()
-            if query_norm == name_norm:
-                data_copy = dict(data)
-                data_copy["jp"] = jp
-                return data_copy
 
     return None
 

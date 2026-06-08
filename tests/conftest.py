@@ -81,7 +81,83 @@ class _DummyManager:
 class _DummyResources:
     def __init__(self):
         self.actor_db = {}
+        self.actor_db_reverse_index = None
         self.info_db = []
+
+    def u(self, relative_path):
+        return manager_module.manager.data_folder / "userdata" / relative_path
+
+    def get_info_data(self, info):
+        info_data = {
+            "zh_cn": info,
+            "zh_tw": info,
+            "jp": info,
+            "keyword": [info],
+            "has_name": False,
+        }
+
+        info_key = info.upper()
+        for row in self.info_db or []:
+            matched = False
+            if row.get("keyword"):
+                for kw in row["keyword"].split(","):
+                    kw = kw.strip()
+                    if kw and kw.upper() == info_key:
+                        matched = True
+                        break
+            if not matched:
+                for attr in ("zh_cn", "zh_tw", "jp"):
+                    if (row.get(attr) or "").upper() == info_key:
+                        matched = True
+                        break
+            if matched:
+                info_data["zh_cn"] = row.get("zh_cn") or info
+                info_data["zh_tw"] = row.get("zh_tw") or info
+                info_data["jp"] = row.get("jp") or info
+                kw = row.get("keyword") or ""
+                info_data["keyword"] = [k.strip() for k in kw.split(",") if k.strip()] if kw else [info]
+                info_data["has_name"] = True
+                return info_data
+        return info_data
+
+    def reload_actor_db(self):
+        import openpyxl
+
+        db_path = self.u("actor_database.xlsx")
+        if not db_path.exists():
+            self.actor_db = None
+            self.actor_db_reverse_index = None
+            return
+
+        old_actor_db = self.actor_db
+        try:
+            wb = openpyxl.load_workbook(db_path, read_only=True, data_only=True)
+            ws = wb.active
+            db = {}
+            for row_idx, row in enumerate(ws.iter_rows(values_only=True), start=1):
+                if row_idx == 1:
+                    continue
+                jp = str(row[0] or "").strip()
+                if not jp:
+                    continue
+                tmdbid_val = None
+                if len(row) > 5:
+                    tmdbid_raw = str(row[5] or "").strip()
+                    if tmdbid_raw.isdigit():
+                        tmdbid_val = int(tmdbid_raw)
+                db[jp] = {
+                    "zh_cn": str(row[1] or "").strip() if len(row) > 1 else "",
+                    "zh_tw": str(row[2] or "").strip() if len(row) > 2 else "",
+                    "keyword": str(row[3] or "").strip() if len(row) > 3 else "",
+                    "href": str(row[4] or "").strip() if len(row) > 4 else "",
+                    "tmdbid": tmdbid_val,
+                    "tmdb_url": str(row[6] or "").strip() if len(row) > 6 else "",
+                }
+            wb.close()
+            self.actor_db = db
+            self.actor_db_reverse_index = None
+        except Exception:
+            self.actor_db = old_actor_db
 
 
 manager_module = types.ModuleType("mdcx.config.manager")

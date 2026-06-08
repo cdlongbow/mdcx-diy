@@ -1,17 +1,12 @@
-from lxml import etree
-
 from mdcx.config.resources import resources
 
 
 def test_get_info_data_matches_output_language_attrs(monkeypatch):
-    xml_info = etree.fromstring(
-        """
-        <info>
-          <a zh_cn="苗条" zh_tw="苗條" jp="スレンダー" keyword=",纖細,苗条的,苗條的," />
-        </info>
-        """.encode()
+    monkeypatch.setattr(
+        resources,
+        "info_db",
+        [{"zh_cn": "苗条", "zh_tw": "苗條", "jp": "スレンダー", "keyword": ",纖細,苗条的,苗條的,"}],
     )
-    monkeypatch.setattr(resources, "info_mapping_data", xml_info)
 
     info_data = resources.get_info_data("スレンダー")
 
@@ -22,16 +17,32 @@ def test_get_info_data_matches_output_language_attrs(monkeypatch):
 
 
 def test_get_info_data_keeps_keyword_matching(monkeypatch):
-    xml_info = etree.fromstring(
-        """
-        <info>
-          <a zh_cn="足交" zh_tw="足交" jp="足交" keyword=",足コキ,足交," />
-        </info>
-        """.encode()
+    monkeypatch.setattr(
+        resources,
+        "info_db",
+        [{"zh_cn": "足交", "zh_tw": "足交", "jp": "足交", "keyword": ",足コキ,足交,"}],
     )
-    monkeypatch.setattr(resources, "info_mapping_data", xml_info)
 
     info_data = resources.get_info_data("足コキ")
 
     assert info_data["has_name"] is True
     assert info_data["zh_cn"] == "足交"
+
+
+def test_reload_actor_db_keeps_existing_cache_on_failure(monkeypatch):
+    old_actor_db = {
+        "上原亜衣": {"zh_cn": "上原亚衣", "zh_tw": "上原亞衣", "keyword": "", "href": "", "tmdbid": 1, "tmdb_url": ""}
+    }
+    monkeypatch.setattr(resources, "actor_db", old_actor_db.copy())
+
+    def _raise_load_workbook(*args, **kwargs):
+        raise RuntimeError("boom")
+
+    import openpyxl
+
+    monkeypatch.setattr(openpyxl, "load_workbook", _raise_load_workbook)
+    monkeypatch.setattr(resources, "u", lambda _name: type("_P", (), {"exists": lambda self: True})())
+
+    resources.reload_actor_db()
+
+    assert resources.actor_db == old_actor_db

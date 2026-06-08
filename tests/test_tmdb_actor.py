@@ -35,6 +35,7 @@ def test_search_actor_db_reverse_matches_variant_and_alias(monkeypatch: pytest.M
             }
         },
     )
+    monkeypatch.setattr(tmdb_actor.resources, "actor_db_reverse_index", None)
 
     by_variant = tmdb_actor.search_actor_db_reverse("上原亚衣")
     by_alias = tmdb_actor.search_actor_db_reverse("Rio")
@@ -46,6 +47,31 @@ def test_search_actor_db_reverse_matches_variant_and_alias(monkeypatch: pytest.M
     assert by_alias is not None
     assert by_alias["jp"] == "上原亜衣"
     assert by_alias["tmdbid"] == 123
+
+
+def test_search_actor_db_reverse_builds_reusable_index(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setattr(
+        tmdb_actor.resources,
+        "actor_db",
+        {
+            "加瀬かなこ": {
+                "zh_cn": "加濑香奈子",
+                "zh_tw": "加瀨香奈子",
+                "keyword": "Kana,加濑かな子",
+                "href": "",
+                "tmdbid": 456,
+                "tmdb_url": "https://www.themoviedb.org/person/456",
+            }
+        },
+    )
+    monkeypatch.setattr(tmdb_actor.resources, "actor_db_reverse_index", None)
+
+    result = tmdb_actor.search_actor_db_reverse("加瀬かな子")
+
+    assert result is not None
+    assert result["jp"] == "加瀬かなこ"
+    assert tmdb_actor.resources.actor_db_reverse_index is not None
+    assert tmdb_actor.search_actor_db_reverse("Kana")["tmdbid"] == 456
 
 
 def test_is_japan_place_supports_localized_place_names():
@@ -102,6 +128,23 @@ async def test_query_single_actor_tolerates_missing_http_response(monkeypatch: p
     result = await tmdb_actor._query_single_actor("上原亜衣", "https://api.tmdb.org", "token", object())
 
     assert result is None
+
+
+@pytest.mark.asyncio
+async def test_update_actor_db_row_allows_new_actor_insert_with_tmdbid(_tmp_actor_db: Path):
+    status = await tmdb_actor.update_actor_db_row(
+        jp="未知演员",
+        zh_cn="未知演员",
+        tmdbid=54321,
+    )
+
+    assert status == "inserted_new_row"
+
+    wb = load_workbook(_tmp_actor_db)
+    ws = wb.active
+    assert ws.cell(row=2, column=1).value == "未知演员"
+    assert ws.cell(row=2, column=6).value == 54321
+    wb.close()
 
 
 @pytest.mark.asyncio
