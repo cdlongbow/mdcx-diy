@@ -32,22 +32,32 @@ def show_constants():
         print(f"\t{key}: {value}")
 
 
-show_constants()
+def _create_application() -> tuple[QApplication, MyMAinWindow]:
+    if os.path.isfile("highdpi_passthrough"):
+        # Qt6 默认启用高 DPI，这里仅保留非整数缩放策略开关，避免 150% 缩放被取整。
+        QApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
+
+    app = QApplication(sys.argv)
+    app.setStyle("Fusion")
+    apply_application_palette(False)
+    if platform.system() != "Windows":
+        app.setWindowIcon(QIcon("resources/Img/MDCx.ico"))  # 设置任务栏图标
+
+    ui = MyMAinWindow()
+    ui.show()
+    app.installEventFilter(ui)
+    return app, ui
 
 
-if os.path.isfile("highdpi_passthrough"):
-    # Qt6 默认启用高 DPI，这里仅保留非整数缩放策略开关，避免 150% 缩放被取整。
-    QApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
+def main() -> int:
+    show_constants()
+    app, _ui = _create_application()
+    try:
+        return app.exec()
+    except Exception as e:
+        print(e)
+        return 1
 
-app = QApplication(sys.argv)
-app.setStyle("Fusion")
-apply_application_palette(False)
-if platform.system() != "Windows":
-    app.setWindowIcon(QIcon("resources/Img/MDCx.ico"))  # 设置任务栏图标
-ui = MyMAinWindow()
-ui.show()
-app.installEventFilter(ui)
-try:
-    sys.exit(app.exec())
-except Exception as e:
-    print(e)
+
+if __name__ == "__main__":
+    sys.exit(main())
