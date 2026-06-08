@@ -157,6 +157,10 @@ def get_actress_video_list(html: etree._Element, base_url: str) -> dict:
         "//div[contains(@class, 'item-box')]/a",
         # 模式4：参考JAVDB的box类
         "//a[@class='box']",
+        # 模式5：匹配特定番号模式的链接（备选）
+        "//a[contains(@href, '/SSIS-')]",
+        # 模式6：所有相对链接（最后备选）
+        "//a[starts-with(@href, '/')]",
     ]
     
     videos = []
@@ -208,28 +212,28 @@ def _extract_actress_video_info(video: etree._Element, base_url: str) -> dict:
     else:
         url = href
     
-    # 尝试多种模式提取番号
+    # 优先从URL提取番号（最可靠）
     number = None
-    number_patterns = [
-        ".//div[@class='photo-info']/span/text()",
-        ".//date/text()",
-        ".//span[@class='date']/text()",
-        ".//div[contains(@class, 'video-number')]/text()",
-        ".//h3/text()",  # 有时番号在标题中
-    ]
+    number_match = re.search(r'/([A-Z]{2,6}-?\d{3,})', url, re.IGNORECASE)
+    if number_match:
+        number = number_match.group(1).replace("-", "")
     
-    for pattern in number_patterns:
-        number_elements = video.xpath(pattern)
-        if number_elements:
-            number = str(number_elements[0]).strip()
-            if number:
-                break
-    
+    # 如果URL中没有找到，尝试从HTML元素提取
     if not number:
-        # 尝试从URL中提取番号
-        number_match = re.search(r'/([A-Z]{2,6}-?\d{3,})', url, re.IGNORECASE)
-        if number_match:
-            number = number_match.group(1).replace("-", "")
+        number_patterns = [
+            ".//div[@class='photo-info']/span/text()",
+            ".//div[contains(@class, 'video-number')]/text()",
+            ".//h3/text()",
+            ".//date/text()",  # 最后才尝试date标签
+            ".//span[@class='date']/text()",
+        ]
+        
+        for pattern in number_patterns:
+            number_elements = video.xpath(pattern)
+            if number_elements:
+                number = str(number_elements[0]).strip()
+                if number:
+                    break
     
     # 尝试提取标题
     title = ""
@@ -251,8 +255,8 @@ def _extract_actress_video_info(video: etree._Element, base_url: str) -> dict:
     date_str = ""
     date_patterns = [
         ".//div[@class='info']/date/text()",
-        ".//span[@class='date']/text()",
         ".//div[contains(@class, 'meta')]/text()",
+        ".//span[@class='date']/text()",
     ]
     
     for pattern in date_patterns:
