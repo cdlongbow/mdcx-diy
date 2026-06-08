@@ -176,13 +176,9 @@ def migrate_xml_to_xlsx():
     # 4. 保留旧文件（不再使用）
 ```
 
-### 内置备份
+### 文件加载保护
 
-系统包含 `actor_database.xlsx` 的内置备份：
-
-- **备份路径**：`resources.actor_db_backup_path`
-- **用途**：防止用户误删或损坏原始文件
-- **恢复**：可自动从备份恢复
+程序启动时如果 `userdata/actor_database.xlsx` 不存在，会自动从内置副本 `resources/actor_database.xlsx` 复制一份到 `userdata/` 目录。`resources.actor_db_backup_path` 指向的就是这个内置副本。
 
 ## 使用场景
 
@@ -298,7 +294,7 @@ TMDB ID 缓存最终用于 NFO 文件生成：
 
 4. **Excel 文件损坏**
    - 系统会自动从内置备份恢复
-   - 检查 `resources.actor_db_backup_path`
+   - 检查 `userdata/actor_database.xlsx` 是否存在
 
 ### 日志位置
 
