@@ -161,6 +161,7 @@ class MyMAinWindow(QMainWindow):
         self.file_main_open_path = Path()  # 主界面打开的文件路径
         self.json_array: dict[str, ShowData] = {}  # 主界面右侧结果树状数据
         self.preview_request_id = 0  # 主界面图片预览请求序号，用于丢弃过期加载结果
+        self._did_apply_initial_size = False
 
         self.window_radius = 0  # 窗口四角弧度，为0时表示显示窗口标题栏
         self.window_border = 0  # 窗口描边，为0时表示显示窗口标题栏
@@ -632,7 +633,10 @@ class MyMAinWindow(QMainWindow):
         return super().eventFilter(a0, a1)
 
     def showEvent(self, a0):
-        self.resize(1030, 700)  # 调整窗口大小
+        if not self._did_apply_initial_size:
+            self._did_apply_initial_size = True
+            self.resize(1030, 700)  # 首次显示时应用默认窗口大小
+        super().showEvent(a0)
 
     # 当隐藏边框时，最小化后，点击任务栏时，需要监听事件，在恢复窗口时隐藏边框
     def changeEvent(self, a0):
@@ -664,6 +668,7 @@ class MyMAinWindow(QMainWindow):
             self.window_radius = 5
             if IS_WINDOWS:
                 self.window_border = 1
+                self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
             else:
                 self.window_border = 0
             self.setWindowFlag(Qt.WindowType.FramelessWindowHint, True)  # 隐藏标题栏
@@ -677,6 +682,8 @@ class MyMAinWindow(QMainWindow):
             self.window_radius = 0
             self.window_border = 0
             self.window_marjin = 0
+            if IS_WINDOWS:
+                self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, False)
             self.setWindowFlag(Qt.WindowType.FramelessWindowHint, False)  # 显示标题栏
             self.Ui.pushButton_close.setVisible(False)
             self.Ui.pushButton_min.setVisible(False)

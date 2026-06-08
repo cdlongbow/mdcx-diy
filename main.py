@@ -38,7 +38,8 @@ def _create_application() -> tuple[QApplication, MyMAinWindow]:
         QApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
 
     app = QApplication(sys.argv)
-    app.setStyle("Fusion")
+    if platform.system() != "Windows":
+        app.setStyle("Fusion")
     apply_application_palette(False)
     if platform.system() != "Windows":
         app.setWindowIcon(QIcon("resources/Img/MDCx.ico"))  # 设置任务栏图标

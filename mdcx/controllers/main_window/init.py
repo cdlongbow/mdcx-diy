@@ -26,10 +26,9 @@ def Init_Ui(self: "MyMAinWindow"):
     self.setWindowIcon(QIcon(resources.icon_ico))  # 设置任务栏图标
     self.setWindowOpacity(1.0)  # 设置窗口透明度
     if IS_WINDOWS:
-        self.setFixedSize(
-            self.width(), self.height()
-        )  # 禁止调整窗口大小(mac 平台禁止后最小化没反应，恢复时顶部会残留标题栏)
-    self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)  # 设置窗口背景透明
+        self.setMinimumSize(self.size())
+    else:
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)  # 设置窗口背景透明
     self.Ui.progressBar_scrape.setValue(0)  # 进度条清0
     self.Ui.progressBar_scrape.setTextVisible(False)  # 不显示进度条文字
     self.Ui.pushButton_start_cap.setCheckable(True)  # 主界面开始按钮可点状态
