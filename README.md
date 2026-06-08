@@ -406,6 +406,7 @@ uv run python -m mdcx.cmd.gen_enums
 - 确认 API 密钥有效
 - 查看日志了解详细错误信息
 
+本项目源自Hazard804大佬改良的mdcx项目，衷心感谢！！！以下是源项目说明。
 ## 交流群
 
 [![Telegram](https://img.shields.io/badge/Telegram-Join_Chat-2CA5E0?style=flat&logo=telegram&logoColor=white)](https://t.me/mdcx_chat)
