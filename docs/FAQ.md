@@ -6,14 +6,11 @@
 
 ### Q: 安装时提示 "No module named 'PyQt6'" 怎么办？
 
-**A**: 安装 PyQt6 或改用 PyQt5：
+**A**: 当前项目仅支持 PyQt6，请先安装或修复 PyQt6 依赖：
 
 ```bash
-# 方案 1: 安装 PyQt6
+# 安装 PyQt6
 pip install PyQt6
-
-# 方案 2: 安装 PyQt5
-pip install PyQt5
 ```
 
 ### Q: Linux 上 GUI 无法显示或显示异常？
@@ -33,7 +30,7 @@ export QT_QPA_PLATFORM=xcb
 
 ### Q: 如何确定需要哪个版本的 Python？
 
-**A**: MDCX 需要 Python 3.8 或更高版本：
+**A**: MDCX 需要 Python 3.13 或更高版本：
 
 ```bash
 python --version
@@ -43,10 +40,10 @@ python3 --version
 
 ### Q: macOS 上运行报 "Python is not installed" 错误？
 
-**A**: macOS 可能需要通过 Homebrew 安装 Python：
+**A**: macOS 可能需要通过 Homebrew 安装 Python 3.13：
 
 ```bash
-brew install python@3.8
+brew install python@3.13
 ```
 
 ## 数据库管理

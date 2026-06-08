@@ -58,7 +58,7 @@
 
 版本迁移和升级指南：
 
-- 🔄 [PyQt6 迁移](pyqt6-migration.md) - 从 PyQt5 迁移到 PyQt6
+- 🔄 [PyQt6 迁移](pyqt6-migration.md) - 从 PyQt5 迁移到 PyQt6 的记录
 - 🔄 [爬虫迁移](crawler-migration.md) - 爬虫系统重构和迁移
 - 📝 [变更日志](changelog.md) - 版本更新历史
 
@@ -94,7 +94,7 @@
 
 ### 迁移指南
 
-- [PyQt6 迁移](pyqt6-migration.md) - 从 PyQt5 迁移到 PyQt6 的指南
+- [PyQt6 迁移](pyqt6-migration.md) - 从 PyQt5 迁移到 PyQt6 的记录
 - [爬虫迁移](crawler-migration.md) - 爬虫系统重构和迁移指南
 
 ---

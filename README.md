@@ -309,7 +309,7 @@ MDCx 专为以下用户和场景打造：
 
 #### 迁移指南
 
-- 🔄 [PyQt6 迁移](docs/pyqt6-migration.md) - 从 PyQt5 迁移到 PyQt6 的方案
+- 🔄 [PyQt6 迁移](docs/pyqt6-migration.md) - 从 PyQt5 迁移到 PyQt6 的记录
 - 🔄 [爬虫迁移](docs/crawler-migration.md) - 刮削器新版框架迁移指南
 
 #### 代码质量

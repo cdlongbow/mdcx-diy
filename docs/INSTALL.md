@@ -10,11 +10,11 @@
 - macOS 11 或更高版本
 
 ### Python 环境
-- Python 3.8 或更高版本
+- Python 3.13 或更高版本
 - pip 包管理器
 
 ### 依赖项
-- PyQt6 或 PyQt5（GUI 框架）
+- PyQt6（GUI 框架）
 - openpyxl（Excel 文件处理）
 - requests（HTTP 请求）
 - lxml（HTML/XML 解析）
@@ -26,7 +26,7 @@
 
 1. **安装 Python**
    ```powershell
-   # 从 https://www.python.org/downloads/ 下载并安装 Python 3.8+
+   # 从 https://www.python.org/downloads/ 下载并安装 Python 3.13+
    # 安装时勾选 "Add Python to PATH"
    ```
 
@@ -38,7 +38,7 @@
 
 3. **安装依赖**
    ```powershell
-   pip install -r requirements.txt
+   pip install -e .
    ```
 
 4. **运行程序**
@@ -72,7 +72,7 @@
 
 4. **安装依赖**
    ```bash
-   pip install -r requirements.txt
+   pip install -e .
    ```
 
 5. **运行程序**
@@ -85,7 +85,7 @@
 1. **安装 Python**
    ```bash
    # 使用 Homebrew
-   brew install python@3.8
+   brew install python@3.13
    ```
 
 2. **克隆仓库**
@@ -102,7 +102,7 @@
 
 4. **安装依赖**
    ```bash
-   pip install -r requirements.txt
+   pip install -e .
    ```
 
 5. **运行程序**
@@ -118,10 +118,10 @@
 
 ### PyQt6 导入错误
 
-如果遇到 PyQt6 导入错误，尝试安装 PyQt5：
+如果遇到 PyQt6 导入错误，请先确认当前环境已安装 PyQt6：
 
 ```bash
-pip install PyQt5
+pip install PyQt6
 ```
 
 ### 权限问题（Linux/macOS）
@@ -153,8 +153,8 @@ sudo yum install libxcb-xinerama0 libxcb-cursor0
 ## 更新
 
 ```bash
-git pull origin master
-pip install -r requirements.txt --upgrade
+git pull origin main
+pip install -e . --upgrade
 ```
 
 ## 下一步
