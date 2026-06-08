@@ -33,6 +33,44 @@ def get_external_id_tag_name(site: Website | str) -> str:
     return f"{site_name}id"
 
 
+def _strip_number_prefix(text: str, number: str) -> str:
+    if not text or not number:
+        return text
+    return re.sub(rf"^{re.escape(number)}\s+", "", text, count=1).strip()
+
+
+def _build_generated_read_tags(
+    *,
+    actor_list: list[str],
+    letters: str,
+    mosaic: str,
+    publisher: str,
+    series: str,
+    studio: str,
+) -> set[str]:
+    generated_tags: set[str] = set()
+
+    generated_tags.add("中文字幕")
+    if letters and letters != "未知车牌":
+        generated_tags.add(letters)
+    if mosaic:
+        generated_tags.add(mosaic)
+
+    actor_template = getattr(manager.config, "nfo_tag_actor", "actor")
+    for actor_name in actor_list:
+        if actor_name:
+            generated_tags.add(actor_template.replace("actor", actor_name))
+
+    if series:
+        generated_tags.add(manager.config.nfo_tag_series.replace("series", series))
+    if studio:
+        generated_tags.add(manager.config.nfo_tag_studio.replace("studio", studio))
+    if publisher:
+        generated_tags.add(manager.config.nfo_tag_publisher.replace("publisher", publisher))
+
+    return {tag for tag in generated_tags if tag}
+
+
 async def write_nfo(file_info: FileInfo, data: CrawlersResult, nfo_file: Path, output_dir: Path, update=False) -> bool:
     start_time = time.time()
     download_files = manager.config.download_files
@@ -261,8 +299,8 @@ async def write_nfo(file_info: FileInfo, data: CrawlersResult, nfo_file: Path, o
             actor_tmdb_ids = data.actor_tmdb_ids if NfoInclude.ACTOR_TMDBID in nfo_include_new else {}
             actor_name_to_tmdbid: dict[str, int] = {}
             if actor_tmdb_ids:
-                if data.original_actors and len(data.original_actors) == len(data.actors):
-                    for i, mapped_name in enumerate(data.actors):
+                if data.original_actors and len(data.original_actors) == len(actors):
+                    for i, mapped_name in enumerate(actors):
                         if i < len(data.original_actors):
                             if tmdbid := actor_tmdb_ids.get(data.original_actors[i].strip()):
                                 actor_name_to_tmdbid[mapped_name.strip()] = tmdbid
@@ -420,8 +458,8 @@ async def get_nfo_data(file_path: Path, movie_number: str) -> tuple[CrawlersResu
     if not number:
         number = movie_number
     letters = get_number_letters(number)
-    title = title.replace(number + " ", "").strip()
-    originaltitle = originaltitle.replace(number + " ", "").strip()
+    title = _strip_number_prefix(title, number)
+    originaltitle = _strip_number_prefix(originaltitle, number)
     originaltitle_amazon = originaltitle
     if originaltitle:
         for key, value in ManualConfig.SPECIAL_WORD.items():
@@ -500,15 +538,17 @@ async def get_nfo_data(file_path: Path, movie_number: str) -> tuple[CrawlersResu
         json_data.mosaic = "动漫"
     json_data.mosaic = normalize_mosaic(json_data.mosaic)
 
-    # 获取只有标签的标签（因为启用字段翻译后，会再次重复添加字幕、演员、发行、系列等字段）
-    replace_keys = set(filter(None, ["：", ":"] + re.split(r"[,，]", actor)))
-    temp_tag_list = list(filter(None, re.split(r"[,，]", tag.replace("中文字幕", ""))))
-    only_tag_list = temp_tag_list.copy()
-    for each_tag in temp_tag_list:
-        for each_key in replace_keys:
-            if each_key in each_tag:
-                only_tag_list.remove(each_tag)
-                break
+    # 读取模式下移除后续会由 translate_info() 重建的标签，保留其余结构化标签
+    generated_tags = _build_generated_read_tags(
+        actor_list=actor_list,
+        letters=letters,
+        mosaic=json_data.mosaic,
+        publisher=publisher,
+        series=series,
+        studio=studio,
+    )
+    temp_tag_list = [item.strip() for item in re.split(r"[,，]", tag) if item.strip()]
+    only_tag_list = [each_tag for each_tag in temp_tag_list if each_tag not in generated_tags]
     tag_only = ",".join(only_tag_list)
 
     # 获取本地图片路径

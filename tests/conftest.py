@@ -1,6 +1,9 @@
 import sys
 import types
 from pathlib import Path
+from types import SimpleNamespace
+
+from mdcx.config.enums import Language
 
 
 class _DummySignal:
@@ -59,6 +62,7 @@ class _DummyConfig:
         self.update_titletemplate = "number title"
         self.nfo_include_new = []
         self.actor_no_name = "佚名"
+        self.read_mode = []
         self.nfo_tag_series = "series"
         self.nfo_tagline = "release"
         self.add_genre_to_tag = False
@@ -67,6 +71,9 @@ class _DummyConfig:
         self.original_nfo_title = False
         self.use_simple_tag = False
         self.website = ""
+
+    def get_field_config(self, _field):
+        return SimpleNamespace(language=Language.JP, translate=False)
 
 
 class _DummyManager:
@@ -83,6 +90,7 @@ class _DummyResources:
         self.actor_db = {}
         self.actor_db_reverse_index = None
         self.info_db = []
+        self.info_mapping_data = None
 
     def u(self, relative_path):
         return manager_module.manager.data_folder / "userdata" / relative_path

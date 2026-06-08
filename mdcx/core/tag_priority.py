@@ -76,9 +76,17 @@ def _normalize_tag(value: str) -> str:
 
 def _get_mapping_nodes():
     info_db = resources.info_db
-    if info_db is None or not info_db:
+    if info_db:
+        return id(info_db), info_db
+
+    info_mapping_data = getattr(resources, "info_mapping_data", None)
+    if info_mapping_data is None:
         return None, []
-    return id(info_db), info_db
+
+    nodes = list(info_mapping_data)
+    if not nodes:
+        return None, []
+    return id(info_mapping_data), nodes
 
 
 def get_priority_tag_names() -> frozenset[str]:
