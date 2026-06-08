@@ -12,7 +12,7 @@ from typing import Any
 
 from ..config.manager import manager
 from ..config.resources import resources
-from ..log import LogBuffer
+from ..models.log_buffer import LogBuffer
 from ..utils import norm_name
 
 
