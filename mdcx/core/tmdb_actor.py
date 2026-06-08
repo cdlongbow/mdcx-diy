@@ -702,9 +702,6 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
         if not pid:
             continue
 
-        if not item.get("adult"):
-            continue
-
         gender = item.get("gender")
         if gender not in (0, 1):
             continue
@@ -720,9 +717,6 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
         except (json.JSONDecodeError, ValueError):
             continue
         place = detail.get("place_of_birth", "")
-
-        if not is_japan_place(place):
-            continue
 
         all_names = set()
         for x in [item.get("name"), item.get("original_name"), detail.get("name")]:
@@ -747,6 +741,7 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
             {
                 "pid": pid,
                 "is_match": is_match,
+                "adult": bool(item.get("adult")),
                 "popularity": popularity,
                 "known_for_count": known_for_count,
                 "place_has_japan": place_has_japan,
@@ -762,7 +757,7 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
         return None
 
     matched.sort(
-        key=lambda x: (x["popularity"], x["known_for_count"], x["place_has_japan"]),
+        key=lambda x: (x["place_has_japan"], x["adult"], x["popularity"], x["known_for_count"]),
         reverse=True,
     )
 

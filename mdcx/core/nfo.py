@@ -259,25 +259,21 @@ async def write_nfo(file_info: FileInfo, data: CrawlersResult, nfo_file: Path, o
             if not actors:
                 actors = [manager.config.actor_no_name]
             actor_tmdb_ids = data.actor_tmdb_ids if NfoInclude.ACTOR_TMDBID in nfo_include_new else {}
+            actor_name_to_tmdbid: dict[str, int] = {}
+            if actor_tmdb_ids:
+                if data.original_actors and len(data.original_actors) == len(data.actors):
+                    for i, mapped_name in enumerate(data.actors):
+                        if i < len(data.original_actors):
+                            if tmdbid := actor_tmdb_ids.get(data.original_actors[i].strip()):
+                                actor_name_to_tmdbid[mapped_name.strip()] = tmdbid
+                for actor_name, tid in actor_tmdb_ids.items():
+                    actor_name_to_tmdbid.setdefault(actor_name.strip(), tid)
             for name in actors:
                 print("  <actor>", file=code)
                 write_text_element(code, "name", name, indent="    ")
                 write_text_element(code, "type", "Actor", indent="    ")
-            if actor_tmdb_ids:
-                # 查找原始演员名对应的 tmdbid
-                # 优先通过 original_actors 建立原名→映射名对照
-                if data.original_actors and len(data.original_actors) == len(data.actors):
-                    for i, orig_name in enumerate(data.original_actors):
-                        if i < len(data.actors) and data.actors[i].strip() == orig_name.strip():
-                            if tmdbid := data.actor_tmdb_ids.get(orig_name):
-                                write_text_element(code, "tmdbid", str(tmdbid), indent="    ")
-                                break
-                # 兼容读取模式：actor_tmdb_ids 的 key 可能是映射名
-                else:
-                    for orig_name, tid in actor_tmdb_ids.items():
-                        if orig_name in [a.strip() for a in data.actors]:
-                            write_text_element(code, "tmdbid", str(tid), indent="    ")
-                            break
+                if tmdbid := actor_name_to_tmdbid.get(name.strip()):
+                    write_text_element(code, "tmdbid", str(tmdbid), indent="    ")
                 print("  </actor>", file=code)
 
         # 输出导演
