@@ -756,7 +756,7 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
         },
     )
 
-    if resp.status_code != 200:
+    if resp is None or resp.status_code != 200:
         return None
 
     try:
@@ -789,7 +789,7 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
         detail_url = f"{base_url}/3/person/{pid}"
         detail_resp = await _tmdb_request(client, "GET", detail_url, params={"api_key": api_key, "language": "zh-CN"})
 
-        if detail_resp.status_code != 200:
+        if detail_resp is None or detail_resp.status_code != 200:
             continue
 
         try:
@@ -813,7 +813,7 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
         _pop = item.get("popularity", 0) or 0
         popularity = float(_pop) if isinstance(_pop, (int, float, str)) else 0.0
         known_for_count = len(detail.get("known_for", [])) if "known_for" in detail else 0
-        place_has_japan = "japan" in place.lower() or "日本" in place
+        place_has_japan = is_japan_place(place)
 
         translations = await _fetch_person_translations(pid, base_url, api_key, client)
 
@@ -868,7 +868,7 @@ async def _fetch_person_translations(pid: int, base_url: str, api_key: str, clie
     try:
         trans_url = f"{base_url}/3/person/{pid}/translations"
         trans_resp = await _tmdb_request(client, "GET", trans_url, params={"api_key": api_key})
-        if trans_resp.status_code != 200:
+        if trans_resp is None or trans_resp.status_code != 200:
             return result
 
         try:
@@ -877,19 +877,22 @@ async def _fetch_person_translations(pid: int, base_url: str, api_key: str, clie
             return result
         for trans in trans_data.get("translations", []):
             iso = trans.get("iso_639_1", "")
+            region = trans.get("iso_3166_1", "")
             en_name = trans.get("english_name", "")
             data = trans.get("data", {})
             native_name = data.get("name", "")
 
-            if iso == "zh":
+            if iso == "zh" and region == "CN":
+                result["zh_cn"] = data.get("name") or en_name or ""
+            elif iso == "zh" and region == "TW":
+                result["zh_tw"] = data.get("name") or en_name or ""
+            elif iso == "zh":
                 name_to_use = native_name or en_name
                 if name_to_use:
-                    result["zh_cn"] = name_to_use
-                    result["zh_tw"] = name_to_use
-            elif iso == "zh-CN":
-                result["zh_cn"] = data.get("name") or en_name or ""
-            elif iso == "zh-TW":
-                result["zh_tw"] = data.get("name") or en_name or ""
+                    if not result["zh_cn"]:
+                        result["zh_cn"] = name_to_use
+                    if not result["zh_tw"]:
+                        result["zh_tw"] = name_to_use
     except Exception:
         pass
 

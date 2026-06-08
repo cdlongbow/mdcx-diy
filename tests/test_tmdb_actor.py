@@ -48,6 +48,62 @@ def test_search_actor_db_reverse_matches_variant_and_alias(monkeypatch: pytest.M
     assert by_alias["tmdbid"] == 123
 
 
+def test_is_japan_place_supports_localized_place_names():
+    assert tmdb_actor.is_japan_place("东京") is True
+    assert tmdb_actor.is_japan_place("神奈川县") is True
+    assert tmdb_actor.is_japan_place("中国广东") is False
+
+
+@pytest.mark.asyncio
+async def test_fetch_person_translations_distinguishes_cn_and_tw(monkeypatch: pytest.MonkeyPatch):
+    class _StubResponse:
+        def __init__(self, payload):
+            self.status_code = 200
+            self._payload = payload
+
+        def json(self):
+            return self._payload
+
+    async def _stub_tmdb_request(*args, **kwargs):
+        return _StubResponse(
+            {
+                "translations": [
+                    {
+                        "iso_639_1": "zh",
+                        "iso_3166_1": "CN",
+                        "english_name": "Kana",
+                        "data": {"name": "加濑香奈"},
+                    },
+                    {
+                        "iso_639_1": "zh",
+                        "iso_3166_1": "TW",
+                        "english_name": "Kana",
+                        "data": {"name": "加瀨香奈"},
+                    },
+                ]
+            }
+        )
+
+    monkeypatch.setattr(tmdb_actor, "_tmdb_request", _stub_tmdb_request)
+
+    result = await tmdb_actor._fetch_person_translations(123, "https://api.tmdb.org", "token", object())
+
+    assert result == {"zh_cn": "加濑香奈", "zh_tw": "加瀨香奈"}
+
+
+@pytest.mark.asyncio
+async def test_query_single_actor_tolerates_missing_http_response(monkeypatch: pytest.MonkeyPatch):
+    async def _stub_tmdb_request(*args, **kwargs):
+        return None
+
+    monkeypatch.setattr(tmdb_actor, "_tmdb_request", _stub_tmdb_request)
+    monkeypatch.setattr(tmdb_actor.manager.config, "show_data_log", False)
+
+    result = await tmdb_actor._query_single_actor("上原亜衣", "https://api.tmdb.org", "token", object())
+
+    assert result is None
+
+
 @pytest.mark.asyncio
 async def test_update_actor_db_row_writes_tmdbid_and_tmdb_url(_tmp_actor_db: Path):
     status = await tmdb_actor.update_actor_db_row(
