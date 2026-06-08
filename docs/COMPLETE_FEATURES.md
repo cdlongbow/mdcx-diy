@@ -362,14 +362,6 @@ def detect_and_crop(image_path: str) -> str:
 [左下]   [下]   [右下]
 ```
 
-### 图片修复功能
-
-**修复功能**
-- 🔧 检测损坏的图片文件
-- 🔄 自动尝试修复
-- 📝 生成修复报告
-- 💾 备份原始文件
-
 ---
 
 ## 多语言翻译
@@ -1201,13 +1193,6 @@ matches = manager.auto_match("/path/to/videos")
 # 复制字幕到视频目录
 manager.copy_subtitles(matches)
 ```
-
-### 缺失文件检测工具 (missing.py)
-
-**功能列表**
-- 🔍 扫描缺失文件
-- 📋 生成缺失报告
-- 🔄 重新刮削
 
 ### Wiki 工具 (wiki.py)
 
