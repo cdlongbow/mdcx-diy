@@ -66,6 +66,11 @@ class BuildManager:
         self.is_linux = self.os == "Linux"
         self.debug = debug
 
+    def _app_icon_path(self) -> str:
+        if self.is_windows:
+            return "resources/Img/MDCx.ico"
+        return "resources/Img/MDCx.icns"
+
     def run(self):
         """运行构建流程"""
         try:
@@ -124,7 +129,7 @@ class BuildManager:
             logger.info(f"\tcreate-dmg 版本: {r}")
 
         logger.info("检查必要文件...")
-        required_files = ["main.py", "mdcx", "resources/Img/MDCx.icns", "resources", "libs"]
+        required_files = ["main.py", "mdcx", self._app_icon_path(), "resources", "libs"]
         for file_path in required_files:
             if not Path(file_path).exists():
                 raise BuildError(f"文件检查失败: {file_path}")
@@ -148,7 +153,7 @@ class BuildManager:
             "--add-data",
             "libs:.",
             "--icon",
-            "resources/Img/MDCx.icns",
+            self._app_icon_path(),
             "--hidden-import",
             "_cffi_backend",
             "--collect-all",
@@ -227,7 +232,7 @@ class BuildManager:
             "--volname",
             self.app_name,
             "--volicon",
-            "resources/Img/MDCx.icns",
+            self._app_icon_path(),
             "--window-pos",
             "200",
             "120",

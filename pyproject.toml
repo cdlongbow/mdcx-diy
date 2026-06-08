@@ -1,5 +1,8 @@
 [tool.setuptools]
-py-modules = ['mdcx', 'scripts']
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["mdcx*", "scripts*"]
 
 [project]
 name = "mdcx"
