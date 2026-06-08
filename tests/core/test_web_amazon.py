@@ -1,4 +1,5 @@
 from pathlib import Path
+from urllib.parse import parse_qs, unquote_plus, urlparse
 
 import numpy as np
 import pytest
@@ -24,6 +25,20 @@ from mdcx.core.web import (
 )
 from mdcx.models.log_buffer import LogBuffer
 from mdcx.models.types import CrawlersResult, OtherInfo
+
+
+def _save_test_image(path: Path, size: tuple[int, int], color: tuple[int, int, int] = (255, 255, 255)) -> None:
+    Image.new("RGB", size, color).save(path)
+
+
+def _extract_search_query(req_url: str) -> str:
+    parsed = urlparse(req_url)
+    query = parse_qs(parsed.query).get("k", [""])[0]
+    return unquote_plus(query)
+
+
+def _normalize_search_query(query: str) -> str:
+    return " ".join(str(query).split())
 
 
 def test_normalize_amazon_image_url_converts_to_sl1500():

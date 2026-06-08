@@ -17,178 +17,178 @@ from pathlib import Path
 # Grouped by category. Order within each group matters (longer names first).
 MIGRATIONS = {
     # (category_prefix_for_Qt, category_prefix_for_QFrame, replacements)
-    'Qt': [
+    "Qt": [
         # ContextMenuPolicy
-        ('ContextMenuPolicy', 'ActionsContextMenu'),
-        ('ContextMenuPolicy', 'DefaultContextMenu'),
-        ('ContextMenuPolicy', 'NoContextMenu'),
-        ('ContextMenuPolicy', 'PreventContextMenu'),
-        ('ContextMenuPolicy', 'CustomContextMenu'),
+        ("ContextMenuPolicy", "ActionsContextMenu"),
+        ("ContextMenuPolicy", "DefaultContextMenu"),
+        ("ContextMenuPolicy", "NoContextMenu"),
+        ("ContextMenuPolicy", "PreventContextMenu"),
+        ("ContextMenuPolicy", "CustomContextMenu"),
         # CursorShape
-        ('CursorShape', 'ArrowCursor'),
-        ('CursorShape', 'UpArrowCursor'),
-        ('CursorShape', 'CrossCursor'),
-        ('CursorShape', 'WaitCursor'),
-        ('CursorShape', 'IBeamCursor'),
-        ('CursorShape', 'SizeVerCursor'),
-        ('CursorShape', 'SizeHorCursor'),
-        ('CursorShape', 'SizeAllCursor'),
-        ('CursorShape', 'PointingHandCursor'),
-        ('CursorShape', 'WhatsThisCursor'),
-        ('CursorShape', 'BusyCursor'),
-        ('CursorShape', 'ForbiddenCursor'),
-        ('CursorShape', 'SplitVCursor'),
-        ('CursorShape', 'SplitHCursor'),
-        ('CursorShape', 'OpenHandCursor'),
-        ('CursorShape', 'ClosedHandCursor'),
-        ('CursorShape', 'SizeBDiagCursor'),
-        ('CursorShape', 'SizeFDiagCursor'),
-        ('CursorShape', 'BlankCursor'),
+        ("CursorShape", "ArrowCursor"),
+        ("CursorShape", "UpArrowCursor"),
+        ("CursorShape", "CrossCursor"),
+        ("CursorShape", "WaitCursor"),
+        ("CursorShape", "IBeamCursor"),
+        ("CursorShape", "SizeVerCursor"),
+        ("CursorShape", "SizeHorCursor"),
+        ("CursorShape", "SizeAllCursor"),
+        ("CursorShape", "PointingHandCursor"),
+        ("CursorShape", "WhatsThisCursor"),
+        ("CursorShape", "BusyCursor"),
+        ("CursorShape", "ForbiddenCursor"),
+        ("CursorShape", "SplitVCursor"),
+        ("CursorShape", "SplitHCursor"),
+        ("CursorShape", "OpenHandCursor"),
+        ("CursorShape", "ClosedHandCursor"),
+        ("CursorShape", "SizeBDiagCursor"),
+        ("CursorShape", "SizeFDiagCursor"),
+        ("CursorShape", "BlankCursor"),
         # ScrollBarPolicy
-        ('ScrollBarPolicy', 'ScrollBarAsNeeded'),
-        ('ScrollBarPolicy', 'ScrollBarAlwaysOff'),
-        ('ScrollBarPolicy', 'ScrollBarAlwaysOn'),
+        ("ScrollBarPolicy", "ScrollBarAsNeeded"),
+        ("ScrollBarPolicy", "ScrollBarAlwaysOff"),
+        ("ScrollBarPolicy", "ScrollBarAlwaysOn"),
         # TextFormat
-        ('TextFormat', 'AutoText'),
-        ('TextFormat', 'PlainText'),
-        ('TextFormat', 'RichText'),
-        ('TextFormat', 'MarkdownText'),
+        ("TextFormat", "AutoText"),
+        ("TextFormat", "PlainText"),
+        ("TextFormat", "RichText"),
+        ("TextFormat", "MarkdownText"),
         # AlignmentFlag - longer names first
-        ('AlignmentFlag', 'AlignTrailing'),
-        ('AlignmentFlag', 'AlignLeading'),
-        ('AlignmentFlag', 'AlignJustify'),
-        ('AlignmentFlag', 'AlignHCenter'),
-        ('AlignmentFlag', 'AlignVCenter'),
-        ('AlignmentFlag', 'AlignCenter'),
-        ('AlignmentFlag', 'AlignRight'),
-        ('AlignmentFlag', 'AlignLeft'),
-        ('AlignmentFlag', 'AlignTop'),
-        ('AlignmentFlag', 'AlignBottom'),
-        ('AlignmentFlag', 'AlignBaseline'),
-        ('AlignmentFlag', 'AlignAuto'),
+        ("AlignmentFlag", "AlignTrailing"),
+        ("AlignmentFlag", "AlignLeading"),
+        ("AlignmentFlag", "AlignJustify"),
+        ("AlignmentFlag", "AlignHCenter"),
+        ("AlignmentFlag", "AlignVCenter"),
+        ("AlignmentFlag", "AlignCenter"),
+        ("AlignmentFlag", "AlignRight"),
+        ("AlignmentFlag", "AlignLeft"),
+        ("AlignmentFlag", "AlignTop"),
+        ("AlignmentFlag", "AlignBottom"),
+        ("AlignmentFlag", "AlignBaseline"),
+        ("AlignmentFlag", "AlignAuto"),
         # TextInteractionFlag - longer names first
-        ('TextInteractionFlag', 'TextEditorInteraction'),
-        ('TextInteractionFlag', 'TextBrowserInteraction'),
-        ('TextInteractionFlag', 'LinksAccessibleByKeyboard'),
-        ('TextInteractionFlag', 'LinksAccessibleByMouse'),
-        ('TextInteractionFlag', 'TextSelectableByKeyboard'),
-        ('TextInteractionFlag', 'TextSelectableByMouse'),
-        ('TextInteractionFlag', 'TextEditable'),
-        ('TextInteractionFlag', 'NoTextInteraction'),
+        ("TextInteractionFlag", "TextEditorInteraction"),
+        ("TextInteractionFlag", "TextBrowserInteraction"),
+        ("TextInteractionFlag", "LinksAccessibleByKeyboard"),
+        ("TextInteractionFlag", "LinksAccessibleByMouse"),
+        ("TextInteractionFlag", "TextSelectableByKeyboard"),
+        ("TextInteractionFlag", "TextSelectableByMouse"),
+        ("TextInteractionFlag", "TextEditable"),
+        ("TextInteractionFlag", "NoTextInteraction"),
         # LayoutDirection
-        ('LayoutDirection', 'LayoutDirectionAuto'),
-        ('LayoutDirection', 'LayoutDirectionUndefined'),
-        ('LayoutDirection', 'LeftToRight'),
-        ('LayoutDirection', 'RightToLeft'),
+        ("LayoutDirection", "LayoutDirectionAuto"),
+        ("LayoutDirection", "LayoutDirectionUndefined"),
+        ("LayoutDirection", "LeftToRight"),
+        ("LayoutDirection", "RightToLeft"),
         # Orientation
-        ('Orientation', 'Horizontal'),
-        ('Orientation', 'Vertical'),
+        ("Orientation", "Horizontal"),
+        ("Orientation", "Vertical"),
         # FocusPolicy
-        ('FocusPolicy', 'WheelFocus'),
-        ('FocusPolicy', 'StrongFocus'),
-        ('FocusPolicy', 'ClickFocus'),
-        ('FocusPolicy', 'TabFocus'),
-        ('FocusPolicy', 'NoFocus'),
+        ("FocusPolicy", "WheelFocus"),
+        ("FocusPolicy", "StrongFocus"),
+        ("FocusPolicy", "ClickFocus"),
+        ("FocusPolicy", "TabFocus"),
+        ("FocusPolicy", "NoFocus"),
         # TextElideMode
-        ('TextElideMode', 'ElideMiddle'),
-        ('TextElideMode', 'ElideRight'),
-        ('TextElideMode', 'ElideLeft'),
-        ('TextElideMode', 'ElideNone'),
+        ("TextElideMode", "ElideMiddle"),
+        ("TextElideMode", "ElideRight"),
+        ("TextElideMode", "ElideLeft"),
+        ("TextElideMode", "ElideNone"),
         # DropAction
-        ('DropAction', 'CopyAction'),
-        ('DropAction', 'MoveAction'),
-        ('DropAction', 'LinkAction'),
-        ('DropAction', 'IgnoreAction'),
+        ("DropAction", "CopyAction"),
+        ("DropAction", "MoveAction"),
+        ("DropAction", "LinkAction"),
+        ("DropAction", "IgnoreAction"),
         # WindowState
-        ('WindowState', 'WindowActive'),
-        ('WindowState', 'WindowMinimized'),
-        ('WindowState', 'WindowMaximized'),
-        ('WindowState', 'WindowFullScreen'),
-        ('WindowState', 'WindowClose'),
-        ('WindowState', 'WindowShade'),
-        ('WindowState', 'WindowNoState'),
+        ("WindowState", "WindowActive"),
+        ("WindowState", "WindowMinimized"),
+        ("WindowState", "WindowMaximized"),
+        ("WindowState", "WindowFullScreen"),
+        ("WindowState", "WindowClose"),
+        ("WindowState", "WindowShade"),
+        ("WindowState", "WindowNoState"),
         # AspectRatioMode
-        ('AspectRatioMode', 'KeepAspectRatioByExpanding'),
-        ('AspectRatioMode', 'KeepAspectRatio'),
-        ('AspectRatioMode', 'IgnoreAspectRatio'),
+        ("AspectRatioMode", "KeepAspectRatioByExpanding"),
+        ("AspectRatioMode", "KeepAspectRatio"),
+        ("AspectRatioMode", "IgnoreAspectRatio"),
     ],
-    'QFrame': [
+    "QFrame": [
         # QFrame.Shape
-        ('Shape', 'StyledPanel'),
-        ('Shape', 'GroupBoxPanel'),
-        ('Shape', 'StyledLine'),
-        ('Shape', 'WinPanel'),
-        ('Shape', 'Panel'),
-        ('Shape', 'HLine'),
-        ('Shape', 'VLine'),
-        ('Shape', 'Box'),
-        ('Shape', 'NoFrame'),
+        ("Shape", "StyledPanel"),
+        ("Shape", "GroupBoxPanel"),
+        ("Shape", "StyledLine"),
+        ("Shape", "WinPanel"),
+        ("Shape", "Panel"),
+        ("Shape", "HLine"),
+        ("Shape", "VLine"),
+        ("Shape", "Box"),
+        ("Shape", "NoFrame"),
         # QFrame.Shadow
-        ('Shadow', 'Sunken'),
-        ('Shadow', 'Raised'),
-        ('Shadow', 'Plain'),
+        ("Shadow", "Sunken"),
+        ("Shadow", "Raised"),
+        ("Shadow", "Plain"),
     ],
-    'QAbstractItemView': [
+    "QAbstractItemView": [
         # EditTrigger
-        ('EditTrigger', 'AnyKeyPressed'),
-        ('EditTrigger', 'EditKeyPressed'),
-        ('EditTrigger', 'SelectedClicked'),
-        ('EditTrigger', 'CurrentChanged'),
-        ('EditTrigger', 'DoubleClicked'),
-        ('EditTrigger', 'NoEditTriggers'),
+        ("EditTrigger", "AnyKeyPressed"),
+        ("EditTrigger", "EditKeyPressed"),
+        ("EditTrigger", "SelectedClicked"),
+        ("EditTrigger", "CurrentChanged"),
+        ("EditTrigger", "DoubleClicked"),
+        ("EditTrigger", "NoEditTriggers"),
         # SelectionMode
-        ('SelectionMode', 'ExtendedSelection'),
-        ('SelectionMode', 'MultiSelection'),
-        ('SelectionMode', 'ContiguousSelection'),
-        ('SelectionMode', 'SingleSelection'),
-        ('SelectionMode', 'NoSelection'),
+        ("SelectionMode", "ExtendedSelection"),
+        ("SelectionMode", "MultiSelection"),
+        ("SelectionMode", "ContiguousSelection"),
+        ("SelectionMode", "SingleSelection"),
+        ("SelectionMode", "NoSelection"),
         # SelectionBehavior
-        ('SelectionBehavior', 'SelectRows'),
-        ('SelectionBehavior', 'SelectColumns'),
-        ('SelectionBehavior', 'SelectItems'),
+        ("SelectionBehavior", "SelectRows"),
+        ("SelectionBehavior", "SelectColumns"),
+        ("SelectionBehavior", "SelectItems"),
         # ScrollHint
-        ('ScrollHint', 'ScrollPerIndexChange'),
-        ('ScrollHint', 'ScrollPerItem'),
+        ("ScrollHint", "ScrollPerIndexChange"),
+        ("ScrollHint", "ScrollPerItem"),
     ],
-    'QAbstractScrollArea': [
+    "QAbstractScrollArea": [
         # SizeAdjustPolicy
-        ('SizeAdjustPolicy', 'AdjustToContentsOnFirstShow'),
-        ('SizeAdjustPolicy', 'AdjustToContents'),
-        ('SizeAdjustPolicy', 'AdjustIgnored'),
+        ("SizeAdjustPolicy", "AdjustToContentsOnFirstShow"),
+        ("SizeAdjustPolicy", "AdjustToContents"),
+        ("SizeAdjustPolicy", "AdjustIgnored"),
     ],
-    'QTabWidget': [
+    "QTabWidget": [
         # TabPosition
-        ('TabPosition', 'North'),
-        ('TabPosition', 'South'),
-        ('TabPosition', 'West'),
-        ('TabPosition', 'East'),
+        ("TabPosition", "North"),
+        ("TabPosition", "South"),
+        ("TabPosition", "West"),
+        ("TabPosition", "East"),
         # TabShape
-        ('TabShape', 'Rounded'),
-        ('TabShape', 'Triangular'),
+        ("TabShape", "Rounded"),
+        ("TabShape", "Triangular"),
     ],
-    'QLCDNumber': [
+    "QLCDNumber": [
         # LCDNumberValueMode
-        ('LCDNumberValueMode', 'Hex'),
-        ('LCDNumberValueMode', 'Dec'),
-        ('LCDNumberValueMode', 'Oct'),
-        ('LCDNumberValueMode', 'Bin'),
+        ("LCDNumberValueMode", "Hex"),
+        ("LCDNumberValueMode", "Dec"),
+        ("LCDNumberValueMode", "Oct"),
+        ("LCDNumberValueMode", "Bin"),
     ],
-    'QLayout': [
+    "QLayout": [
         # SizeConstraint
-        ('SizeConstraint', 'SetDefaultConstraint'),
-        ('SizeConstraint', 'SetFixedSize'),
-        ('SizeConstraint', 'SetMaximumSize'),
-        ('SizeConstraint', 'SetMinimumSize'),
+        ("SizeConstraint", "SetDefaultConstraint"),
+        ("SizeConstraint", "SetFixedSize"),
+        ("SizeConstraint", "SetMaximumSize"),
+        ("SizeConstraint", "SetMinimumSize"),
     ],
-    'QSizePolicy': [
+    "QSizePolicy": [
         # Policy
-        ('Policy', 'MinimumExpanding'),
-        ('Policy', 'Minimum'),
-        ('Policy', 'Maximum'),
-        ('Policy', 'Preferred'),
-        ('Policy', 'Expanding'),
-        ('Policy', 'Ignored'),
-        ('Policy', 'Fixed'),
+        ("Policy", "MinimumExpanding"),
+        ("Policy", "Minimum"),
+        ("Policy", "Maximum"),
+        ("Policy", "Preferred"),
+        ("Policy", "Expanding"),
+        ("Policy", "Ignored"),
+        ("Policy", "Fixed"),
     ],
 }
 
@@ -202,8 +202,8 @@ def build_patterns():
             # But NOT Qt.Category.EnumName (already migrated)
             # Use negative lookahead (?!\.) to ensure enum name isn't followed by dot
             # Use negative lookbehind to avoid matching category name as enum
-            old = rf'{cls_name}\.{enum_name}(?!\.)'
-            new = f'{cls_name}.{category}.{enum_name}'
+            old = rf"{cls_name}\.{enum_name}(?!\.)"
+            new = f"{cls_name}.{category}.{enum_name}"
             patterns.append((old, new))
     return patterns
 
@@ -215,7 +215,7 @@ def fix_enums_in_file(filepath: str) -> int:
         print(f"  [SKIP] {filepath} not found")
         return 0
 
-    content = path.read_text(encoding='utf-8')
+    content = path.read_text(encoding="utf-8")
     patterns = build_patterns()
     total = 0
 
@@ -228,7 +228,7 @@ def fix_enums_in_file(filepath: str) -> int:
             print(f"  {count:4d} x  {pattern} -> {replacement}")
 
     if total > 0:
-        path.write_text(content, encoding='utf-8')
+        path.write_text(content, encoding="utf-8")
     return total
 
 

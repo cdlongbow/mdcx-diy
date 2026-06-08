@@ -2,6 +2,7 @@
 Amazon 相关封面搜索与条码识别逻辑
 """
 
+import asyncio
 import re
 import urllib.parse
 from asyncio import to_thread

@@ -121,18 +121,18 @@ def split_csv(value: str) -> list[str]:
 def get_actress_video_list(html: etree._Element, base_url: str) -> dict:
     """
     从JAVBus演员详情页解析作品列表
-    
+
     Args:
         html: 已解析的HTML元素
         base_url: JAVBus基础URL
-    
+
     Returns:
         包含视频信息的字典，格式为：
         {
             "videos": [
                 {
                     "number": "番号",
-                    "title": "标题", 
+                    "title": "标题",
                     "date": "发行日期",
                     "url": "详情页URL"
                 },
@@ -141,11 +141,8 @@ def get_actress_video_list(html: etree._Element, base_url: str) -> dict:
             "has_next": True/False
         }
     """
-    result = {
-        "videos": [],
-        "has_next": False
-    }
-    
+    result = {"videos": [], "has_next": False}
+
     # 基于JAVBus搜索页面的模式，推测演员详情页可能使用类似结构
     # 可能的XPath模式（按优先级排序）
     video_xpath_patterns = [
@@ -162,17 +159,17 @@ def get_actress_video_list(html: etree._Element, base_url: str) -> dict:
         # 模式6：所有相对链接（最后备选）
         "//a[starts-with(@href, '/')]",
     ]
-    
+
     videos = []
     for pattern in video_xpath_patterns:
         video_elements = html.xpath(pattern)
         if video_elements:
             videos = video_elements
             break
-    
+
     if not videos:
         return result
-    
+
     for video in videos:
         try:
             # 尝试多种XPath模式提取视频信息
@@ -182,22 +179,22 @@ def get_actress_video_list(html: etree._Element, base_url: str) -> dict:
         except Exception:
             # 单个视频解析失败不影响其他视频
             continue
-    
+
     # 检查是否有下一页
     next_page = html.xpath("//a[@class='next' or contains(text(), '下一页')]")
     result["has_next"] = len(next_page) > 0
-    
+
     return result
 
 
 def _extract_actress_video_info(video: etree._Element, base_url: str) -> dict:
     """
     从单个视频元素中提取信息
-    
+
     Args:
         video: 视频元素
         base_url: 基础URL
-    
+
     Returns:
         视频信息字典
     """
@@ -205,19 +202,19 @@ def _extract_actress_video_info(video: etree._Element, base_url: str) -> dict:
     href = video.get("href", "")
     if not href:
         return {}
-    
+
     # 补全URL
     if not href.startswith("http"):
         url = base_url + href if href.startswith("/") else base_url + "/" + href
     else:
         url = href
-    
+
     # 优先从URL提取番号（最可靠）
     number = None
-    number_match = re.search(r'/([A-Z]{2,6}-?\d{3,})', url, re.IGNORECASE)
+    number_match = re.search(r"/([A-Z]{2,6}-?\d{3,})", url, re.IGNORECASE)
     if number_match:
         number = number_match.group(1).replace("-", "")
-    
+
     # 如果URL中没有找到，尝试从HTML元素提取
     if not number:
         number_patterns = [
@@ -227,14 +224,14 @@ def _extract_actress_video_info(video: etree._Element, base_url: str) -> dict:
             ".//date/text()",  # 最后才尝试date标签
             ".//span[@class='date']/text()",
         ]
-        
+
         for pattern in number_patterns:
             number_elements = video.xpath(pattern)
             if number_elements:
                 number = str(number_elements[0]).strip()
                 if number:
                     break
-    
+
     # 尝试提取标题
     title = ""
     title_patterns = [
@@ -243,14 +240,14 @@ def _extract_actress_video_info(video: etree._Element, base_url: str) -> dict:
         ".//div[contains(@class, 'title')]/text()",
         ".//span[@class='title']/text()",
     ]
-    
+
     for pattern in title_patterns:
         title_elements = video.xpath(pattern)
         if title_elements:
             title = str(title_elements[0]).strip()
             if title:
                 break
-    
+
     # 尝试提取日期
     date_str = ""
     date_patterns = [
@@ -258,30 +255,25 @@ def _extract_actress_video_info(video: etree._Element, base_url: str) -> dict:
         ".//div[contains(@class, 'meta')]/text()",
         ".//span[@class='date']/text()",
     ]
-    
+
     for pattern in date_patterns:
         date_elements = video.xpath(pattern)
         if date_elements:
             date_str = str(date_elements[0]).strip()
             if date_str:
                 break
-    
-    return {
-        "number": number,
-        "title": title,
-        "date": date_str,
-        "url": url
-    }
+
+    return {"number": number, "title": title, "date": date_str, "url": url}
 
 
 def get_actress_list(html: etree._Element, base_url: str) -> list:
     """
     从JAVBus演员列表页解析演员信息
-    
+
     Args:
         html: 已解析的HTML元素
         base_url: JAVBus基础URL
-    
+
     Returns:
         演员信息列表，格式为：
         [
@@ -294,38 +286,38 @@ def get_actress_list(html: etree._Element, base_url: str) -> list:
         ]
     """
     actresses = []
-    
+
     # 尝试多种XPath模式提取演员列表
     actress_patterns = [
         "//a[@class='actress-item']",
-        "//div[@class='actress-box']/a", 
+        "//div[@class='actress-box']/a",
         "//div[contains(@class, 'actress')]/a",
         "//div[@class='photo-frame']/a",
     ]
-    
+
     actress_elements = []
     for pattern in actress_patterns:
         elements = html.xpath(pattern)
         if elements:
             actress_elements = elements
             break
-    
+
     for actress in actress_elements:
         try:
             href = actress.get("href", "")
             if not href:
                 continue
-            
+
             # 补全URL
             if not href.startswith("http"):
                 url = base_url + href if href.startswith("/") else base_url + "/" + href
             else:
                 url = href
-            
+
             # 提取演员ID
-            id_match = re.search(r'/actresses/(\d+)', url)
+            id_match = re.search(r"/actresses/(\d+)", url)
             actor_id = id_match.group(1) if id_match else ""
-            
+
             # 提取演员姓名
             name_patterns = [
                 ".//div[@class='actress-name']/text()",
@@ -334,7 +326,7 @@ def get_actress_list(html: etree._Element, base_url: str) -> list:
                 ".//span[@class='name']/text()",
                 ".//text()",  # 最后尝试所有文本
             ]
-            
+
             name = ""
             for pattern in name_patterns:
                 name_elements = actress.xpath(pattern)
@@ -342,16 +334,12 @@ def get_actress_list(html: etree._Element, base_url: str) -> list:
                     name = str(name_elements[0]).strip()
                     if name:
                         break
-            
+
             if name and actor_id:
-                actresses.append({
-                    "name": name,
-                    "url": url,
-                    "id": actor_id
-                })
+                actresses.append({"name": name, "url": url, "id": actor_id})
         except Exception:
             continue
-    
+
     return actresses
 
 

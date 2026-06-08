@@ -16,6 +16,7 @@ from ..base.file import movie_lists
 from ..config.manager import manager
 from ..config.resources import resources
 from ..core.file import get_file_info_v2
+from ..crawlers.javbus import get_actress_video_list
 from ..models.flags import Flags
 from ..signals import signal
 from ..utils import get_used_time
@@ -41,11 +42,10 @@ async def _get_actor_numbers(actor_url, actor_single_url):
     获取演员的番号列表（使用JAVBus替代JAVDB）
     """
     from ..config.enums import Website
-    from ..config.manager import manager
-    
+
     # 获取JAVBus基础URL
     javbus_url = manager.config.get_site_url(Website.JAVBUS, "https://www.javbus.com")
-    
+
     # 获取单体番号
     next_page = True
     number_single_list = set()
@@ -63,35 +63,32 @@ async def _get_actor_numbers(actor_url, actor_single_url):
                     html, error = await computed.async_client.get_text(page_url)
             if html is None:
                 return
-        
+
         # 检查是否被年龄验证挡住
         if "你是否已經成年" in html or "Age Verification" in html:
             signal.show_log_text("   提示：JAVBus需要年龄验证，请先在浏览器中访问并确认年龄")
             return
-            
+
         # 检查是否有错误页面
         if "404" in html or "Not Found" in html:
             signal.show_log_text("   演员页面不存在或URL错误")
             return
-        
-        from lxml import etree
-        from ..crawlers.javbus import get_actress_video_list
-        
+
         html_obj = etree.fromstring(html, etree.HTMLParser())
         result = get_actress_video_list(html_obj, javbus_url)
-        
+
         if not result["videos"]:
             break
-            
+
         for video in result["videos"]:
             number_single_list.add(video["number"])
-        
+
         if not result["has_next"] or i >= 60:
             next_page = False
             if i == 60:
                 signal.show_log_text("   已达 60 页上限！！！（JAVBus 可能限制显示数量）")
         i += 1
-    
+
     Flags.actor_numbers_dic[actor_single_url] = number_single_list
 
     # 获取全部番号
@@ -102,24 +99,24 @@ async def _get_actor_numbers(actor_url, actor_single_url):
         html = await _scraper_web(page_url)
         if len(html) < 1:
             return
-        
+
         # 检查是否被年龄验证挡住
         if "你是否已經成年" in html or "Age Verification" in html:
             signal.show_log_text("   提示：JAVBus需要年龄验证，请先在浏览器中访问并确认年龄")
             return
-            
+
         html_obj = etree.fromstring(html, etree.HTMLParser(encoding="utf-8"))
         result = get_actress_video_list(html_obj, javbus_url)
-        
+
         if not result["videos"]:
             break
-            
+
         for video in result["videos"]:
             video_number = video["number"]
             video_title = video["title"]
             video_date = video["date"]
             video_url = video["url"]
-            
+
             # 格式化日期
             time_list = re.split(r"[./-]", video_date)
             if len(time_list) >= 3:
@@ -127,15 +124,15 @@ async def _get_actor_numbers(actor_url, actor_single_url):
                     video_date = f"{time_list[2]}/{time_list[0]}/{time_list[1]}"
                 else:
                     video_date = f"{time_list[0]}/{time_list[1]}/{time_list[2]}"
-            
+
             # JAVBus可能不提供磁力链接信息，使用空字符串
             download_info = "   "
             single_info = "单体" if video_number in number_single_list else "\u3000\u3000"
-            
+
             Flags.actor_numbers_dic[actor_url].update(
                 {video_number: [video_number, video_date, video_url, download_info, video_title, single_info]}
             )
-        
+
         if not result["has_next"] or i >= 60:
             next_page = False
             if i == 60:
@@ -240,8 +237,9 @@ async def check_missing_number(actor_flag):
 
     # 遍历本地资源库
     signal.show_log_text("")
+    library_lines = "\n   ".join(str(p) for p in libraries)
     signal.show_log_text(
-        f"\n本地资源库地址:\n   {'\n   '.join(str(p) for p in libraries)}\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n⏳ 开始遍历本地资源库，以获取本地视频的最新列表...\n   提示：每次启动第一次查询将更新本地视频数据。（大概1000个/30秒，如果视频较多，请耐心等待。）"
+        f"\n本地资源库地址:\n   {library_lines}\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n⏳ 开始遍历本地资源库，以获取本地视频的最新列表...\n   提示：每次启动第一次查询将更新本地视频数据。（大概1000个/30秒，如果视频较多，请耐心等待。）"
     )
     all_movies: list[Path] = []
     for p in libraries:

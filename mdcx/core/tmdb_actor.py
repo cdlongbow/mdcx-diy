@@ -16,7 +16,12 @@ from ..models.log_buffer import LogBuffer
 from ..utils import convert_half
 
 
+async def _read_text_file(path: Path, encoding: str = "utf-8") -> str:
+    return await asyncio.to_thread(path.read_text, encoding=encoding)
+
+
 # ============= 速率限制器 =============
+
 
 class _TmdbRateLimiter:
     """令牌桶限流器，控制 TMDB API 请求速率。"""
@@ -49,6 +54,7 @@ def _tmdb_debug_enabled() -> bool:
 
 
 # ============= HTTP 适配器 =============
+
 
 class _TmdbResponse:
     """Unified response wrapper for TMDB API calls."""
@@ -364,7 +370,6 @@ async def update_actor_db_row(
     db_path.parent.mkdir(parents=True, exist_ok=True)
     try:
         import openpyxl
-        from openpyxl.utils import get_column_letter
 
         write_status = "unchanged"
 
@@ -401,10 +406,10 @@ async def update_actor_db_row(
             if keyword:
                 existing_kw = str(ws.cell(row=existing_row, column=COL_KEYWORD + 1).value or "").strip()
                 if append_keyword:
-                    new_kws = set(keyword.split(","))
+                    new_kws = {k.strip() for k in keyword.split(",") if k.strip()}
                     existing_kws_set = set()
                     if existing_kw:
-                        existing_kws_set = set(k.strip() for k in existing_kw.split(",") if k.strip())
+                        existing_kws_set = {k.strip() for k in existing_kw.split(",") if k.strip()}
                     merged = existing_kws_set | new_kws
                     ws.cell(row=existing_row, column=COL_KEYWORD + 1, value=",".join(sorted(merged)))
                 elif not existing_kw:
@@ -437,7 +442,7 @@ async def update_actor_db_row(
                     column=COL_TMDB_URL + 1,
                     value=f"https://www.themoviedb.org/person/{tmdbid}",
                 )
-                ws.cell(row=last_row, column=COL_TMDB_URL + 1                ).hyperlink = f"https://www.themoviedb.org/person/{tmdbid}"
+                ws.cell(row=last_row, column=COL_TMDB_URL + 1).hyperlink = f"https://www.themoviedb.org/person/{tmdbid}"
 
         _format_db_worksheet(ws)
 
@@ -541,8 +546,7 @@ async def migrate_xml_to_xlsx() -> bool:
             except ImportError:
                 pass
             if parser:
-                with open(xml_path, encoding="utf-8") as f:
-                    content = f.read()
+                content = await _read_text_file(xml_path)
                 xml_data = etree.HTML(content.encode("utf-8"), parser)
                 actor_objects = xml_data.xpath("//a")
 
@@ -724,9 +728,7 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
     old_db = dict(resources.actor_db) if resources.actor_db else {}
     resources.reload_actor_db()
 
-    cached_before = len(
-        [a for a in actors if a.strip() in old_db and old_db[a.strip()].get("tmdbid")]
-    )
+    cached_before = len([a for a in actors if a.strip() in old_db and old_db[a.strip()].get("tmdbid")])
     LogBuffer.log().write(
         f" 🎬 [TMDB] 查询完成: 缓存命中 {len(actors) - len(need_query)} 个, "
         f"本次匹配 {len(result) - cached_before} 个, 共 {len(result)} 个"
@@ -741,13 +743,18 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
     search_url = f"{base_url}/3/search/person"
     target_variants = _expand_name_variants(actor_name)
 
-    resp = await _tmdb_request(client, "GET", search_url, params={
-        "api_key": api_key,
-        "query": actor_name,
-        "include_adult": "true",
-        "language": "zh-CN",
-        "page": 1,
-    })
+    resp = await _tmdb_request(
+        client,
+        "GET",
+        search_url,
+        params={
+            "api_key": api_key,
+            "query": actor_name,
+            "include_adult": "true",
+            "language": "zh-CN",
+            "page": 1,
+        },
+    )
 
     if resp.status_code != 200:
         return None
@@ -918,8 +925,7 @@ async def migrate_info_xml_to_xlsx() -> bool:
         if not parser:
             return False
 
-        with open(xml_path, encoding="utf-8") as f:
-            content = f.read()
+        content = await _read_text_file(xml_path)
         xml_data = etree.HTML(content.encode("utf-8"), parser)
         info_objects = xml_data.xpath("//a")
 

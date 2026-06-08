@@ -3,6 +3,7 @@ Amazon ASIN 数据库保存功能
 用于保存影片番号与 ASIN 对应关系，方便后续统计和复用
 """
 
+import asyncio
 from datetime import datetime
 from pathlib import Path
 from typing import TypedDict
@@ -333,13 +334,18 @@ async def export_asin_statistics(
         "total_records": total_records,
     }
 
-    with open(output_path, "w", encoding="utf-8") as f:
-        f.write("=" * 60 + "\n")
-        f.write("Amazon ASIN 数据库统计报告\n")
-        f.write(f"生成时间：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-        f.write("=" * 60 + "\n\n")
-
-        f.write(f"总记录数：{total_records}\n")
-        f.write("\n" + "=" * 60 + "\n")
+    report = (
+        "=" * 60
+        + "\n"
+        + "Amazon ASIN 数据库统计报告\n"
+        + f"生成时间：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+        + "=" * 60
+        + "\n\n"
+        + f"总记录数：{total_records}\n"
+        + "\n"
+        + "=" * 60
+        + "\n"
+    )
+    await asyncio.to_thread(output_path.write_text, report, encoding="utf-8")
 
     return stats

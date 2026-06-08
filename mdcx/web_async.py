@@ -374,24 +374,24 @@ class AsyncWebClient:
 
     def _is_no_proxy_host(self, host: str) -> bool:
         """Check if a host should bypass proxy based on no_proxy_sites configuration.
-        
+
         Supports both site values (e.g., 'libredmm') and full domains (e.g., 'libredmm.com').
         """
         if not host or not self.no_proxy_sites:
             return False
-        
+
         # Import here to avoid circular dependency
         from .manual import ManualConfig
-        
+
         for no_proxy in self.no_proxy_sites:
             no_proxy = no_proxy.strip().lower()
             if not no_proxy:
                 continue
-            
+
             # Direct match: host equals the configured value
             if host == no_proxy:
                 return True
-            
+
             # Match site value against domain mappings from WEB_DIC
             # e.g., user inputs 'javdb', host is 'www.javdb.com'
             for domain_key, website_enum in ManualConfig.WEB_DIC.items():
@@ -403,17 +403,17 @@ class AsyncWebClient:
                     for tld in [".com", ".net", ".org", ".co", ".jp", ".io"]:
                         if domain_key + tld == host or host.endswith("." + domain_key + tld):
                             return True
-            
+
             # Generic matching: try common TLDs for any site value
             # This handles sites like 'libredmm' that may not be in WEB_DIC
             for tld in [".com", ".net", ".org", ".co", ".jp", ".io"]:
                 if host == no_proxy + tld or host.endswith("." + no_proxy + tld):
                     return True
-            
+
             # Standard subdomain matching
             if host.endswith("." + no_proxy):
                 return True
-        
+
         return False
 
     def retain(self) -> None:
@@ -1293,7 +1293,7 @@ class AsyncWebClient:
 
             u = httpx.URL(url)
             host = u.host or ""
-            
+
             # Check if this host should bypass proxy
             use_proxy = use_proxy and not self._is_no_proxy_host(host)
             request_proxy = self.proxy if use_proxy else None
