@@ -38,30 +38,60 @@ async def _scraper_web(url):
 
 async def _get_actor_numbers(actor_url, actor_single_url):
     """
-    获取演员的番号列表
+    获取演员的番号列表（使用JAVBus替代JAVDB）
     """
+    from ..config.enums import Website
+    from ..config.manager import manager
+    
+    # 获取JAVBus基础URL
+    javbus_url = manager.config.get_site_url(Website.JAVBUS, "https://www.javbus.com")
+    
     # 获取单体番号
     next_page = True
     number_single_list = set()
     i = 1
     while next_page:
-        page_url = f"{actor_url}?page={i}&t=s"
+        # 使用JAVBus的演员详情页URL格式
+        page_url = f"{actor_url}?page={i}"
         async with manager.acquire_computed() as computed:
             html, error = await computed.async_client.get_text(page_url)
-            if html is None:
-                html, error = await computed.async_client.get_text(page_url)
         if html is None:
+            if i == 1:  # 第一页就失败，可能是URL格式问题
+                # 尝试使用JAVBus格式的URL
+                page_url = f"{actor_url}?page={i}&t=s"
+                async with manager.acquire_computed() as computed:
+                    html, error = await computed.async_client.get_text(page_url)
+            if html is None:
+                return
+        
+        # 检查是否被年龄验证挡住
+        if "你是否已經成年" in html or "Age Verification" in html:
+            signal.show_log_text("   提示：JAVBus需要年龄验证，请先在浏览器中访问并确认年龄")
             return
-        if "pagination-next" not in html or i >= 60:
+            
+        # 检查是否有错误页面
+        if "404" in html or "Not Found" in html:
+            signal.show_log_text("   演员页面不存在或URL错误")
+            return
+        
+        from lxml import etree
+        from ..crawlers.javbus import get_actress_video_list
+        
+        html_obj = etree.fromstring(html, etree.HTMLParser())
+        result = get_actress_video_list(html_obj, javbus_url)
+        
+        if not result["videos"]:
+            break
+            
+        for video in result["videos"]:
+            number_single_list.add(video["number"])
+        
+        if not result["has_next"] or i >= 60:
             next_page = False
             if i == 60:
-                signal.show_log_text("   已达 60 页上限！！！（JAVDB 仅能返回该演员的前 60 页数据！）")
-        html = etree.fromstring(html, etree.HTMLParser())
-        actor_info = html.xpath('//a[@class="box"]')
-        for each in actor_info:
-            video_number = each.xpath('div[@class="video-title"]/strong/text()')[0]
-            number_single_list.add(video_number)
+                signal.show_log_text("   已达 60 页上限！！！（JAVBus 可能限制显示数量）")
         i += 1
+    
     Flags.actor_numbers_dic[actor_single_url] = number_single_list
 
     # 获取全部番号
@@ -72,33 +102,44 @@ async def _get_actor_numbers(actor_url, actor_single_url):
         html = await _scraper_web(page_url)
         if len(html) < 1:
             return
-        if "pagination-next" not in html or i >= 60:
-            next_page = False
-            if i == 60:
-                signal.show_log_text("   已达 60 页上限！！！（JAVDB 仅能返回该演员的前 60 页数据！）")
-        html = etree.fromstring(html, etree.HTMLParser(encoding="utf-8"))
-        actor_info = html.xpath('//a[@class="box"]')
-        for each in actor_info:
-            video_number = each.xpath('div[@class="video-title"]/strong/text()')[0]
-            video_title = each.xpath('div[@class="video-title"]/text()')[0]
-            video_date = each.xpath('div[@class="meta"]/text()')[0].strip()
-            video_url = "https://javdb.com" + each.get("href")
-            video_download_link = each.xpath('div[@class="tags has-addons"]/span[@class="tag is-success"]/text()')
-            video_sub_link = each.xpath('div[@class="tags has-addons"]/span[@class="tag is-warning"]/text()')
-            download_info = "   "
-            if video_sub_link:
-                download_info = "🧲  🀄️"
-            elif video_download_link:
-                download_info = "🧲    "
-            single_info = "单体" if video_number in number_single_list else "\u3000\u3000"
+        
+        # 检查是否被年龄验证挡住
+        if "你是否已經成年" in html or "Age Verification" in html:
+            signal.show_log_text("   提示：JAVBus需要年龄验证，请先在浏览器中访问并确认年龄")
+            return
+            
+        html_obj = etree.fromstring(html, etree.HTMLParser(encoding="utf-8"))
+        result = get_actress_video_list(html_obj, javbus_url)
+        
+        if not result["videos"]:
+            break
+            
+        for video in result["videos"]:
+            video_number = video["number"]
+            video_title = video["title"]
+            video_date = video["date"]
+            video_url = video["url"]
+            
+            # 格式化日期
             time_list = re.split(r"[./-]", video_date)
-            if len(time_list[0]) == 2:
-                video_date = f"{time_list[2]}/{time_list[0]}/{time_list[1]}"
-            else:
-                video_date = f"{time_list[0]}/{time_list[1]}/{time_list[2]}"
+            if len(time_list) >= 3:
+                if len(time_list[0]) == 2:
+                    video_date = f"{time_list[2]}/{time_list[0]}/{time_list[1]}"
+                else:
+                    video_date = f"{time_list[0]}/{time_list[1]}/{time_list[2]}"
+            
+            # JAVBus可能不提供磁力链接信息，使用空字符串
+            download_info = "   "
+            single_info = "单体" if video_number in number_single_list else "\u3000\u3000"
+            
             Flags.actor_numbers_dic[actor_url].update(
                 {video_number: [video_number, video_date, video_url, download_info, video_title, single_info]}
             )
+        
+        if not result["has_next"] or i >= 60:
+            next_page = False
+            if i == 60:
+                signal.show_log_text("   已达 60 页上限！！！（JAVBus 可能限制显示数量）")
         i += 1
 
 
@@ -276,12 +317,12 @@ async def check_missing_number(actor_flag):
             actor_url = actor_name if "http" in actor_name else resources.get_actor_data(actor_name).get("href")
             if actor_url:
                 signal.show_log_text(
-                    f"\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n⏳ 从 JAVDB 获取 [ {actor_name} ] 的所有番号列表..."
+                    f"\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n⏳ 从 JAVBus 获取 [ {actor_name} ] 的所有番号列表..."
                 )
                 await _get_actor_missing_numbers(actor_name, actor_url, actor_flag)
             else:
                 signal.show_log_text(
-                    f"\n🔴 未找到 [ {actor_name} ] 的主页地址，你可以填写演员的 JAVDB 主页地址替换演员名称..."
+                    f"\n🔴 未找到 [ {actor_name} ] 的主页地址，你可以填写演员的 JAVBus 主页地址替换演员名称..."
                 )
     else:
         signal.show_log_text("\n🔴 没有要查询的演员！")
