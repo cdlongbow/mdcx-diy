@@ -1,6 +1,15 @@
 import asyncio
 import threading
-from warnings import deprecated
+
+try:
+    from warnings import deprecated
+except ImportError:
+
+    def deprecated(_message):
+        def decorator(func):
+            return func
+
+        return decorator
 
 
 class LogBuffer:
