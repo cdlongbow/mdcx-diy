@@ -100,15 +100,15 @@ jobs:
         id: get-changelog
         shell: bash
         run: |
-          if [ ! -s changelog.md ]; then
-            echo "changelog.md 不存在或为空，无法生成 Release 说明。"
+          if [ ! -s docs/changelog.md ]; then
+            echo "docs/changelog.md 不存在或为空，无法生成 Release 说明。"
             exit 1
           fi
 
           delimiter="__MDCX_CHANGELOG_EOF__"
           {
             echo "CHANGELOG<<$delimiter"
-            cat changelog.md
+            cat docs/changelog.md
             echo
             echo "$delimiter"
           } >> "$GITHUB_OUTPUT"

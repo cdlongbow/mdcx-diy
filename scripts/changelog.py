@@ -151,7 +151,7 @@ def generate_changelog(commit_log: str, output_file: Path) -> None:
 @app.command()
 def main(
     pattern: Annotated[str, typer.Option("--pattern", "-p", help="Git tag匹配模式")] = "220*",
-    output: Annotated[str, typer.Option("--output", "-o", help="输出文件路径")] = "changelog.md",
+    output: Annotated[str, typer.Option("--output", "-o", help="输出文件路径")] = "docs/changelog.md",
     verbose: Annotated[bool, typer.Option("--verbose", "-v", help="显示详细信息")] = False,
     tag: Annotated[str, typer.Option("--tag", help="当前发布 tag（用于 release 工作流）")] = "",
 ) -> None:
