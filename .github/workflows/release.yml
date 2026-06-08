@@ -1,5 +1,8 @@
 name: Build and Release with Python3.13
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   release:
     types: [published]
@@ -31,7 +34,7 @@ jobs:
           # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners
 
           items+=('{"build": "macos", "os": "macos-latest", "arch": "aarch64"}')
-          items+=('{"build": "windows", "os": "windows-latest", "arch": "x86_64"}')
+          items+=('{"build": "windows", "os": "windows-2025", "arch": "x86_64"}')
 
           # 合并items到json数组
           matrix="matrix=["
