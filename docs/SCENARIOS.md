@@ -263,7 +263,7 @@
 #### 3. 补充演员信息
 
 1. **编辑演员信息**
-   - 打开 `resources/userdata/actor_database.xlsx`
+   - 打开 `userdata/actor_database.xlsx`
    - 找到需要修改的演员行
    - 直接修改日文名、中文名、繁体名、别名、信息链接或 TMDB ID
    - 保存 Excel 文件

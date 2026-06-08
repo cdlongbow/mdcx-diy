@@ -54,8 +54,8 @@ brew install python@3.8
 ### Q: 数据库文件在哪里？
 
 **A**: 默认位置：
-- Windows: `resources/userdata/actor_database.xlsx`
-- Linux/macOS: `resources/userdata/actor_database.xlsx`
+- Windows: `userdata/actor_database.xlsx`
+- Linux/macOS: `userdata/actor_database.xlsx`
 
 ### Q: 如何备份数据库？
 

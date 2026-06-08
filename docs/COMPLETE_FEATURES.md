@@ -277,7 +277,7 @@ TAG_PRIORITIES = {
 |--------|---------|------|------|
 | javdbid | `uniqueid type="javdb"` | JavDB ID | javdb123 |
 | javlibid | `uniqueid type="javlib"` | JavLibrary ID | javlib456 |
-| tmdbid | `uniqueid type="tmdb"` | TMDB ID | tmdb789 |
+| tmdbid | `actor/tmdbid` | 演员 TMDB ID | 789 |
 
 ---
 
@@ -636,34 +636,20 @@ def detect_and_crop(image_path: str) -> str:
 
 **查询功能**
 - 🔍 按名称搜索演员
-- 🎬 获取演员详细信息
+- 🎬 获取 TMDB ID 和候选基础信息
 - 🌐 获取多语言信息
-- 📸 获取演员图片
+- 🔄 将命中结果写回本地 Excel 缓存
 
-**查询参数**
-- `query`: 搜索查询
-- `language`: 语言（zh-CN, ja, en）
-- `include_adult`: 是否包含成人内容
-- `page`: 页码
-
-**返回信息**
-```json
-{
-  "id": 12345,
-  "name": "演员名称",
-  "original_name": "演员原名",
-  "birthday": "1990-01-01",
-  "place_of_birth": "出生地",
-  "biography": "简介",
-  "profile_path": "/path/to/image.jpg"
-}
-```
+**匹配特性**
+- 支持日文名、中文名、繁体名、别名联合命中
+- 支持常见异体字归一化和名字变体展开
+- 使用候选排序提升命中率
 
 #### 令牌桶限流器
 
 **参数配置**
 - `rate`: 速率（令牌/秒），默认 3.5
-- `capacity`: 突发容量，默认 10
+- `burst`: 突发容量，默认 10
 
 **限流逻辑**
 ```
@@ -676,27 +662,16 @@ def detect_and_crop(image_path: str) -> str:
 4. 无令牌 → 等待令牌补充
 ```
 
-**代码实现** (tmdb_actor.py)
-```python
-from aiolimiter import AsyncLimiter
-
-class _TmdbRateLimiter:
-    """TMDB API 限流器"""
-
-    def __init__(self, rate: float = 3.5, capacity: int = 10):
-        self._rate_limiter = AsyncLimiter(rate, capacity)
-
-    async def acquire(self):
-        """获取令牌"""
-        await self._rate_limiter.acquire()
-```
+**实现说明**
+- 使用项目内的 `_TmdbRateLimiter`
+- 结合异步并发控制，避免请求突刺
 
 #### 并发查询
 
 **并发配置**
 - 默认并发数：3
-- 可配置范围：1-10
-- 过滤 adult 内容
+- 查询前优先反查本地 Excel 缓存
+- 对候选进行排序匹配
 
 **查询流程**
 ```

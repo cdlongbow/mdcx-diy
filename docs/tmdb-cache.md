@@ -68,9 +68,10 @@ TMDB 缓存由两层组成：
     │
     ▼
 对 need_query 列表中的演员：
-    ├── 并发 3 路（Semaphore(3)）
+    ├── 先用 Excel 中的日文名、中文名、繁体名、别名做反向缓存搜索
+    ├── 仍未命中时并发 3 路查询 TMDB
     ├── 通过令牌桶限流器（3.5 req/s，突发 10）
-    ├── 调用 TMDB API 查询
+    ├── 使用名字归一化和候选排序完成匹配
     ├── 匹配成功后调用 update_actor_db_row() 写回 Excel
     └── 写回后调用 resources.reload_actor_db() 刷新内存缓存
 ```
@@ -88,7 +89,15 @@ TMDB 缓存由两层组成：
 ```
 查询演员名 → 检查内存缓存 → 未找到 tmdbid
     ↓
+检查 Excel 反向缓存（支持别名、中文名、繁体名）
+    ↓
+命中则直接返回
+    ↓
+仍未命中时继续
+    ↓
 调用 TMDB API 搜索演员
+    ↓
+使用名字归一化、异体字变体和候选排序匹配
     ↓
 匹配成功后获取 TMDB ID
     ↓
@@ -203,9 +212,20 @@ def migrate_xml_to_xlsx():
 
 1. 用户刮削一部影片
 2. 系统发现某演员在 Excel 中缺少 tmdbid
-3. 自动调用 TMDB API 查询（3 路并发，限流 3.5 req/s）
-4. 查询成功后自动填充 TMDB ID 到 Excel
-5. 自动刷新内存缓存
+3. 先用 Excel 中已有名字和别名做反向缓存匹配
+4. 仍未命中时自动调用 TMDB API 查询（3 路并发，限流 3.5 req/s）
+5. 查询成功后自动填充 TMDB ID 到 Excel
+6. 自动刷新内存缓存
+
+## 名字匹配策略
+
+TMDB 查询结合以下策略提升命中率：
+
+- 全角半角归一化
+- 常见异体字归一化，如 `亜/亞 -> 亚`、`條 -> 条`、`瀬 -> 濑`、`沢/澤 -> 泽`、`桜/櫻 -> 樱`
+- 假名和汉字混写变体，如 `かなこ <-> かな子`
+- 使用日文名、中文名、繁体名和别名共同参与匹配
+- 对 TMDB 候选使用出生地、日本特征、热度等做排序，而不是简单硬过滤
 
 ### 场景 4：手动编辑后自动同步
 
@@ -262,13 +282,12 @@ TMDB ID 缓存最终用于 NFO 文件生成：
 ```xml
 <actor>
     <name>演员名</name>
-    <thumb>演员图片URL</thumb>
     <type>Actor</type>
-    <uniqueid type="tmdb" default="true">12345</uniqueid>
+    <tmdbid>12345</tmdbid>
 </actor>
 ```
 
-- `uniqueid type="tmdb"` 字段来自缓存的 TMDB ID
+- `<tmdbid>` 字段来自缓存的 TMDB ID
 - Emby/Jellyfin 通过此字段关联 TMDB 演员信息
 - 实现演员信息的自动同步和补全
 
@@ -310,7 +329,7 @@ TMDB 相关日志位于：
 | `./mdcx/config/resources.py` | 内存缓存管理与重载 |
 | `./mdcx/core/nfo.py` | NFO 生成时读取 TMDB ID |
 | `./mdcx/models/types.py` | 数据模型定义 |
-| `./resources/userdata/actor_database.xlsx` | 演员数据库（含 TMDB ID） |
+| `./userdata/actor_database.xlsx` | 用户数据中的演员数据库（含 TMDB ID） |
 
 ## 与 Amazon 缓存的对比
 

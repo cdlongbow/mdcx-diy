@@ -16,7 +16,7 @@
 ### 首次启动
 
 1. 运行程序后，你会看到主界面
-2. 程序会自动检测并加载演员数据库（`resources/userdata/actor_database.xlsx`）
+2. 程序会自动检测并加载演员数据库（`userdata/actor_database.xlsx`）
 3. 首次使用时，建议先检查配置设置
 
 ### 界面介绍
@@ -31,7 +31,7 @@
 
 ### 1. 演员数据库管理
 
-演员数据库为 Excel 文件（`resources/userdata/actor_database.xlsx`），基本操作在 Excel 中完成：
+演员数据库为 Excel 文件（`userdata/actor_database.xlsx`），基本操作在 Excel 中完成：
 
 - 使用 Excel 打开数据库文件
 - 查看和编辑演员信息（日文名、中文名、繁体名、别名、信息链接、TMDB ID 等）
@@ -58,7 +58,7 @@
 
 演员数据库为 Excel 文件，搜索在 Excel 中完成：
 
-1. 打开 `resources/userdata/actor_database.xlsx`
+1. 打开 `userdata/actor_database.xlsx`
 2. 使用 Excel 的筛选功能（数据 > 筛选）
 3. 在筛选下拉菜单中选择搜索范围（日文名、中文名、别名等列）
 4. 输入关键词快速定位演员
@@ -69,7 +69,7 @@
 
 演员数据库为 Excel 文件，直接在 Excel 中编辑：
 
-1. 打开 `resources/userdata/actor_database.xlsx`
+1. 打开 `userdata/actor_database.xlsx`
 2. 找到需要修改的演员行
 3. 直接修改日文名、中文名、繁体名、别名、信息链接或 TMDB ID
 4. 保存 Excel 文件
@@ -81,7 +81,7 @@
 演员数据库为 Excel 文件，直接复制备份：
 
 1. 关闭程序（确保文件未被占用）
-2. 复制 `resources/userdata/actor_database.xlsx` 到安全位置
+2. 复制 `userdata/actor_database.xlsx` 到安全位置
 3. 恢复时直接替换原文件即可
 
 ## 演员数据库管理
@@ -123,7 +123,8 @@
 2. 开始刮削影片
 3. 程序会自动：
    - 检查演员数据库中的 TMDB ID
-   - 对缺失的演员调用 TMDB API
+   - 优先使用本地演员数据库中的日文名、中文名、繁体名和别名反查缓存
+   - 对仍然缺失的演员调用 TMDB API
    - 将匹配结果写回 `userdata/actor_database.xlsx`
 4. 查看生成的 NFO 和演员数据库
 
@@ -134,7 +135,7 @@ TMDB API 配置：
 - 在设置中输入 API Key
 - 保存配置
 
-**注意**：TMDB API 有速率限制，建议不要超过 4 req/s。
+**注意**：TMDB 查询内置了限流和并发控制，默认约 3.5 req/s、3 路并发。
 
 ## 高级功能
 
