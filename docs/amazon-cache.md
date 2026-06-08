@@ -223,7 +223,7 @@ Amazon 相关日志位于：
 
 ## 相关文件
 
-- `/workspace/mdcx/core/amazon.py` - Amazon 核心逻辑
-- `/workspace/mdcx/core/amazon_database.py` - ASIN 数据库管理
-- `/workspace/mdcx/base/web.py` - HTTP 请求层
-- `/workspace/resources/userdata/amazon_asin_database.xlsx` - 缓存文件
+- `./mdcx/core/amazon.py` - Amazon 核心逻辑
+- `./mdcx/core/amazon_database.py` - ASIN 数据库管理
+- `./mdcx/base/web.py` - HTTP 请求层
+- `./resources/userdata/amazon_asin_database.xlsx` - 缓存文件

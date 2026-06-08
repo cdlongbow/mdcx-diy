@@ -306,11 +306,11 @@ TMDB 相关日志位于：
 
 | 文件 | 职责 |
 |------|------|
-| `/workspace/mdcx/core/tmdb_actor.py` | TMDB 缓存核心实现（888 行） |
-| `/workspace/mdcx/config/resources.py` | 内存缓存管理与重载 |
-| `/workspace/mdcx/core/nfo.py` | NFO 生成时读取 TMDB ID |
-| `/workspace/mdcx/models/types.py` | 数据模型定义 |
-| `/workspace/resources/userdata/actor_database.xlsx` | 演员数据库（含 TMDB ID） |
+| `./mdcx/core/tmdb_actor.py` | TMDB 缓存核心实现（888 行） |
+| `./mdcx/config/resources.py` | 内存缓存管理与重载 |
+| `./mdcx/core/nfo.py` | NFO 生成时读取 TMDB ID |
+| `./mdcx/models/types.py` | 数据模型定义 |
+| `./resources/userdata/actor_database.xlsx` | 演员数据库（含 TMDB ID） |
 
 ## 与 Amazon 缓存的对比
 

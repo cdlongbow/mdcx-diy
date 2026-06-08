@@ -7,12 +7,12 @@
 ## 目录结构
 
 ```
-/workspace/
+./
 ├── main.py                         # 程序入口
 ├── pyproject.toml                  # 项目配置和依赖管理
 ├── mdcx/                           # 主源码目录
 │   ├── __init__.py
-│   ├── consts.py                   # 常量定义(版本号、平台检测等)
+│   ├── consts.py                   # 常量定义（版本号、平台检测等）
 │   ├── crawler.py                  # 爬虫提供器
 │   ├── number.py                   # 番号解析和验证
 │   ├── signals.py                  # 信号机制(Qt 信号)
