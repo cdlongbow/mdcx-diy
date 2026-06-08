@@ -3,13 +3,11 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - master
-      - develop
+      - main
   pull_request:
     branches:
-      - master
-      - develop
-    types: [review_requested, ready_for_review]
+      - main
+    types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
   quality:

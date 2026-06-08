@@ -700,9 +700,9 @@ class Scraper:
                                                 LogBuffer.log().write(
                                                     f"  ⚠️ [演员数据库] 文件被占用，未写入 {jp_name} 的 tmdbid"
                                                 )
-                                            elif write_status == "write_failed":
+                                            elif write_status.startswith("write_failed:"):
                                                 LogBuffer.log().write(
-                                                    f"  ⚠️ [演员数据库] 写入失败，未保存 {jp_name} 的 tmdbid"
+                                                    f"  ⚠️ [演员数据库] 写入失败，未保存 {jp_name} 的 tmdbid: {write_status.split(':', 1)[1]}"
                                                 )
                                             await asyncio.sleep(0.5)
                                         else:

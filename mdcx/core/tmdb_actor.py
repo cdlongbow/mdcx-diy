@@ -444,8 +444,8 @@ async def update_actor_db_row(
         return "missing_openpyxl"
     except PermissionError:
         return "file_locked"
-    except Exception:
-        return "write_failed"
+    except Exception as e:
+        return f"write_failed:{e}"
 
 
 def search_actor_db_reverse(query_name: str) -> dict | None:
@@ -640,25 +640,33 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
 
     actor_db = resources.actor_db or {}
     result: dict[str, int] = {}
-    need_query: list[str] = []
+    need_query: list[tuple[str, str]] = []
 
     for actor in actors:
         if not actor or not actor.strip():
             continue
         actor_stripped = actor.strip()
+        row = None
         if actor_stripped in actor_db and actor_db[actor_stripped].get("tmdbid"):
             result[actor_stripped] = actor_db[actor_stripped]["tmdbid"]
-        else:
-            need_query.append(actor_stripped)
+            continue
+
+        row = search_actor_db_reverse(actor_stripped)
+        if row and row.get("tmdbid"):
+            result[actor_stripped] = row["tmdbid"]
+            LogBuffer.log().write(f"  ℹ️ [TMDB] {actor_stripped} -> tmdbid={row['tmdbid']} (xlsx反查缓存)")
+            continue
+
+        need_query.append((actor_stripped, row.get("jp") if row and row.get("jp") else actor_stripped))
 
     if not need_query:
         return result
 
     LogBuffer.log().write(f"\n 🎬 [TMDB] 开始查询 {len(need_query)} 个演员的 TMDB ID")
 
-    async def _query_and_update(actor_name: str) -> None:
+    async def _query_and_update(actor_name: str, query_name: str) -> None:
         try:
-            query_result = await _query_single_actor(actor_name, base_url, tmdb_api_key, client)
+            query_result = await _query_single_actor(query_name, base_url, tmdb_api_key, client)
             if query_result:
                 tmdbid = query_result["pid"]
                 result[actor_name] = tmdbid
@@ -670,7 +678,7 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
                 keyword_str = ",".join(aka) if aka else ""
 
                 write_status = await update_actor_db_row(
-                    jp=actor_name,
+                    jp=query_name,
                     zh_cn=zh_cn,
                     zh_tw=zh_tw,
                     keyword=keyword_str,
@@ -691,8 +699,10 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
                     LogBuffer.log().write(f"  ⚠️ [演员数据库] 缺少 openpyxl，未写入 {actor_name} 的 tmdbid")
                 elif write_status == "file_locked":
                     LogBuffer.log().write(f"  ⚠️ [演员数据库] 文件被占用，未写入 {actor_name} 的 tmdbid")
-                elif write_status == "write_failed":
-                    LogBuffer.log().write(f"  ⚠️ [演员数据库] 写入失败，未保存 {actor_name} 的 tmdbid")
+                elif write_status.startswith("write_failed:"):
+                    LogBuffer.log().write(
+                        f"  ⚠️ [演员数据库] 写入失败，未保存 {actor_name} 的 tmdbid: {write_status.split(':', 1)[1]}"
+                    )
             else:
                 LogBuffer.log().write(f"  ⚠️ [TMDB] {actor_name} 未找到匹配的 TMDB 演员")
         except Exception as e:
@@ -700,11 +710,11 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
 
     semaphore = asyncio.Semaphore(3)
 
-    async def _limited_query(actor_name: str) -> None:
+    async def _limited_query(actor_name: str, query_name: str) -> None:
         async with semaphore:
-            await _query_and_update(actor_name)
+            await _query_and_update(actor_name, query_name)
 
-    tasks = [asyncio.create_task(_limited_query(name)) for name in need_query]
+    tasks = [asyncio.create_task(_limited_query(actor_name, query_name)) for actor_name, query_name in need_query]
     await asyncio.gather(*tasks)
 
     old_db = dict(resources.actor_db) if resources.actor_db else {}
