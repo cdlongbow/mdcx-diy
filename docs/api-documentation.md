@@ -168,7 +168,7 @@
 
 #### `fetch_actor_tmdb_ids(actors, client)`
 
-批量查询演员的 TMDB ID。
+为一组演员查询并缓存 TMDB ID，主要由刮削流程自动调用。
 
 **参数**：
 - `actors`：演员名称列表

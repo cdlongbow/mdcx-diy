@@ -4,7 +4,7 @@
 
 ---
 
-## 爬虫基类 ([mdcx/crawlers/base/base.py](mdcx/crawlers/base/base.py))
+## 爬虫基类 ([mdcx/crawlers/base/base.py](../mdcx/crawlers/base/base.py))
 
 ### `GenericBaseCrawler[T]`
 
@@ -51,7 +51,7 @@
 - 工厂模式获取爬虫实例
 - 懒加载优化性能
 
-## 爬虫实现目录 ([mdcx/crawlers/](mdcx/crawlers/))
+## 爬虫实现目录 ([mdcx/crawlers/](../mdcx/crawlers/))
 
 每个网站一个爬虫文件,共 39 个站点
 

@@ -61,7 +61,7 @@ brew install python@3.8
 
 **A**:
 1. 复制 `actor_database.xlsx` 文件到安全位置
-2. 或使用程序内置的备份功能：文件 > 备份数据库
+2. 建议同时备份 `amazon_asin_database.xlsx` 等用户数据文件
 
 ### Q: 数据库损坏了怎么办？
 

@@ -4,7 +4,7 @@
 
 ---
 
-## 模块结构 ([mdcx/core/naming/](mdcx/core/naming/))
+## 模块结构 ([mdcx/core/naming/](../mdcx/core/naming/))
 
 ```
 mdcx/core/naming/

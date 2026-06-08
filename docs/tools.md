@@ -4,7 +4,7 @@
 
 ---
 
-## 演员数据库 ([mdcx/tools/actress_db.py](mdcx/tools/actress_db.py))
+## 演员数据库 ([mdcx/tools/actress_db.py](../mdcx/tools/actress_db.py))
 
 **功能**:管理 Excel 格式的演员数据库
 
@@ -13,7 +13,7 @@
 - 搜索演员信息
 - 更新演员数据
 
-## Emby 演员 ([mdcx/tools/emby_actor_info.py](mdcx/tools/emby_actor_info.py))
+## Emby 演员 ([mdcx/tools/emby_actor_info.py](../mdcx/tools/emby_actor_info.py))
 
 **功能**:更新 Emby/Jellyfin 演员信息
 
@@ -21,7 +21,7 @@
 - Wikipedia:获取简介、出生日期、出生地等
 - 本地数据库:获取中文名、别名等
 
-## Emby 演员图片 ([mdcx/tools/emby_actor_image.py](mdcx/tools/emby_actor_image.py))
+## Emby 演员图片 ([mdcx/tools/emby_actor_image.py](../mdcx/tools/emby_actor_image.py))
 
 **功能**:更新 Emby/Jellyfin 演员图片
 
@@ -30,15 +30,15 @@
 - Gfriends GitHub:头像库
 - 本地文件夹
 
-## 缺失文件检测 ([mdcx/tools/missing.py](mdcx/tools/missing.py))
+## 缺失文件检测 ([mdcx/tools/missing.py](../mdcx/tools/missing.py))
 
 **功能**:检测缺失的文件
 
-## 字幕管理 ([mdcx/tools/subtitle.py](mdcx/tools/subtitle.py))
+## 字幕管理 ([mdcx/tools/subtitle.py](../mdcx/tools/subtitle.py))
 
 **功能**:批量字幕处理
 
-## Wiki 工具 ([mdcx/tools/wiki.py](mdcx/tools/wiki.py))
+## Wiki 工具 ([mdcx/tools/wiki.py](../mdcx/tools/wiki.py))
 
 **功能**:查询 Wikipedia 信息
 

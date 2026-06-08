@@ -47,7 +47,7 @@
 
 ## 日志系统
 
-**信号机制** ([mdcx/signals.py](mdcx/signals.py)):
+**信号机制** ([mdcx/signals.py](../mdcx/signals.py)):
 - Qt 信号机制
 - 线程安全的日志系统
 - UI 更新信号

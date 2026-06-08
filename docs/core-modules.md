@@ -4,7 +4,7 @@
 
 ---
 
-## 1. 刮削器核心 ([mdcx/core/scraper.py](mdcx/core/scraper.py))
+## 1. 刮削器核心 ([mdcx/core/scraper.py](../mdcx/core/scraper.py))
 
 **功能**:主刮削器,协调整个刮削流程
 
@@ -30,7 +30,7 @@
 - 间歇刮削支持
 - 停止/恢复支持
 
-## 2. 文件爬虫 ([mdcx/core/file_crawler.py](mdcx/core/file_crawler.py))
+## 2. 文件爬虫 ([mdcx/core/file_crawler.py](../mdcx/core/file_crawler.py))
 
 **功能**:处理单个文件的刮削逻辑
 
@@ -53,7 +53,7 @@
 - 数据归约:从多个来源归约到单一结果
 - 去重处理:演员、标签等去重
 
-## 3. NFO 生成器 ([mdcx/core/nfo.py](mdcx/core/nfo.py))
+## 3. NFO 生成器 ([mdcx/core/nfo.py](../mdcx/core/nfo.py))
 
 **功能**:生成符合 Kodi/Emby 规范的 NFO 文件
 
@@ -73,7 +73,7 @@
 - `get_nfo_data()`:读取 NFO 文件
 - `get_external_id_tag_name()`:生成外部 ID 标签名
 
-## 4. TMDB 演员 ([mdcx/core/tmdb_actor.py](mdcx/core/tmdb_actor.py))
+## 4. TMDB 演员 ([mdcx/core/tmdb_actor.py](../mdcx/core/tmdb_actor.py))
 
 **功能**:通过 TMDB API 查询日本成人演员信息
 
@@ -86,7 +86,7 @@
 **主要方法**:
 - `load_actor_db()`:加载演员数据库
 - `search_actor_db_reverse()`:反向搜索演员数据库
-- `fetch_actor_tmdb_ids()`:批量查询演员的 TMDB ID
+- `fetch_actor_tmdb_ids()`:为一组演员查询并缓存 TMDB ID
 - `_query_single_actor()`:查询单个演员的 TMDB 信息
 
 **速率限制机制**:
@@ -94,7 +94,7 @@
 2. **并发限制**:Semaphore 限制并发数为 3
 3. **请求间隔**:每个查询后 sleep 0.5 秒
 
-## 5. Amazon 集成 ([mdcx/core/amazon.py](mdcx/core/amazon.py))
+## 5. Amazon 集成 ([mdcx/core/amazon.py](../mdcx/core/amazon.py))
 
 **功能**:Amazon ASIN 获取和高清封面匹配
 
@@ -102,7 +102,7 @@
 - `search_asin()`:搜索 ASIN
 - `get_hd_poster()`:获取高清海报
 
-## 6. 图片处理 ([mdcx/core/image.py](mdcx/core/image.py))
+## 6. 图片处理 ([mdcx/core/image.py](../mdcx/core/image.py))
 
 **功能**:图片下载、裁剪、添加水印
 
@@ -111,7 +111,7 @@
 - `fix_pic_async()`:异步修复图片
 - `cut_pic()`:裁剪图片为 2:3 比例
 
-## 7. 人脸裁剪 ([mdcx/core/face_crop.py](mdcx/core/face_crop.py))
+## 7. 人脸裁剪 ([mdcx/core/face_crop.py](../mdcx/core/face_crop.py))
 
 **功能**:智能人脸检测和裁剪
 
@@ -119,7 +119,7 @@
 - `detect_faces()`:检测人脸
 - `crop_face()`:裁剪人脸区域
 
-## 8. 翻译系统 ([mdcx/core/translate.py](mdcx/core/translate.py))
+## 8. 翻译系统 ([mdcx/core/translate.py](../mdcx/core/translate.py))
 
 **功能**:支持多种翻译服务
 

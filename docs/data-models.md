@@ -4,7 +4,7 @@
 
 ---
 
-## 主要数据类 ([mdcx/models/types.py](mdcx/models/types.py))
+## 主要数据类 ([mdcx/models/types.py](../mdcx/models/types.py))
 
 ### `FileInfo`
 

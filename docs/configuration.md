@@ -4,7 +4,7 @@
 
 ---
 
-## 配置模型 ([mdcx/config/models.py](mdcx/config/models.py))
+## 配置模型 ([mdcx/config/models.py](../mdcx/config/models.py))
 
 ### `Config`
 
@@ -106,7 +106,7 @@
 - `set_field_language(field, language)`:设置字段语言
 - `set_field_translate(field, translate)`:设置字段翻译
 
-## 配置枚举 ([mdcx/config/enums.py](mdcx/config/enums.py))
+## 配置枚举 ([mdcx/config/enums.py](../mdcx/config/enums.py))
 
 ### `Website`
 
@@ -138,7 +138,7 @@
 - `MarkType`:水印类型
 - 等等...
 
-## 配置管理器 ([mdcx/config/manager.py](mdcx/config/manager.py))
+## 配置管理器 ([mdcx/config/manager.py](../mdcx/config/manager.py))
 
 ### `ConfigManager`
 
