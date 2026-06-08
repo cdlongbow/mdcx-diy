@@ -1,6 +1,6 @@
 # MDCx Code Wiki
 
-> 💡 **提示**：本文档已拆分为多个独立章节，可在 [docs/](docs/) 目录查看更详细的文档。
+> 本文档已拆分为多个独立章节，可在 [文档中心](README.md) 查看详细文档。
 
 ## 目录
 
@@ -24,28 +24,28 @@ B. [爬虫迁移指南](#爬虫迁移指南) → [独立文档](crawler-migratio
 
 ## 快速链接
 
-- [docs/README.md](README.md) - 文档中心入口
-- [docs/architecture.md](architecture.md) - 项目架构详解
-- [docs/core-modules.md](core-modules.md) - 核心模块详解
-- [docs/data-models.md](data-models.md) - 数据模型详解
-- [docs/configuration.md](configuration.md) - 配置系统详解
-- [docs/crawler-system.md](crawler-system.md) - 爬虫系统详解
-- [docs/tools.md](tools.md) - 工具模块详解
-- [docs/naming-system.md](naming-system.md) - 命名系统详解
-- [docs/dependencies.md](dependencies.md) - 依赖关系详解
-- [docs/api-documentation.md](api-documentation.md) - API 文档参考
-- [docs/TEST_COVERAGE_SUMMARY.md](TEST_COVERAGE_SUMMARY.md) - 测试覆盖率
+- [文档中心](README.md) - 文档中心入口
+- [项目架构](architecture.md) - 项目架构详解
+- [核心模块](core-modules.md) - 核心模块详解
+- [数据模型](data-models.md) - 数据模型详解
+- [配置系统](configuration.md) - 配置系统详解
+- [爬虫系统](crawler-system.md) - 爬虫系统详解
+- [工具模块](tools.md) - 工具模块详解
+- [命名系统](naming-system.md) - 命名系统详解
+- [依赖关系](dependencies.md) - 依赖关系详解
+- [API 文档](api-documentation.md) - API 文档参考
+- [测试覆盖率](TEST_COVERAGE_SUMMARY.md) - 测试覆盖率
 
 ### 迁移指南
 
-- [docs/pyqt6-migration.md](pyqt6-migration.md) - PyQt6 迁移方案
-- [docs/crawler-migration.md](crawler-migration.md) - 爬虫新版框架迁移指南
+- [PyQt6 迁移](pyqt6-migration.md) - PyQt6 迁移方案
+- [爬虫迁移](crawler-migration.md) - 爬虫新版框架迁移指南
 
 ### 代码质量
 
-- [docs/CODE_REVIEW_CHECKLIST.md](CODE_REVIEW_CHECKLIST.md) - 代码审查检查清单
-- [docs/CODE_REVIEW_GUIDE.md](CODE_REVIEW_GUIDE.md) - 代码审查指南
-- [docs/CODE_REVIEW_STANDARDS.md](CODE_REVIEW_STANDARDS.md) - 代码审查标准
+- [代码审查清单](CODE_REVIEW_CHECKLIST.md) - 代码审查检查清单
+- [代码审查指南](CODE_REVIEW_GUIDE.md) - 代码审查指南
+- [代码审查标准](CODE_REVIEW_STANDARDS.md) - 代码审查标准
 
 ---
 
@@ -1435,7 +1435,7 @@ sys.exit(app.exec())
 
 ## 附录 A：PyQt6 迁移指南
 
-详细的 PyQt6 迁移方案请参考：[docs/pyqt6-migration.md](pyqt6-migration.md)
+详细的 PyQt6 迁移方案请参考：[pyqt6-migration.md](pyqt6-migration.md)
 
 ### 主要差异
 
@@ -1454,7 +1454,7 @@ sys.exit(app.exec())
 
 ## 附录 B：爬虫迁移指南
 
-详细的刮削器新版框架迁移指南请参考：[docs/crawler-migration.md](crawler-migration.md)
+详细的刮削器新版框架迁移指南请参考：[爬虫迁移](crawler-migration.md)
 
 ### 迁移目标
 
