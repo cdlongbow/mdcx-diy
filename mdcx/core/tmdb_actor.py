@@ -44,6 +44,10 @@ class _TmdbRateLimiter:
 _tmdb_rate_limiter = _TmdbRateLimiter()
 
 
+def _tmdb_debug_enabled() -> bool:
+    return bool(getattr(manager.config, "show_data_log", False))
+
+
 # ============= HTTP 适配器 =============
 
 class _TmdbResponse:
@@ -754,9 +758,12 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
         return None
     results = data.get("results", [])
 
-    LogBuffer.log().write(
-        f"  🔎 [TMDB] 搜索演员「{actor_name}」返回 {len(results)} 个候选，目标规范名={sorted(target_variants)}"
-    )
+    if _tmdb_debug_enabled():
+        LogBuffer.log().write(
+            f"  🔎 [TMDB] 搜索演员「{actor_name}」返回 {len(results)} 个候选，目标规范名={sorted(target_variants)}"
+        )
+    else:
+        LogBuffer.log().write(f"  🔎 [TMDB] 搜索演员「{actor_name}」返回 {len(results)} 个候选")
 
     if not results:
         return None
@@ -819,9 +826,11 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
             }
         )
 
-        LogBuffer.log().write(
-            f"    {'✅' if is_match else '·'} [TMDB] pid={pid} name={detail.get('name', '')} place={place or '-'} aliases={sorted(all_names)} norm={sorted(all_norm)}"
-        )
+        if _tmdb_debug_enabled():
+            LogBuffer.log().write(
+                f"    {'✅' if is_match else '·'} [TMDB] pid={pid} name={detail.get('name', '')} "
+                f"place={place or '-'} aliases={sorted(all_names)} norm={sorted(all_norm)}"
+            )
 
     matched = [c for c in candidates if c["is_match"]]
 
