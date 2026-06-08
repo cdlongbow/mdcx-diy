@@ -189,8 +189,41 @@ COL_TMDB_URL = 6
 DB_HEADERS = ["日文原名", "中文名", "繁体名", "别名", "链接", "tmdbid", "tmdb url"]
 
 
+_ACTOR_NAME_VARIANT_MAP = str.maketrans(
+    {
+        "亜": "亚",
+        "亞": "亚",
+        "条": "条",
+        "條": "条",
+        "瀬": "濑",
+        "濑": "濑",
+        "沢": "泽",
+        "澤": "泽",
+        "桜": "樱",
+        "櫻": "樱",
+        "髙": "高",
+        "﨑": "崎",
+    }
+)
+
+
 def norm_name(name: str) -> str:
-    return convert_half(name or "")
+    return convert_half(name or "").translate(_ACTOR_NAME_VARIANT_MAP)
+
+
+def _expand_name_variants(name: str) -> set[str]:
+    normalized = norm_name(name)
+    if not normalized:
+        return set()
+
+    variants = {normalized}
+
+    if normalized.endswith("こ"):
+        variants.add(normalized[:-1] + "子")
+    if normalized.endswith("子"):
+        variants.add(normalized[:-1] + "こ")
+
+    return variants
 
 
 def _get_db_path() -> Path:
@@ -265,7 +298,7 @@ def _norm_name_set(names: list[str]) -> set[str]:
     result = set()
     for n in names:
         if n:
-            result.add(norm_name(n))
+            result.update(_expand_name_variants(n))
     return result
 
 
@@ -319,7 +352,7 @@ async def update_actor_db_row(
     href: str = "",
     tmdbid: int | None = None,
     append_keyword: bool = False,
-) -> None:
+) -> str:
     """
     更新或添加演员数据库行。已有值不覆盖，仅填空白；keyword 在 append_keyword=True 时追加去重。
     """
@@ -328,6 +361,8 @@ async def update_actor_db_row(
     try:
         import openpyxl
         from openpyxl.utils import get_column_letter
+
+        write_status = "unchanged"
 
         if db_path.exists():
             wb = openpyxl.load_workbook(db_path)
@@ -375,6 +410,7 @@ async def update_actor_db_row(
                 ws.cell(row=existing_row, column=COL_HREF + 1, value=href)
             if tmdbid is not None and not ws.cell(row=existing_row, column=COL_TMDBID + 1).value:
                 ws.cell(row=existing_row, column=COL_TMDBID + 1, value=tmdbid)
+                write_status = "inserted_tmdbid"
                 ws.cell(row=existing_row, column=COL_TMDB_URL + 1).value = None
                 ws.cell(
                     row=existing_row,
@@ -384,8 +420,11 @@ async def update_actor_db_row(
                 ws.cell(
                     row=existing_row, column=COL_TMDB_URL + 1
                 ).hyperlink = f"https://www.themoviedb.org/person/{tmdbid}"
+            elif tmdbid is not None:
+                write_status = "kept_existing_tmdbid"
         else:
             ws.append([jp, zh_cn, zh_tw, keyword, href, tmdbid or "", ""])
+            write_status = "inserted_new_row"
             last_row = ws.max_row
             if tmdbid:
                 ws.cell(row=last_row, column=COL_TMDB_URL + 1).value = None
@@ -400,12 +439,13 @@ async def update_actor_db_row(
 
         wb.save(db_path)
         wb.close()
+        return write_status
     except ImportError:
-        pass
+        return "missing_openpyxl"
     except PermissionError:
-        pass
+        return "file_locked"
     except Exception:
-        pass
+        return "write_failed"
 
 
 def search_actor_db_reverse(query_name: str) -> dict | None:
@@ -629,7 +669,7 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
                 aka = query_result.get("also_known_as", [])
                 keyword_str = ",".join(aka) if aka else ""
 
-                await update_actor_db_row(
+                write_status = await update_actor_db_row(
                     jp=actor_name,
                     zh_cn=zh_cn,
                     zh_tw=zh_tw,
@@ -641,6 +681,18 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
                 LogBuffer.log().write(
                     f"  ✅ [TMDB] {actor_name} -> tmdbid={tmdbid}{f' (中文:{zh_cn})' if zh_cn else ''}"
                 )
+                if write_status == "inserted_tmdbid":
+                    LogBuffer.log().write(f"  ✅ [演员数据库] 已写入 {actor_name} -> tmdbid={tmdbid}")
+                elif write_status == "inserted_new_row":
+                    LogBuffer.log().write(f"  ✅ [演员数据库] 已新增 {actor_name}，并写入 tmdbid={tmdbid}")
+                elif write_status == "kept_existing_tmdbid":
+                    LogBuffer.log().write(f"  ℹ️ [演员数据库] {actor_name} 已存在 tmdbid，保留原值")
+                elif write_status == "missing_openpyxl":
+                    LogBuffer.log().write(f"  ⚠️ [演员数据库] 缺少 openpyxl，未写入 {actor_name} 的 tmdbid")
+                elif write_status == "file_locked":
+                    LogBuffer.log().write(f"  ⚠️ [演员数据库] 文件被占用，未写入 {actor_name} 的 tmdbid")
+                elif write_status == "write_failed":
+                    LogBuffer.log().write(f"  ⚠️ [演员数据库] 写入失败，未保存 {actor_name} 的 tmdbid")
             else:
                 LogBuffer.log().write(f"  ⚠️ [TMDB] {actor_name} 未找到匹配的 TMDB 演员")
         except Exception as e:
@@ -673,7 +725,7 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
     查询单个演员的 TMDB 信息。返回匹配结果或 None。
     """
     search_url = f"{base_url}/3/search/person"
-    target = norm_name(actor_name)
+    target_variants = _expand_name_variants(actor_name)
 
     resp = await _tmdb_request(client, "GET", search_url, params={
         "api_key": api_key,
@@ -691,6 +743,10 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
     except (json.JSONDecodeError, ValueError):
         return None
     results = data.get("results", [])
+
+    LogBuffer.log().write(
+        f"  🔎 [TMDB] 搜索演员「{actor_name}」返回 {len(results)} 个候选，目标规范名={sorted(target_variants)}"
+    )
 
     if not results:
         return None
@@ -727,8 +783,8 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
             if a:
                 all_names.add(str(a).strip())
 
-        all_norm = {norm_name(n) for n in all_names if n}
-        is_match = target in all_norm
+        all_norm = _norm_name_set(list(all_names))
+        is_match = bool(target_variants & all_norm)
 
         _pop = item.get("popularity", 0) or 0
         popularity = float(_pop) if isinstance(_pop, (int, float, str)) else 0.0
@@ -746,14 +802,21 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
                 "known_for_count": known_for_count,
                 "place_has_japan": place_has_japan,
                 "name": detail.get("name", ""),
+                "raw_names": sorted(all_names),
+                "all_norm": sorted(all_norm),
                 "translations": translations,
                 "also_known_as": [a for a in aka_list if a],
             }
         )
 
+        LogBuffer.log().write(
+            f"    {'✅' if is_match else '·'} [TMDB] pid={pid} name={detail.get('name', '')} place={place or '-'} aliases={sorted(all_names)} norm={sorted(all_norm)}"
+        )
+
     matched = [c for c in candidates if c["is_match"]]
 
     if not matched:
+        LogBuffer.log().write(f"  ⚠️ [TMDB] 演员「{actor_name}」所有候选均未通过名字匹配")
         return None
 
     matched.sort(

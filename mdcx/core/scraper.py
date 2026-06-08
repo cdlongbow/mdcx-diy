@@ -669,7 +669,7 @@ class Scraper:
                                             # 更新 xlsx
                                             translations = query_result.get("translations", {})
                                             aka = query_result.get("also_known_as", [])
-                                            await update_actor_db_row(
+                                            write_status = await update_actor_db_row(
                                                 jp=jp_name,
                                                 zh_cn=translations.get("zh_cn", ""),
                                                 zh_tw=translations.get("zh_tw", ""),
@@ -680,6 +680,30 @@ class Scraper:
                                             LogBuffer.log().write(
                                                 f"  ✅ [TMDB] {actor_name} -> tmdbid={tmdbid} (读取模式补充)"
                                             )
+                                            if write_status == "inserted_tmdbid":
+                                                LogBuffer.log().write(
+                                                    f"  ✅ [演员数据库] 已写入 {jp_name} -> tmdbid={tmdbid}"
+                                                )
+                                            elif write_status == "inserted_new_row":
+                                                LogBuffer.log().write(
+                                                    f"  ✅ [演员数据库] 已新增 {jp_name}，并写入 tmdbid={tmdbid}"
+                                                )
+                                            elif write_status == "kept_existing_tmdbid":
+                                                LogBuffer.log().write(
+                                                    f"  ℹ️ [演员数据库] {jp_name} 已存在 tmdbid，保留原值"
+                                                )
+                                            elif write_status == "missing_openpyxl":
+                                                LogBuffer.log().write(
+                                                    f"  ⚠️ [演员数据库] 缺少 openpyxl，未写入 {jp_name} 的 tmdbid"
+                                                )
+                                            elif write_status == "file_locked":
+                                                LogBuffer.log().write(
+                                                    f"  ⚠️ [演员数据库] 文件被占用，未写入 {jp_name} 的 tmdbid"
+                                                )
+                                            elif write_status == "write_failed":
+                                                LogBuffer.log().write(
+                                                    f"  ⚠️ [演员数据库] 写入失败，未保存 {jp_name} 的 tmdbid"
+                                                )
                                             await asyncio.sleep(0.5)
                                         else:
                                             LogBuffer.log().write(f"  ⚠️ [TMDB] {actor_name} 未找到匹配的 TMDB 演员")
