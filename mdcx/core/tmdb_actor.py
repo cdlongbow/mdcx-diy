@@ -575,7 +575,7 @@ async def migrate_xml_to_xlsx() -> bool:
 # ============= TMDB API 查询 =============
 
 
-async def fetch_actor_tmdb_ids(actors: list[str], client: AsyncWebClient) -> dict[str, int]:
+async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]:
     if not actors:
         return {}
 
