@@ -1,0 +1,17 @@
+#!/bin/sh
+
+echo "[pre-push] 运行推送前自检..."
+if command -v uv >/dev/null 2>&1; then
+  uv run check --skip-hook-install
+else
+  python3 scripts/check.py --skip-hook-install
+fi
+status=$?
+
+if [ "$status" -ne 0 ]; then
+  echo "[pre-push] 自检失败，已阻止本次推送。"
+  exit "$status"
+fi
+
+echo "[pre-push] 自检通过，继续推送。"
+exit 0

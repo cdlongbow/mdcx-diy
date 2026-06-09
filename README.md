@@ -37,7 +37,17 @@ uv run python main.py
 uv run check
 ```
 
-首次运行时会自动安装本地 `pre-push` 钩子。之后每次执行 `git push`，都会先自动运行自检，通过后再继续推送。
+首次运行时会自动配置 Git hooks。之后每次执行 `git push`，都会先自动运行自检，通过后再继续推送。
+
+**新工作区首次使用**
+
+Clone 仓库后，运行一次：
+
+```bash
+python3 scripts/install_git_hooks.py
+```
+
+或者直接使用 `uv run check` 也会自动配置。
 
 这条命令会依次执行：
 

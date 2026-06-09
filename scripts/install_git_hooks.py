@@ -1,26 +1,27 @@
 from pathlib import Path
+import subprocess
+
 
 ROOT = Path(__file__).resolve().parents[1]
-HOOKS = {
-    "pre-push": ROOT / "scripts" / "git-hooks" / "pre-push",
-}
 
 
-def install_hooks() -> None:
-    git_hooks_dir = ROOT / ".git" / "hooks"
-    if not git_hooks_dir.exists():
-        return
+def install_hooks() -> int:
+    hooks_dir = ROOT / ".githooks"
+    if not hooks_dir.exists():
+        print("[hooks] 错误：.githooks 目录不存在")
+        return 1
 
-    for hook_name, source in HOOKS.items():
-        target = git_hooks_dir / hook_name
-        target.write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
-        target.chmod(0o755)
+    subprocess.run(
+        ["git", "config", "core.hooksPath", ".githooks"],
+        cwd=ROOT,
+        check=True,
+    )
+    print("[hooks] Git hooks 已配置为 .githooks/")
+    return 0
 
 
 def main() -> int:
-    install_hooks()
-    print("[hooks] Git hooks installed.")
-    return 0
+    return install_hooks()
 
 
 if __name__ == "__main__":
