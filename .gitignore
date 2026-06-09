@@ -195,7 +195,6 @@ AGENTS.md
 uv.toml
 
 # 测试文件（非必需，本地开发用）
-test_amazon_*.py
 test_*.xlsx
 
 # Excel 数据库文件在 resources/userdata/ 目录下（由 resources/userdata/.gitignore 管理）
