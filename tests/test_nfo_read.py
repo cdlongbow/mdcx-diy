@@ -77,7 +77,9 @@ async def test_get_nfo_data_strips_only_leading_number_prefix(monkeypatch: pytes
     monkeypatch.setattr(
         nfo_module.manager.config.__class__,
         "get_field_config",
-        lambda self, field: SimpleNamespace(language=Language.JP if field != CrawlerResultFields.OUTLINE else Language.ZH_CN),
+        lambda self, field: SimpleNamespace(
+            language=Language.JP if field != CrawlerResultFields.OUTLINE else Language.ZH_CN
+        ),
     )
 
     video_path = tmp_path / "ABC-123.mp4"
