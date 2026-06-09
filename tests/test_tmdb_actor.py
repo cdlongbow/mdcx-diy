@@ -4,6 +4,7 @@ import pytest
 from openpyxl import load_workbook
 
 from mdcx.core import tmdb_actor
+from mdcx.models.log_buffer import LogBuffer
 
 
 @pytest.fixture
@@ -72,6 +73,32 @@ def test_search_actor_db_reverse_builds_reusable_index(monkeypatch: pytest.Monke
     assert result["jp"] == "加瀬かなこ"
     assert tmdb_actor.resources.actor_db_reverse_index is not None
     assert tmdb_actor.search_actor_db_reverse("Kana")["tmdbid"] == 456
+
+
+def test_get_actor_data_uses_reverse_index_for_translated_name(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setattr(
+        tmdb_actor.resources,
+        "actor_db",
+        {
+            "上原亜衣": {
+                "zh_cn": "上原亚衣",
+                "zh_tw": "上原亞衣",
+                "keyword": "Rio",
+                "href": "https://example.com/uahara-ai",
+                "tmdbid": 123,
+                "tmdb_url": "https://www.themoviedb.org/person/123",
+            }
+        },
+    )
+    monkeypatch.setattr(tmdb_actor.resources, "actor_db_reverse_index", None)
+
+    actor_data = tmdb_actor.resources.get_actor_data("上原亚衣")
+
+    assert actor_data["has_name"] is True
+    assert actor_data["jp"] == "上原亜衣"
+    assert actor_data["zh_cn"] == "上原亚衣"
+    assert actor_data["keyword"] == ["Rio"]
+    assert actor_data["href"] == "https://example.com/uahara-ai"
 
 
 def test_is_japan_place_supports_localized_place_names():
@@ -165,6 +192,9 @@ async def test_update_actor_db_row_writes_tmdbid_and_tmdb_url(_tmp_actor_db: Pat
     assert ws.cell(row=2, column=6).value == 12345
     assert ws.cell(row=2, column=7).value == "https://www.themoviedb.org/person/12345"
     assert ws.cell(row=2, column=7).hyperlink.target == "https://www.themoviedb.org/person/12345"
+    assert ws.title == "演员数据库"
+    assert ws.freeze_panes == "A2"
+    assert ws.auto_filter.ref == "A1:G2"
     wb.close()
 
 
@@ -203,3 +233,80 @@ async def test_update_actor_db_row_keeps_existing_tmdbid(_tmp_actor_db: Path):
     assert ws.cell(row=2, column=6).value == 111
     assert ws.cell(row=2, column=7).value == "https://www.themoviedb.org/person/111"
     wb.close()
+
+
+@pytest.mark.asyncio
+async def test_update_actor_db_row_refreshes_resources_cache(_tmp_actor_db: Path):
+    tmdb_actor.resources.actor_db = {}
+    tmdb_actor.resources.actor_db_reverse_index = {"STALE": "旧数据"}
+
+    status = await tmdb_actor.update_actor_db_row(jp="天使もえ", zh_cn="天使萌", tmdbid=24680)
+
+    assert status == "inserted_new_row"
+    assert tmdb_actor.resources.actor_db is not None
+    assert tmdb_actor.resources.actor_db["天使もえ"]["tmdbid"] == 24680
+    assert tmdb_actor.resources.actor_db_reverse_index is None
+
+
+@pytest.mark.asyncio
+async def test_update_actor_db_row_formats_headers_and_href_hyperlink(_tmp_actor_db: Path):
+    status = await tmdb_actor.update_actor_db_row(
+        jp="三上悠亜",
+        zh_cn="三上悠亚",
+        href="https://example.com/actor/mikami-yua",
+    )
+
+    assert status == "inserted_new_row"
+
+    wb = load_workbook(_tmp_actor_db)
+    ws = wb.active
+    headers = [ws.cell(row=1, column=i).value for i in range(1, 8)]
+
+    assert headers == tmdb_actor.DB_HEADERS
+    assert ws.cell(row=2, column=5).hyperlink.target == "https://example.com/actor/mikami-yua"
+    assert ws.cell(row=2, column=5).style == "Hyperlink"
+    wb.close()
+
+
+@pytest.mark.asyncio
+async def test_update_actor_db_row_returns_file_locked_when_workbook_is_unavailable(
+    _tmp_actor_db: Path, monkeypatch: pytest.MonkeyPatch
+):
+    await tmdb_actor.update_actor_db_row(jp="河北彩花", zh_cn="河北彩花")
+
+    import openpyxl
+
+    def _raise_permission_error(*args, **kwargs):
+        raise PermissionError("locked")
+
+    monkeypatch.setattr(openpyxl, "load_workbook", _raise_permission_error)
+
+    status = await tmdb_actor.update_actor_db_row(jp="河北彩花", tmdbid=13579)
+
+    assert status == "file_locked"
+
+
+@pytest.mark.asyncio
+async def test_load_actor_db_logs_read_failure(monkeypatch: pytest.MonkeyPatch, _tmp_actor_db: Path):
+    await tmdb_actor.update_actor_db_row(jp="相泽南", zh_cn="相泽南")
+
+    import openpyxl
+
+    def _raise_runtime_error(*args, **kwargs):
+        raise RuntimeError("boom")
+
+    monkeypatch.setattr(openpyxl, "load_workbook", _raise_runtime_error)
+    LogBuffer.log().clear()
+
+    result = await tmdb_actor.load_actor_db()
+
+    assert result == {}
+    assert "[演员数据库] 读取失败: boom" in LogBuffer.log().get()
+
+
+def test_format_db_worksheet_logs_failure_for_invalid_worksheet():
+    LogBuffer.log().clear()
+
+    tmdb_actor._format_db_worksheet(object())
+
+    assert "[演员数据库] 工作表格式化失败:" in LogBuffer.log().get()

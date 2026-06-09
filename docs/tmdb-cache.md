@@ -21,7 +21,7 @@ TMDB 缓存由两层组成：
 - **实现**：`resources.actor_db`（dict 类型）
 - **用途**：程序运行时快速查询，避免反复读取 Excel 文件
 - **生命周期**：进程级别，程序重启后失效
-- **刷新机制**：每次 Excel 文件更新后自动调用 `reload_actor_db()` 刷新
+- **刷新机制**：每次成功写入 Excel 后自动调用 `reload_actor_db()` 刷新
 
 ## 缓存数据模型
 
@@ -73,7 +73,7 @@ TMDB 缓存由两层组成：
     ├── 通过令牌桶限流器（3.5 req/s，突发 10）
     ├── 使用名字归一化和候选排序完成匹配
     ├── 匹配成功后调用 update_actor_db_row() 写回 Excel
-    └── 写回后调用 resources.reload_actor_db() 刷新内存缓存
+    └── update_actor_db_row() 内部自动刷新内存缓存
 ```
 
 ### 缓存命中路径（最快）
@@ -118,7 +118,7 @@ def update_actor_db_row(actor_name, tmdbid, tmdb_url):
     #    - tmdb_url 填入第 7 列
     # 3. 如果无：追加新行，包含所有字段
     # 4. 保存 Excel 文件
-    # 5. 调用 resources.reload_actor_db() 刷新内存缓存
+    # 5. 函数内部自动调用 resources.reload_actor_db() 刷新内存缓存
 ```
 
 **写入原则**：
@@ -167,7 +167,7 @@ def reload_actor_db():
 
 ### 刷新时机
 
-- 每次 `update_actor_db_row()` 写入后
+- 每次 `update_actor_db_row()` 成功写入后
 - 用户手动编辑 Excel 文件后（下次刮削时自动重载）
 - 程序启动时（初始加载）
 
@@ -311,9 +311,10 @@ TMDB ID 缓存最终用于 NFO 文件生成：
    - 可检查是否触发了 TMDB API 的速率限制
 
 4. **Excel 文件损坏**
-   - 程序仅在用户数据文件不存在时复制内置副本
-   - 文件损坏时请使用用户自己的备份或手动修复
-   - 检查 `userdata/actor_database.xlsx` 是否存在
+    - 程序仅在用户数据文件不存在时复制内置副本
+    - 文件损坏时请使用用户自己的备份或手动修复
+    - 检查 `userdata/actor_database.xlsx` 是否存在
+    - 查看日志中的 `演员数据库` 相关读取失败或格式化失败提示
 
 ### 日志位置
 
@@ -325,7 +326,7 @@ TMDB 相关日志位于：
 
 | 文件 | 职责 |
 |------|------|
-| `./mdcx/core/tmdb_actor.py` | TMDB 缓存核心实现（888 行） |
+| `./mdcx/core/tmdb_actor.py` | TMDB 缓存核心实现 |
 | `./mdcx/config/resources.py` | 内存缓存管理与重载 |
 | `./mdcx/core/nfo.py` | NFO 生成时读取 TMDB ID |
 | `./mdcx/models/types.py` | 数据模型定义 |

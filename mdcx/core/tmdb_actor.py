@@ -299,8 +299,8 @@ def _format_db_worksheet(ws) -> None:
         for ci in range(1, len(DB_HEADERS) + 1):
             letter = get_column_letter(ci)
             ws.column_dimensions[letter].width = min(col_max[ci] + 2, caps.get(ci, 80))
-    except Exception:
-        pass
+    except Exception as e:
+        LogBuffer.log().write(f"  ⚠️ [演员数据库] 工作表格式化失败: {e}")
 
 
 def _norm_name_set(names: list[str]) -> set[str]:
@@ -353,46 +353,52 @@ def _build_actor_db_reverse_index(actor_db: dict[str, dict]) -> dict[str, str]:
     return index
 
 
+def _read_actor_db_xlsx(db_path: Path) -> dict[str, dict]:
+    db: dict[str, dict] = {}
+
+    import openpyxl
+
+    wb = openpyxl.load_workbook(db_path, read_only=True, data_only=True)
+    ws = wb.active
+    for row_idx, row in enumerate(ws.iter_rows(values_only=True), start=1):
+        if row_idx == 1:
+            continue
+        if len(row) < 1:
+            continue
+        jp = str(row[COL_JP] or "").strip()
+        if not jp:
+            continue
+        tmdbid_val = None
+        tmdbid_raw = str(row[COL_TMDBID] or "").strip() if len(row) > COL_TMDBID else ""
+        if tmdbid_raw and tmdbid_raw.isdigit():
+            tmdbid_val = int(tmdbid_raw)
+        db[jp] = {
+            "zh_cn": str(row[COL_ZH_CN] or "").strip() if len(row) > COL_ZH_CN else "",
+            "zh_tw": str(row[COL_ZH_TW] or "").strip() if len(row) > COL_ZH_TW else "",
+            "keyword": str(row[COL_KEYWORD] or "").strip() if len(row) > COL_KEYWORD else "",
+            "href": str(row[COL_HREF] or "").strip() if len(row) > COL_HREF else "",
+            "tmdbid": tmdbid_val,
+            "tmdb_url": str(row[COL_TMDB_URL] or "").strip() if len(row) > COL_TMDB_URL else "",
+        }
+    wb.close()
+    return db
+
+
 async def load_actor_db() -> dict[str, dict]:
     """
     加载演员数据库 xlsx。
     返回: {jp_name: {"zh_cn": ..., "zh_tw": ..., "keyword": "...", "href": "...", "tmdbid": int|None, "tmdb_url": "..."}}
     """
     db_path = _get_db_path()
-    db: dict[str, dict] = {}
     if not db_path.exists():
-        return db
+        return {}
     try:
-        import openpyxl
-
-        wb = openpyxl.load_workbook(db_path, read_only=True, data_only=True)
-        ws = wb.active
-        for row_idx, row in enumerate(ws.iter_rows(values_only=True), start=1):
-            if row_idx == 1:
-                continue
-            if len(row) < 1:
-                continue
-            jp = str(row[COL_JP] or "").strip()
-            if not jp:
-                continue
-            tmdbid_val = None
-            tmdbid_raw = str(row[COL_TMDBID] or "").strip() if len(row) > COL_TMDBID else ""
-            if tmdbid_raw and tmdbid_raw.isdigit():
-                tmdbid_val = int(tmdbid_raw)
-            db[jp] = {
-                "zh_cn": str(row[COL_ZH_CN] or "").strip() if len(row) > COL_ZH_CN else "",
-                "zh_tw": str(row[COL_ZH_TW] or "").strip() if len(row) > COL_ZH_TW else "",
-                "keyword": str(row[COL_KEYWORD] or "").strip() if len(row) > COL_KEYWORD else "",
-                "href": str(row[COL_HREF] or "").strip() if len(row) > COL_HREF else "",
-                "tmdbid": tmdbid_val,
-                "tmdb_url": str(row[COL_TMDB_URL] or "").strip() if len(row) > COL_TMDB_URL else "",
-            }
-        wb.close()
+        return _read_actor_db_xlsx(db_path)
     except ImportError:
-        pass
-    except Exception:
-        pass
-    return db
+        LogBuffer.log().write("  ⚠️ [演员数据库] 缺少 openpyxl，无法读取 actor_database.xlsx")
+    except Exception as e:
+        LogBuffer.log().write(f"  ⚠️ [演员数据库] 读取失败: {e}")
+    return {}
 
 
 async def update_actor_db_row(
@@ -489,6 +495,7 @@ async def update_actor_db_row(
 
         wb.save(db_path)
         wb.close()
+        resources.reload_actor_db()
         return write_status
     except ImportError:
         return "missing_openpyxl"
@@ -727,7 +734,6 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
     await asyncio.gather(*tasks)
 
     old_db = dict(resources.actor_db) if resources.actor_db else {}
-    resources.reload_actor_db()
 
     cached_before = len([a for a in actors if a.strip() in old_db and old_db[a.strip()].get("tmdbid")])
     LogBuffer.log().write(

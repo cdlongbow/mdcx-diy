@@ -95,6 +95,30 @@ class _DummyResources:
     def u(self, relative_path):
         return manager_module.manager.data_folder / "userdata" / relative_path
 
+    def get_actor_data(self, actor):
+        from mdcx.core.tmdb_actor import search_actor_db_reverse
+
+        actor_data = {
+            "zh_cn": actor,
+            "zh_tw": actor,
+            "jp": actor,
+            "keyword": [actor],
+            "href": "",
+            "has_name": False,
+        }
+
+        if self.actor_db is not None:
+            row = search_actor_db_reverse(actor)
+            if row:
+                actor_data["zh_cn"] = row.get("zh_cn") or actor
+                actor_data["zh_tw"] = row.get("zh_tw") or actor
+                actor_data["jp"] = row.get("jp") or actor
+                kw = row.get("keyword") or ""
+                actor_data["keyword"] = [k.strip() for k in kw.split(",") if k.strip()] if kw else [actor_data["jp"]]
+                actor_data["href"] = row.get("href") or ""
+                actor_data["has_name"] = True
+        return actor_data
+
     def get_info_data(self, info):
         info_data = {
             "zh_cn": info,

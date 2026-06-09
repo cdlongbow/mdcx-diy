@@ -106,33 +106,20 @@ class Resources:
             "has_name": False,
         }
 
-        # 查询演员数据库 xlsx
         actor_db = self.actor_db
         if actor_db is not None:
-            actor_name = f",{actor.upper()},"
-            for each in ManualConfig.FULL_HALF_CHAR:
-                actor_name = actor_name.replace(each[0], each[1])
+            from ..core.tmdb_actor import search_actor_db_reverse
 
-            # 在 xlsx 中搜索匹配的演员
-            for jp, data in actor_db.items():
-                # 构建所有可搜索的名字列表
-                searchable = [jp]
-                if data.get("keyword"):
-                    searchable.extend(k.strip() for k in data["keyword"].split(",") if k.strip())
-
-                for name in searchable:
-                    test_name = f",{name.upper()},"
-                    for each in ManualConfig.FULL_HALF_CHAR:
-                        test_name = test_name.replace(each[0], each[1])
-                    if test_name == actor_name:
-                        actor_data["zh_cn"] = data.get("zh_cn") or actor
-                        actor_data["zh_tw"] = data.get("zh_tw") or actor
-                        actor_data["jp"] = jp
-                        kw = data.get("keyword") or ""
-                        actor_data["keyword"] = [k.strip() for k in kw.split(",") if k.strip()] if kw else [jp]
-                        actor_data["href"] = data.get("href") or ""
-                        actor_data["has_name"] = True
-                        return actor_data
+            row = search_actor_db_reverse(actor)
+            if row:
+                actor_data["zh_cn"] = row.get("zh_cn") or actor
+                actor_data["zh_tw"] = row.get("zh_tw") or actor
+                actor_data["jp"] = row.get("jp") or actor
+                kw = row.get("keyword") or ""
+                actor_data["keyword"] = [k.strip() for k in kw.split(",") if k.strip()] if kw else [actor_data["jp"]]
+                actor_data["href"] = row.get("href") or ""
+                actor_data["has_name"] = True
+                return actor_data
         return actor_data
 
     def get_info_data(self, info):
@@ -255,32 +242,9 @@ class Resources:
             self.actor_db_reverse_index = None
             return
         try:
-            wb = openpyxl.load_workbook(db_path, read_only=True, data_only=True)
-            ws = wb.active
-            db: dict[str, dict] = {}
-            for row_idx, row in enumerate(ws.iter_rows(values_only=True), start=1):
-                if row_idx == 1:
-                    continue
-                if len(row) < 1:
-                    continue
-                jp = str(row[0] or "").strip()
-                if not jp:
-                    continue
-                tmdbid_val = None
-                if len(row) > 5:
-                    tmdbid_raw = str(row[5] or "").strip()
-                    if tmdbid_raw and tmdbid_raw.isdigit():
-                        tmdbid_val = int(tmdbid_raw)
-                db[jp] = {
-                    "zh_cn": str(row[1] or "").strip() if len(row) > 1 else "",
-                    "zh_tw": str(row[2] or "").strip() if len(row) > 2 else "",
-                    "keyword": str(row[3] or "").strip() if len(row) > 3 else "",
-                    "href": str(row[4] or "").strip() if len(row) > 4 else "",
-                    "tmdbid": tmdbid_val,
-                    "tmdb_url": str(row[6] or "").strip() if len(row) > 6 else "",
-                }
-            wb.close()
-            self.actor_db = db
+            from ..core.tmdb_actor import _read_actor_db_xlsx
+
+            self.actor_db = _read_actor_db_xlsx(db_path)
             self.actor_db_reverse_index = None
         except Exception as e:
             signal.show_traceback_log(f"[演员数据库] 重载失败，保留当前缓存: {e}")

@@ -639,7 +639,6 @@ class Scraper:
                                 f"  ⚠️ [TMDB] 缺少 aiohttp 库，读取模式下无法通过 API 补充 {len(still_missing)} 个演员的 tmdbid"
                             )
                             res.actor_tmdb_ids = existing_tmdb_ids
-                            resources.reload_actor_db()
                         else:
                             async with aiohttp.ClientSession() as client:
                                 protocol = "https://"
@@ -709,8 +708,6 @@ class Scraper:
                                         LogBuffer.log().write(f"  ❌ [TMDB] {actor_name} 查询失败: {e}")
 
                     res.actor_tmdb_ids = existing_tmdb_ids
-                    # 重新加载演员数据库以反映更新
-                    resources.reload_actor_db()
 
         # 刮削json_data
         # 获取已刮削的json_data
