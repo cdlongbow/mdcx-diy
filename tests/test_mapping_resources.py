@@ -58,7 +58,9 @@ def test_reload_actor_db_reads_shared_actor_xlsx_schema(monkeypatch, tmp_path):
     wb = Workbook()
     ws = wb.active
     ws.append(["日文原名", "中文名", "繁体名", "别名", "链接", "tmdbid", "tmdb url"])
-    ws.append(["葵つかさ", "葵司", "葵司", "Aoi", "https://example.com/aoi", 9988, "https://www.themoviedb.org/person/9988"])
+    ws.append(
+        ["葵つかさ", "葵司", "葵司", "Aoi", "https://example.com/aoi", 9988, "https://www.themoviedb.org/person/9988"]
+    )
     wb.save(db_path)
     wb.close()
 
