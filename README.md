@@ -37,11 +37,13 @@ uv run python main.py
 uv run check
 ```
 
+首次运行时会自动安装本地 `pre-push` 钩子。之后每次执行 `git push`，都会先自动运行自检，通过后再继续推送。
+
 这条命令会依次执行：
 
 - `ruff format --check`
 - `ruff check`
-- `python3 -m pytest tests/test_tmdb_actor.py tests/test_mapping_resources.py`
+- `python -m pytest tests/test_tmdb_actor.py tests/test_mapping_resources.py`
 
 ### 核心特色
 
