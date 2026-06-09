@@ -37,6 +37,7 @@ gen_enums = "mdcx.cmd.gen_enums:main"
 build = "scripts.build:main"
 bump = "scripts.bump:app"
 changelog = "scripts.changelog:app"
+check = "scripts.check:main"
 
 [dependency-groups]
 dev = [

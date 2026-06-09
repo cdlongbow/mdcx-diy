@@ -31,6 +31,18 @@ uv sync --dev
 uv run python main.py
 ```
 
+### 推送前自检
+
+```bash
+uv run check
+```
+
+这条命令会依次执行：
+
+- `ruff format --check`
+- `ruff check`
+- `python3 -m pytest tests/test_tmdb_actor.py tests/test_mapping_resources.py`
+
 ### 核心特色
 
 - 🌐 **40+ 网站刮削支持** - 覆盖有码、无码、FC2、国产、欧美等各类内容
