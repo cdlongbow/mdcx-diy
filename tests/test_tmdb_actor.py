@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import pytest
-from openpyxl import load_workbook
+from openpyxl import Workbook, load_workbook
 
 from mdcx.core import tmdb_actor
 from mdcx.models.log_buffer import LogBuffer
@@ -195,6 +195,46 @@ async def test_update_actor_db_row_writes_tmdbid_and_tmdb_url(_tmp_actor_db: Pat
     assert ws.title == "演员数据库"
     assert ws.freeze_panes == "A2"
     assert ws.auto_filter.ref == "A1:G2"
+    wb.close()
+
+
+def test_load_actor_db_derives_tmdb_url_from_tmdbid(_tmp_actor_db: Path):
+    wb = Workbook()
+    ws = wb.active
+    ws.append(tmdb_actor.DB_HEADERS)
+    ws.append(
+        ["错位演员", "", "", "", "", 6233846, "https://www.themoviedb.org/person/6215799"]
+    )
+    wb.save(_tmp_actor_db)
+    wb.close()
+
+    actor_db = tmdb_actor._read_actor_db_xlsx(_tmp_actor_db)
+
+    assert actor_db["错位演员"]["tmdbid"] == 6233846
+    assert actor_db["错位演员"]["tmdb_url"] == "https://www.themoviedb.org/person/6233846"
+
+
+@pytest.mark.asyncio
+async def test_update_actor_db_row_repairs_mismatched_tmdb_url(_tmp_actor_db: Path):
+    wb = Workbook()
+    ws = wb.active
+    ws.append(tmdb_actor.DB_HEADERS)
+    ws.append(
+        ["错位演员", "", "", "", "", 6233846, "https://www.themoviedb.org/person/6215799"]
+    )
+    ws.cell(row=2, column=7).hyperlink = "https://www.themoviedb.org/person/6215799"
+    wb.save(_tmp_actor_db)
+    wb.close()
+
+    status = await tmdb_actor.update_actor_db_row(jp="错位演员", tmdbid=6233846)
+
+    assert status == "kept_existing_tmdbid"
+
+    wb = load_workbook(_tmp_actor_db)
+    ws = wb.active
+    assert ws.cell(row=2, column=6).value == 6233846
+    assert ws.cell(row=2, column=7).value == "https://www.themoviedb.org/person/6233846"
+    assert ws.cell(row=2, column=7).hyperlink.target == "https://www.themoviedb.org/person/6233846"
     wb.close()
 
 

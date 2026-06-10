@@ -201,6 +201,10 @@ COL_TMDB_URL = 6
 DB_HEADERS = ["日文原名", "中文名", "繁体名", "别名", "链接", "tmdbid", "tmdb url"]
 
 
+def _tmdb_person_url(tmdbid: int | str) -> str:
+    return f"https://www.themoviedb.org/person/{tmdbid}"
+
+
 _ACTOR_NAME_VARIANT_MAP = str.maketrans(
     {
         "亜": "亚",
@@ -282,7 +286,14 @@ def _format_db_worksheet(ws) -> None:
                 if existing_target != href_val:
                     href_cell.hyperlink = href_val
                     href_cell.style = "Hyperlink"
-            tmdb_val = str(tmdb_cell.value or "").strip()
+            tmdbid_val = str(row[COL_TMDBID].value or "").strip()
+            if tmdbid_val.isdigit():
+                expected_tmdb_val = _tmdb_person_url(tmdbid_val)
+                if str(tmdb_cell.value or "").strip() != expected_tmdb_val:
+                    tmdb_cell.value = expected_tmdb_val
+                tmdb_val = expected_tmdb_val
+            else:
+                tmdb_val = str(tmdb_cell.value or "").strip()
             if tmdb_val and tmdb_val.startswith("http"):
                 existing_target = tmdb_cell.hyperlink.target if tmdb_cell.hyperlink else None
                 if existing_target != tmdb_val:
@@ -375,13 +386,16 @@ def _read_actor_db_xlsx(db_path: Path) -> dict[str, dict]:
         tmdbid_raw = str(row[COL_TMDBID] or "").strip() if len(row) > COL_TMDBID else ""
         if tmdbid_raw and tmdbid_raw.isdigit():
             tmdbid_val = int(tmdbid_raw)
+        tmdb_url = str(row[COL_TMDB_URL] or "").strip() if len(row) > COL_TMDB_URL else ""
+        if tmdbid_val is not None:
+            tmdb_url = _tmdb_person_url(tmdbid_val)
         db[jp] = {
             "zh_cn": str(row[COL_ZH_CN] or "").strip() if len(row) > COL_ZH_CN else "",
             "zh_tw": str(row[COL_ZH_TW] or "").strip() if len(row) > COL_ZH_TW else "",
             "keyword": str(row[COL_KEYWORD] or "").strip() if len(row) > COL_KEYWORD else "",
             "href": str(row[COL_HREF] or "").strip() if len(row) > COL_HREF else "",
             "tmdbid": tmdbid_val,
-            "tmdb_url": str(row[COL_TMDB_URL] or "").strip() if len(row) > COL_TMDB_URL else "",
+            "tmdb_url": tmdb_url,
         }
     wb.close()
     return db
@@ -484,15 +498,10 @@ async def update_actor_db_row(
             if tmdbid is not None and not ws.cell(row=existing_row, column=COL_TMDBID + 1).value:
                 ws.cell(row=existing_row, column=COL_TMDBID + 1, value=tmdbid)
                 write_status = "inserted_tmdbid"
+                tmdb_url = _tmdb_person_url(tmdbid)
                 ws.cell(row=existing_row, column=COL_TMDB_URL + 1).value = None
-                ws.cell(
-                    row=existing_row,
-                    column=COL_TMDB_URL + 1,
-                    value=f"https://www.themoviedb.org/person/{tmdbid}",
-                )
-                ws.cell(
-                    row=existing_row, column=COL_TMDB_URL + 1
-                ).hyperlink = f"https://www.themoviedb.org/person/{tmdbid}"
+                ws.cell(row=existing_row, column=COL_TMDB_URL + 1, value=tmdb_url)
+                ws.cell(row=existing_row, column=COL_TMDB_URL + 1).hyperlink = tmdb_url
             elif tmdbid is not None and write_status == "unchanged":
                 write_status = "kept_existing_tmdbid"
         else:
@@ -500,13 +509,10 @@ async def update_actor_db_row(
             write_status = "inserted_new_row"
             last_row = ws.max_row
             if tmdbid:
+                tmdb_url = _tmdb_person_url(tmdbid)
                 ws.cell(row=last_row, column=COL_TMDB_URL + 1).value = None
-                ws.cell(
-                    row=last_row,
-                    column=COL_TMDB_URL + 1,
-                    value=f"https://www.themoviedb.org/person/{tmdbid}",
-                )
-                ws.cell(row=last_row, column=COL_TMDB_URL + 1).hyperlink = f"https://www.themoviedb.org/person/{tmdbid}"
+                ws.cell(row=last_row, column=COL_TMDB_URL + 1, value=tmdb_url)
+                ws.cell(row=last_row, column=COL_TMDB_URL + 1).hyperlink = tmdb_url
 
         _format_db_worksheet(ws)
 
@@ -624,15 +630,10 @@ async def migrate_xml_to_xlsx() -> bool:
                     ws.append([jp, zh_cn, zh_tw, keyword, href, tmdbid or "", ""])
                     if tmdbid:
                         last_row = ws.max_row
+                        tmdb_url = _tmdb_person_url(tmdbid)
                         ws.cell(row=last_row, column=COL_TMDB_URL + 1).value = None
-                        ws.cell(
-                            row=last_row,
-                            column=COL_TMDB_URL + 1,
-                            value=f"https://www.themoviedb.org/person/{tmdbid}",
-                        )
-                        ws.cell(
-                            row=last_row, column=COL_TMDB_URL + 1
-                        ).hyperlink = f"https://www.themoviedb.org/person/{tmdbid}"
+                        ws.cell(row=last_row, column=COL_TMDB_URL + 1, value=tmdb_url)
+                        ws.cell(row=last_row, column=COL_TMDB_URL + 1).hyperlink = tmdb_url
 
                 _format_db_worksheet(ws)
                 wb.save(db_path)
