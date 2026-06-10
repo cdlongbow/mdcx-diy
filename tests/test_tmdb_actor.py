@@ -334,9 +334,7 @@ async def test_update_actor_db_row_overwrite_names_overwrites_existing_zh_cn_zh_
 async def test_update_actor_db_row_default_preserves_existing_zh_cn_zh_tw(_tmp_actor_db: Path):
     await tmdb_actor.update_actor_db_row(jp="波多野結衣", zh_cn="波多野结衣", zh_tw="波多野結衣", tmdbid=111)
 
-    status = await tmdb_actor.update_actor_db_row(
-        jp="波多野結衣", zh_cn="新译名", zh_tw="新繁體名", tmdbid=111
-    )
+    status = await tmdb_actor.update_actor_db_row(jp="波多野結衣", zh_cn="新译名", zh_tw="新繁體名", tmdbid=111)
 
     assert status in ("unchanged", "kept_existing_tmdbid")
 
@@ -385,17 +383,16 @@ async def test_update_actor_db_row_overwrite_skips_empty_new_values(_tmp_actor_d
 async def test_fetch_actor_tmdb_ids_supplements_translation_for_cached_actor(
     monkeypatch: pytest.MonkeyPatch, _tmp_actor_db: Path
 ):
-    from mdcx.models.log_buffer import LogBuffer
-
     await tmdb_actor.update_actor_db_row(jp="三上悠亜", zh_cn="", zh_tw="", tmdbid=12345)
-    tmdb_actor.resources.actor_db = {"三上悠亜": {"zh_cn": "", "zh_tw": "", "keyword": "", "href": "", "tmdbid": 12345, "tmdb_url": ""}}
+    tmdb_actor.resources.actor_db = {
+        "三上悠亜": {"zh_cn": "", "zh_tw": "", "keyword": "", "href": "", "tmdbid": 12345, "tmdb_url": ""}
+    }
     tmdb_actor.resources.actor_db_reverse_index = None
 
     monkeypatch.setattr(tmdb_actor.manager.config, "tmdb_api_key", "fake-key")
     monkeypatch.setattr(tmdb_actor.manager.config, "tmdb_api_base", "api.tmdb.org")
 
     async def _stub_tmdb_request(client, method, url, **kwargs):
-        params = kwargs.get("params") or {}
         if "/translations" in url:
             return tmdb_actor._TmdbResponse(
                 200,
@@ -420,14 +417,11 @@ async def test_fetch_actor_tmdb_ids_supplements_translation_for_cached_actor(
 
 
 @pytest.mark.asyncio
-async def test_fetch_actor_tmdb_ids_zhconv_fallback_for_new_actor(
-    monkeypatch: pytest.MonkeyPatch, _tmp_actor_db: Path
-):
+async def test_fetch_actor_tmdb_ids_zhconv_fallback_for_new_actor(monkeypatch: pytest.MonkeyPatch, _tmp_actor_db: Path):
     monkeypatch.setattr(tmdb_actor.manager.config, "tmdb_api_key", "fake-key")
     monkeypatch.setattr(tmdb_actor.manager.config, "tmdb_api_base", "api.tmdb.org")
 
     async def _stub_tmdb_request(client, method, url, **kwargs):
-        params = kwargs.get("params") or {}
         if "/search/person" in url:
             return tmdb_actor._TmdbResponse(
                 200,
@@ -471,7 +465,14 @@ async def test_fetch_actor_tmdb_ids_skips_translate_when_both_names_present(
 ):
     await tmdb_actor.update_actor_db_row(jp="已完整演员", zh_cn="完整中文名", zh_tw="完整繁體名", tmdbid=55555)
     tmdb_actor.resources.actor_db = {
-        "已完整演员": {"zh_cn": "完整中文名", "zh_tw": "完整繁體名", "keyword": "", "href": "", "tmdbid": 55555, "tmdb_url": ""}
+        "已完整演员": {
+            "zh_cn": "完整中文名",
+            "zh_tw": "完整繁體名",
+            "keyword": "",
+            "href": "",
+            "tmdbid": 55555,
+            "tmdb_url": "",
+        }
     }
     tmdb_actor.resources.actor_db_reverse_index = None
 

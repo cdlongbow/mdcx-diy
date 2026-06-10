@@ -713,8 +713,7 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
                     jp=jp_name, zh_cn=zh_cn, zh_tw=zh_tw, tmdbid=tid, overwrite_names=True
                 )
                 LogBuffer.log().write(
-                    f" 🔄 [TMDB] {actor_name} 翻译补全: zh_cn={zh_cn or '-'} zh_tw={zh_tw or '-'}"
-                    f" ({write_status})"
+                    f" 🔄 [TMDB] {actor_name} 翻译补全: zh_cn={zh_cn or '-'} zh_tw={zh_tw or '-'} ({write_status})"
                 )
         except Exception as e:
             LogBuffer.log().write(f" ⚠️ [TMDB] {actor_name} 翻译补全失败: {e}")
@@ -727,9 +726,7 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
             async with trans_semaphore:
                 await _translate_and_update(actor_name, jp_name, tid)
 
-        trans_tasks = [
-            asyncio.create_task(_limited_translate(a, j, t)) for a, j, t in need_translate
-        ]
+        trans_tasks = [asyncio.create_task(_limited_translate(a, j, t)) for a, j, t in need_translate]
         await asyncio.gather(*trans_tasks)
 
     if not need_query:
