@@ -253,7 +253,8 @@ def _format_db_worksheet(ws) -> None:
 
         # 自动筛选
         last_col = get_column_letter(len(DB_HEADERS))
-        ws.auto_filter.ref = f"A1:{last_col}{ws.max_row}"
+        max_row = ws.max_row if ws.max_row else 1
+        ws.auto_filter.ref = f"A1:{last_col}{max_row}"
 
         # 表头样式
         header_fill = openpyxl.styles.PatternFill("solid", fgColor="F2F2F2")
