@@ -71,6 +71,8 @@ class _DummyConfig:
         self.original_nfo_title = False
         self.use_simple_tag = False
         self.website = ""
+        self.tmdb_api_key = ""
+        self.tmdb_api_base = ""
 
     def get_field_config(self, _field):
         return SimpleNamespace(language=Language.JP, translate=False)

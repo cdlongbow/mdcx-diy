@@ -10,6 +10,8 @@ import time
 from pathlib import Path
 from typing import Any
 
+import zhconv
+
 from ..config.manager import manager
 from ..config.resources import resources
 from ..models.log_buffer import LogBuffer
@@ -409,9 +411,13 @@ async def update_actor_db_row(
     href: str = "",
     tmdbid: int | None = None,
     append_keyword: bool = False,
+    overwrite_names: bool = False,
 ) -> str:
     """
-    更新或添加演员数据库行。已有值不覆盖，仅填空白；keyword 在 append_keyword=True 时追加去重。
+    更新或添加演员数据库行。
+
+    默认已有值不覆盖，仅填空白；keyword 在 append_keyword=True 时追加去重。
+    当 overwrite_names=True 时，zh_cn/zh_tw 允许用新值覆盖已有值（用于已有 tmdbid 演员翻译补全）。
     """
     db_path = _get_db_path()
     db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -445,10 +451,20 @@ async def update_actor_db_row(
                 break
 
         if existing_row:
-            if not ws.cell(row=existing_row, column=COL_ZH_CN + 1).value and zh_cn:
-                ws.cell(row=existing_row, column=COL_ZH_CN + 1, value=zh_cn)
-            if not ws.cell(row=existing_row, column=COL_ZH_TW + 1).value and zh_tw:
-                ws.cell(row=existing_row, column=COL_ZH_TW + 1, value=zh_tw)
+            existing_zh_cn = ws.cell(row=existing_row, column=COL_ZH_CN + 1).value
+            existing_zh_tw = ws.cell(row=existing_row, column=COL_ZH_TW + 1).value
+            if overwrite_names:
+                if zh_cn and str(existing_zh_cn or "").strip() != zh_cn:
+                    ws.cell(row=existing_row, column=COL_ZH_CN + 1, value=zh_cn)
+                    write_status = "updated_zh_cn"
+                if zh_tw and str(existing_zh_tw or "").strip() != zh_tw:
+                    ws.cell(row=existing_row, column=COL_ZH_TW + 1, value=zh_tw)
+                    write_status = "updated_zh_cn_zh_tw" if write_status == "updated_zh_cn" else "updated_zh_tw"
+            else:
+                if not existing_zh_cn and zh_cn:
+                    ws.cell(row=existing_row, column=COL_ZH_CN + 1, value=zh_cn)
+                if not existing_zh_tw and zh_tw:
+                    ws.cell(row=existing_row, column=COL_ZH_TW + 1, value=zh_tw)
 
             if keyword:
                 existing_kw = str(ws.cell(row=existing_row, column=COL_KEYWORD + 1).value or "").strip()
@@ -476,7 +492,7 @@ async def update_actor_db_row(
                 ws.cell(
                     row=existing_row, column=COL_TMDB_URL + 1
                 ).hyperlink = f"https://www.themoviedb.org/person/{tmdbid}"
-            elif tmdbid is not None:
+            elif tmdbid is not None and write_status == "unchanged":
                 write_status = "kept_existing_tmdbid"
         else:
             ws.append([jp, zh_cn, zh_tw, keyword, href, tmdbid or "", ""])
@@ -658,6 +674,8 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
     result: dict[str, int] = {}
     need_query: list[tuple[str, str]] = []
 
+    need_translate: list[tuple[str, str, int]] = []
+
     for actor in actors:
         if not actor or not actor.strip():
             continue
@@ -665,15 +683,53 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
         row = None
         if actor_stripped in actor_db and actor_db[actor_stripped].get("tmdbid"):
             result[actor_stripped] = actor_db[actor_stripped]["tmdbid"]
+            row_data = actor_db[actor_stripped]
+            if not row_data.get("zh_cn") or not row_data.get("zh_tw"):
+                need_translate.append((actor_stripped, actor_stripped, row_data["tmdbid"]))
             continue
 
         row = search_actor_db_reverse(actor_stripped)
         if row and row.get("tmdbid"):
             result[actor_stripped] = row["tmdbid"]
-            LogBuffer.log().write(f"  ℹ️ [TMDB] {actor_stripped} -> tmdbid={row['tmdbid']} (xlsx反查缓存)")
+            LogBuffer.log().write(f" ℹ️ [TMDB] {actor_stripped} -> tmdbid={row['tmdbid']} (xlsx反查缓存)")
+            if not row.get("zh_cn") or not row.get("zh_tw"):
+                need_translate.append((actor_stripped, row.get("jp", actor_stripped), row["tmdbid"]))
             continue
 
         need_query.append((actor_stripped, row.get("jp") if row and row.get("jp") else actor_stripped))
+
+    async def _translate_and_update(actor_name: str, jp_name: str, tid: int) -> None:
+        try:
+            translations = await _fetch_person_translations(tid, base_url, tmdb_api_key, client)
+            zh_cn = translations.get("zh_cn", "")
+            zh_tw = translations.get("zh_tw", "")
+            if not zh_cn and zh_tw:
+                zh_cn = zhconv.convert(zh_tw, "zh-cn")
+            if not zh_tw and zh_cn:
+                zh_tw = zhconv.convert(zh_cn, "zh-hant")
+            if zh_cn or zh_tw:
+                write_status = await update_actor_db_row(
+                    jp=jp_name, zh_cn=zh_cn, zh_tw=zh_tw, tmdbid=tid, overwrite_names=True
+                )
+                LogBuffer.log().write(
+                    f" 🔄 [TMDB] {actor_name} 翻译补全: zh_cn={zh_cn or '-'} zh_tw={zh_tw or '-'}"
+                    f" ({write_status})"
+                )
+        except Exception as e:
+            LogBuffer.log().write(f" ⚠️ [TMDB] {actor_name} 翻译补全失败: {e}")
+
+    if need_translate:
+        LogBuffer.log().write(f"\n 🔄 [TMDB] 补全 {len(need_translate)} 个已有 tmdbid 演员的翻译")
+        trans_semaphore = asyncio.Semaphore(3)
+
+        async def _limited_translate(actor_name: str, jp_name: str, tid: int) -> None:
+            async with trans_semaphore:
+                await _translate_and_update(actor_name, jp_name, tid)
+
+        trans_tasks = [
+            asyncio.create_task(_limited_translate(a, j, t)) for a, j, t in need_translate
+        ]
+        await asyncio.gather(*trans_tasks)
 
     if not need_query:
         return result
@@ -690,6 +746,10 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
                 translations = query_result.get("translations", {})
                 zh_cn = translations.get("zh_cn", "")
                 zh_tw = translations.get("zh_tw", "")
+                if not zh_cn and zh_tw:
+                    zh_cn = zhconv.convert(zh_tw, "zh-cn")
+                if not zh_tw and zh_cn:
+                    zh_tw = zhconv.convert(zh_cn, "zh-hant")
                 aka = query_result.get("also_known_as", [])
                 keyword_str = ",".join(aka) if aka else ""
 

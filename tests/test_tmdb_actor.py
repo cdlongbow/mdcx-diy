@@ -310,3 +310,184 @@ def test_format_db_worksheet_logs_failure_for_invalid_worksheet():
     tmdb_actor._format_db_worksheet(object())
 
     assert "[演员数据库] 工作表格式化失败:" in LogBuffer.log().get()
+
+
+@pytest.mark.asyncio
+async def test_update_actor_db_row_overwrite_names_overwrites_existing_zh_cn_zh_tw(_tmp_actor_db: Path):
+    await tmdb_actor.update_actor_db_row(jp="波多野結衣", zh_cn="波多野结衣", zh_tw="波多野結衣", tmdbid=111)
+
+    status = await tmdb_actor.update_actor_db_row(
+        jp="波多野結衣", zh_cn="新译名", zh_tw="新繁體名", tmdbid=111, overwrite_names=True
+    )
+
+    assert status in ("updated_zh_cn", "updated_zh_tw", "updated_zh_cn_zh_tw")
+
+    wb = load_workbook(_tmp_actor_db)
+    ws = wb.active
+    assert ws.cell(row=2, column=2).value == "新译名"
+    assert ws.cell(row=2, column=3).value == "新繁體名"
+    assert ws.cell(row=2, column=6).value == 111
+    wb.close()
+
+
+@pytest.mark.asyncio
+async def test_update_actor_db_row_default_preserves_existing_zh_cn_zh_tw(_tmp_actor_db: Path):
+    await tmdb_actor.update_actor_db_row(jp="波多野結衣", zh_cn="波多野结衣", zh_tw="波多野結衣", tmdbid=111)
+
+    status = await tmdb_actor.update_actor_db_row(
+        jp="波多野結衣", zh_cn="新译名", zh_tw="新繁體名", tmdbid=111
+    )
+
+    assert status in ("unchanged", "kept_existing_tmdbid")
+
+    wb = load_workbook(_tmp_actor_db)
+    ws = wb.active
+    assert ws.cell(row=2, column=2).value == "波多野结衣"
+    assert ws.cell(row=2, column=3).value == "波多野結衣"
+    wb.close()
+
+
+@pytest.mark.asyncio
+async def test_update_actor_db_row_overwrite_fills_blank_fields(_tmp_actor_db: Path):
+    await tmdb_actor.update_actor_db_row(jp="未知演员", zh_cn="", zh_tw="", tmdbid=222)
+
+    status = await tmdb_actor.update_actor_db_row(
+        jp="未知演员", zh_cn="新中文名", zh_tw="新繁體名", tmdbid=222, overwrite_names=True
+    )
+
+    assert status in ("updated_zh_cn", "updated_zh_tw", "updated_zh_cn_zh_tw")
+
+    wb = load_workbook(_tmp_actor_db)
+    ws = wb.active
+    assert ws.cell(row=2, column=2).value == "新中文名"
+    assert ws.cell(row=2, column=3).value == "新繁體名"
+    wb.close()
+
+
+@pytest.mark.asyncio
+async def test_update_actor_db_row_overwrite_skips_empty_new_values(_tmp_actor_db: Path):
+    await tmdb_actor.update_actor_db_row(jp="有名字的演员", zh_cn="原名", zh_tw="原名繁體", tmdbid=333)
+
+    status = await tmdb_actor.update_actor_db_row(
+        jp="有名字的演员", zh_cn="", zh_tw="", tmdbid=333, overwrite_names=True
+    )
+
+    assert status in ("unchanged", "kept_existing_tmdbid")
+
+    wb = load_workbook(_tmp_actor_db)
+    ws = wb.active
+    assert ws.cell(row=2, column=2).value == "原名"
+    assert ws.cell(row=2, column=3).value == "原名繁體"
+    wb.close()
+
+
+@pytest.mark.asyncio
+async def test_fetch_actor_tmdb_ids_supplements_translation_for_cached_actor(
+    monkeypatch: pytest.MonkeyPatch, _tmp_actor_db: Path
+):
+    from mdcx.models.log_buffer import LogBuffer
+
+    await tmdb_actor.update_actor_db_row(jp="三上悠亜", zh_cn="", zh_tw="", tmdbid=12345)
+    tmdb_actor.resources.actor_db = {"三上悠亜": {"zh_cn": "", "zh_tw": "", "keyword": "", "href": "", "tmdbid": 12345, "tmdb_url": ""}}
+    tmdb_actor.resources.actor_db_reverse_index = None
+
+    monkeypatch.setattr(tmdb_actor.manager.config, "tmdb_api_key", "fake-key")
+    monkeypatch.setattr(tmdb_actor.manager.config, "tmdb_api_base", "api.tmdb.org")
+
+    async def _stub_tmdb_request(client, method, url, **kwargs):
+        params = kwargs.get("params") or {}
+        if "/translations" in url:
+            return tmdb_actor._TmdbResponse(
+                200,
+                '{"translations":[{"iso_639_1":"zh","iso_3166_1":"CN","english_name":"Mikami Yua","data":{"name":"三上悠亚"}},{"iso_639_1":"zh","iso_3166_1":"TW","english_name":"Mikami Yua","data":{"name":"三上悠亞"}}]}',
+            )
+        return None
+
+    monkeypatch.setattr(tmdb_actor, "_tmdb_request", _stub_tmdb_request)
+
+    result = await tmdb_actor.fetch_actor_tmdb_ids(["三上悠亜"], object())
+
+    assert result == {"三上悠亜": 12345}
+
+    wb = load_workbook(_tmp_actor_db)
+    ws = wb.active
+    for row in ws.iter_rows(min_row=2, values_only=True):
+        if str(row[0] or "").strip() == "三上悠亜":
+            assert row[1] == "三上悠亚"
+            assert row[2] == "三上悠亞"
+            break
+    wb.close()
+
+
+@pytest.mark.asyncio
+async def test_fetch_actor_tmdb_ids_zhconv_fallback_for_new_actor(
+    monkeypatch: pytest.MonkeyPatch, _tmp_actor_db: Path
+):
+    monkeypatch.setattr(tmdb_actor.manager.config, "tmdb_api_key", "fake-key")
+    monkeypatch.setattr(tmdb_actor.manager.config, "tmdb_api_base", "api.tmdb.org")
+
+    async def _stub_tmdb_request(client, method, url, **kwargs):
+        params = kwargs.get("params") or {}
+        if "/search/person" in url:
+            return tmdb_actor._TmdbResponse(
+                200,
+                '{"results":[{"id":99999,"name":"NewActor","original_name":"NewActor","gender":1,"adult":true,"popularity":1.0}]}',
+            )
+        if "/person/99999" in url and "/translations" not in url:
+            return tmdb_actor._TmdbResponse(
+                200,
+                '{"id":99999,"name":"NewActor","original_name":"NewActor","gender":1,"place_of_birth":"Tokyo, Japan","also_known_as":["新俳優"]}',
+            )
+        if "/person/99999/translations" in url:
+            return tmdb_actor._TmdbResponse(
+                200,
+                '{"translations":[{"iso_639_1":"zh","iso_3166_1":"CN","english_name":"","data":{"name":"新演员简体"}}]}',
+            )
+        return None
+
+    monkeypatch.setattr(tmdb_actor, "_tmdb_request", _stub_tmdb_request)
+    monkeypatch.setattr(tmdb_actor.manager.config, "show_data_log", False)
+
+    result = await tmdb_actor.fetch_actor_tmdb_ids(["NewActor"], object())
+
+    assert result == {"NewActor": 99999}
+
+    wb = load_workbook(_tmp_actor_db)
+    ws = wb.active
+    found = False
+    for row in ws.iter_rows(min_row=2, values_only=True):
+        if str(row[0] or "").strip() == "NewActor":
+            assert row[1] == "新演员简体"
+            assert row[2] == "新演員簡體"
+            found = True
+            break
+    assert found, "NewActor row not found in xlsx"
+    wb.close()
+
+
+@pytest.mark.asyncio
+async def test_fetch_actor_tmdb_ids_skips_translate_when_both_names_present(
+    monkeypatch: pytest.MonkeyPatch, _tmp_actor_db: Path
+):
+    await tmdb_actor.update_actor_db_row(jp="已完整演员", zh_cn="完整中文名", zh_tw="完整繁體名", tmdbid=55555)
+    tmdb_actor.resources.actor_db = {
+        "已完整演员": {"zh_cn": "完整中文名", "zh_tw": "完整繁體名", "keyword": "", "href": "", "tmdbid": 55555, "tmdb_url": ""}
+    }
+    tmdb_actor.resources.actor_db_reverse_index = None
+
+    monkeypatch.setattr(tmdb_actor.manager.config, "tmdb_api_key", "fake-key")
+    monkeypatch.setattr(tmdb_actor.manager.config, "tmdb_api_base", "api.tmdb.org")
+
+    call_count = {"translations": 0}
+
+    async def _stub_tmdb_request(client, method, url, **kwargs):
+        if "/translations" in url:
+            call_count["translations"] += 1
+        return None
+
+    monkeypatch.setattr(tmdb_actor, "_tmdb_request", _stub_tmdb_request)
+
+    result = await tmdb_actor.fetch_actor_tmdb_ids(["已完整演员"], object())
+
+    assert result == {"已完整演员": 55555}
+    assert call_count["translations"] == 0
