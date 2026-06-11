@@ -377,7 +377,7 @@ class Scraper:
         if manager.config.scrape_like == "single" and file_mode != FileMode.Single and manager.config.main_mode != 4:
             LogBuffer.log().write(
                 f"\n 😸 [Note] You specified 「 {website_single} 」, some videos may not have results! "
-        )
+            )
 
         # 获取刮削数据
         json_data = None
@@ -505,21 +505,21 @@ class Scraper:
                         if Flags.scrape_starting > count:
                             time_note = f" 🏖 当前还存在 {Flags.scrape_starting - count} 个已经在刮削的任务，等待这些任务结束将进入休息状态...\n"
                             signal.show_log_text(time_note)
-                        await Flags.sleep_end.wait() # 等待休眠结束
+                        await Flags.sleep_end.wait()  # 等待休眠结束
                     elif Flags.sleep_end.is_set() and count < count_all:
-                        Flags.sleep_end.clear() # 开始休眠
-                        Flags.rest_next_begin_time = time.time() # 下一轮倒计时开始时间
+                        Flags.sleep_end.clear()  # 开始休眠
+                        Flags.rest_next_begin_time = time.time()  # 下一轮倒计时开始时间
                         time_note = f'\n ⏸ 休息 {Flags.rest_time_convert} 秒，将在 <font color="red">{get_real_time(Flags.rest_next_begin_time + Flags.rest_time_convert)}</font> 继续刮削剩余的 {count_all - count} 个任务...\n'
                         signal.show_log_text(time_note)
                         while (
                             Switch.REST_SCRAPE in manager.config.switch_on
                             and time.time() - Flags.rest_next_begin_time < Flags.rest_time_convert
                         ):
-                            if Flags.scrape_starting > count: # 如果突然调大了文件数量，这时跳出休眠
+                            if Flags.scrape_starting > count:  # 如果突然调大了文件数量，这时跳出休眠
                                 break
                             await asyncio.sleep(1)
                         Flags.rest_now_begin_count = count
-                        Flags.sleep_end.set() # 休眠结束，下一轮开始
+                        Flags.sleep_end.set()  # 休眠结束，下一轮开始
                         Flags.next_start_time = time.time() - manager.config.thread_time
                     else:
                         await Flags.sleep_end.wait()

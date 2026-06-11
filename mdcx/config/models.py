@@ -152,17 +152,19 @@ def default_field_config(language: Language = Language.UNDEFINED, translate: boo
     return FieldConfig(site_prority=list(DEFAULT_FIELD_SITE_PRIORITY), language=language, translate=translate)
 
 
-SENSITIVE_FIELDS = frozenset({
-    "baidu_key",
-    "deepl_key",
-    "llm_key",
-    "api_key",
-    "theporndb_api_token",
-    "tmdb_api_key",
-    "javdb",
-    "fc2ppvdb",
-    "javbus",
-})
+SENSITIVE_FIELDS = frozenset(
+    {
+        "baidu_key",
+        "deepl_key",
+        "llm_key",
+        "api_key",
+        "theporndb_api_token",
+        "tmdb_api_key",
+        "javdb",
+        "fc2ppvdb",
+        "javbus",
+    }
+)
 
 
 class Config(BaseModel):
