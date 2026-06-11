@@ -623,9 +623,11 @@ def save_config(self: "MyMAinWindow"):
     manager.config.timeout = self.Ui.horizontalSlider_timeout.value()  # 超时时间
     manager.config.retry = self.Ui.horizontalSlider_retry.value()  # 重试次数
 
-    site = self.Ui.comboBox_custom_website.currentText()
-    if site in Website and site != Website.AIRAV.value:
-        site = Website(site)
+    site_text = self.Ui.comboBox_custom_website.currentText()
+    with suppress(ValueError):
+        site = Website(site_text)
+        if site == Website.AIRAV:
+            site = Website.AIRAV_CC
         url = self.Ui.lineEdit_site_custom_url.text().strip("/ ")
         if url:
             with suppress(ValidationError):

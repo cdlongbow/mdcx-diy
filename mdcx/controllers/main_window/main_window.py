@@ -612,7 +612,9 @@ class MyMAinWindow(QMainWindow):
         if a1.type() == QEvent.Type.MouseButtonRelease:  # 松开鼠标，检查是否在前台
             self.recover_windowflags()
         if a1.type() == QEvent.Type.ApplicationActivate and not self.isVisible():
+            self._user_initiated_close = True
             self.show()
+            self._user_initiated_close = False
         if a0.objectName() == "label_poster" or a0.objectName() == "label_thumb":
             if a1.type() == QEvent.Type.MouseButtonPress:
                 a1 = cast("QMouseEvent", a1)
@@ -2981,8 +2983,15 @@ class MyMAinWindow(QMainWindow):
 
     # 设置-保存
     def pushButton_save_config_clicked(self):
-        self.save_config()
-        self.load_config()  # 确保界面显示和实际配置一致
+        try:
+            self.save_config()
+            self.load_config()  # 确保界面显示和实际配置一致
+        except Exception:
+            error = traceback.format_exc()
+            signal_qt.show_traceback_log(error)
+            self.tray_icon_show()
+            QMessageBox.critical(self, "保存配置失败", f"配置保存失败，软件已保持运行。\n\n{error}")
+            return
         signal_qt.show_scrape_info(f"💡 配置已保存！{get_current_time()}")
 
     # 设置-另存为

@@ -1,5 +1,6 @@
 import threading
 import time
+from contextlib import suppress
 from typing import Literal
 
 from PyQt6.QtCore import QObject, pyqtSignal
@@ -51,7 +52,8 @@ class Signals(QObject):
         return text
 
     def show_traceback_log(self, text):
-        print(text)
+        with suppress(Exception):
+            print(text)
         self.add_log(text)
 
     def show_log_text(self, text):
