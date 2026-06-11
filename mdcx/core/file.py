@@ -821,10 +821,11 @@ async def deal_old_files(
     需要考虑分集带文件名图片是否会有重复水印问题
     """
 
-    # poster_marked True 不加水印，避免二次加水印,；poster_exists 是不是存在本地图片
-    info.poster_marked = True
-    info.thumb_marked = True
-    info.fanart_marked = True
+    # poster_marked / thumb_marked / fanart_marked 初始为 False，
+    # 确保本地已有图片时 add_mark 仍能正常执行加水印流程
+    info.poster_marked = False
+    info.thumb_marked = False
+    info.fanart_marked = False
     poster_exists = True
     thumb_exists = True
     fanart_exists = True
