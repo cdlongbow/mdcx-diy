@@ -73,6 +73,7 @@ class UnexpectedScrapeCancellation(Exception): ...
 class Scraper:
     def __init__(self, crawler_provider: "CrawlerProviderProtocol"):
         self.crawler_provider = crawler_provider
+        self._rest_lock = asyncio.Lock()
 
     async def _run_tasks_with_limit(self, movie_list: list[Path], task_count: int, thread_number: int) -> None:
         task_iter = iter(enumerate(movie_list, 1))
@@ -206,7 +207,7 @@ class Scraper:
         Flags.total_count = task_count
 
         if task_count:
-            Flags.count_claw += 1
+            Flags.count_claw = await Flags.increment("count_claw")
             if manager.config.main_mode == 4:
                 signal.show_log_text(f" 🕷 当前为读取模式，并发数（{thread_number}），线程延时（0）秒...")
             else:
@@ -296,6 +297,12 @@ class Scraper:
             signal.exec_exit_app.emit()
 
     async def process_one_file(self, task: tuple[Path, int, int]) -> None:
+        try:
+            await self._process_one_file_impl(task)
+        finally:
+            LogBuffer.clear_task()
+
+    async def _process_one_file_impl(self, task: tuple[Path, int, int]) -> None:
         # 获取顺序
         file_path, count, count_all = task
         Flags.counting_order += 1
@@ -316,7 +323,7 @@ class Scraper:
             await asyncio.sleep(1)
 
         # 非第一个加延时
-        Flags.scrape_starting += 1
+        Flags.scrape_starting = await Flags.increment("scrape_starting")
         count = Flags.scrape_starting
         thread_time = manager.config.thread_time
         if count == 1 or thread_time == 0 or manager.config.main_mode == 4:
@@ -336,7 +343,7 @@ class Scraper:
                 self._check_stop(show_name)
                 await asyncio.sleep(1)
 
-        Flags.scrape_started += 1
+        Flags.scrape_started = await Flags.increment("scrape_started")
         if count > 1 and thread_time != 0:
             signal.show_log_text(f" 🕷 {get_current_time()} 开始刮削：{Flags.scrape_started}/{count_all} {show_name}")
 
@@ -370,16 +377,17 @@ class Scraper:
         if manager.config.scrape_like == "single" and file_mode != FileMode.Single and manager.config.main_mode != 4:
             LogBuffer.log().write(
                 f"\n 😸 [Note] You specified 「 {website_single} 」, some videos may not have results! "
-            )
+        )
 
         # 获取刮削数据
         json_data = None
         other = None
+        scrape_error: str | None = None
         try:
             json_data, other = await self._process_one_file(file_info, file_mode)
             if json_data and other:
                 if manager.config.main_mode == 4:
-                    number = json_data.number  # 读取模式且存在nfo时，可能会导致movie_number改变，需要更新
+                    number = json_data.number
                 Flags.json_data_dic.update({number: ScrapeResult(file_info, json_data, other)})
                 for status_number in (origin_number, number):
                     if status_number in Flags.json_get_status and Flags.json_get_status[status_number] is None:
@@ -387,12 +395,13 @@ class Scraper:
             elif origin_number in Flags.json_get_status and Flags.json_get_status[origin_number] is None:
                 Flags.json_get_status[origin_number] = False
         except Exception as e:
+            scrape_error = str(e)
             if origin_number in Flags.json_get_status and Flags.json_get_status[origin_number] is None:
                 Flags.json_get_status[origin_number] = False
             self._check_stop(show_name)
             signal.show_traceback_log(traceback.format_exc())
             signal.show_log_text(traceback.format_exc())
-            LogBuffer.error().write("scrape file error: " + str(e))
+            LogBuffer.error().write("scrape file error: " + scrape_error)
             LogBuffer.log().write("\n" + traceback.format_exc())
 
         # 显示刮削数据
@@ -402,7 +411,7 @@ class Scraper:
             if json_data and other:
                 show_data.data = json_data
                 show_data.other = other
-                Flags.succ_count += 1
+                Flags.succ_count = await Flags.increment("succ_count")
                 show_data.show_name = (
                     str(Flags.count_claw)
                     + "-"
@@ -414,7 +423,7 @@ class Scraper:
                 )
                 signal.show_list_name("succ", show_data, number)
             else:
-                Flags.fail_count += 1
+                Flags.fail_count = await Flags.increment("fail_count")
                 show_data.show_name = (
                     str(Flags.count_claw)
                     + "-"
@@ -425,16 +434,16 @@ class Scraper:
                     + file_info.definition
                 )
                 signal.show_list_name("fail", show_data, number)
-                if e := LogBuffer.error().get():
-                    LogBuffer.log().write(f"\n 🔴 [Failed] Reason: {e}")
-                    if "WinError 5" in e:
-                        LogBuffer.log().write(
-                            "\n 🔴 该问题为权限问题：请尝试以管理员身份运行，同时关闭其他正在运行的Python脚本！"
-                        )
+                error_msg = LogBuffer.error().get() or scrape_error or "未知错误"
+                LogBuffer.log().write(f"\n 🔴 [Failed] Reason: {error_msg}")
+                if "WinError 5" in error_msg:
+                    LogBuffer.log().write(
+                        "\n 🔴 该问题为权限问题：请尝试以管理员身份运行，同时关闭其他正在运行的Python脚本！"
+                    )
                 failed_folder = get_movie_path_setting(file_path).failed_folder
                 fail_file_path = await move_file_to_failed_folder(failed_folder, file_path, folder_old_path)
-                Flags.failed_list.append((fail_file_path, LogBuffer.error().get()))
-                await self._failed_file_info_show(str(Flags.fail_count), fail_file_path, LogBuffer.error().get())
+                Flags.failed_list.append((fail_file_path, error_msg))
+                await self._failed_file_info_show(str(Flags.fail_count), fail_file_path, error_msg)
                 signal.view_failed_list_settext.emit(f"失败 {Flags.fail_count}")
         except Exception as e:
             self._check_stop(show_name)
@@ -444,7 +453,7 @@ class Scraper:
 
         # 显示刮削结果
         try:
-            Flags.scrape_done += 1
+            Flags.scrape_done = await Flags.increment("scrape_done")
             count = Flags.scrape_done
             progress_value = count / count_all * 100
             progress_percentage = f"{progress_value:.2f}%"
@@ -480,36 +489,37 @@ class Scraper:
                 Flags.can_save_remain = True
             except Exception as e1:
                 signal.show_log_text(f"remove:  {file_path}\n {str(e1)}\n {traceback.format_exc()}")
-        except Exception as e:
+        except Exception as exc:
             self._check_stop(show_name)
             signal.show_traceback_log(traceback.format_exc())
             signal.show_log_text(traceback.format_exc())
-            signal.show_log_text(str(e))
+            signal.show_log_text(str(exc))
 
         # 处理间歇刮削
         try:
             if manager.config.main_mode != 4 and Switch.REST_SCRAPE in manager.config.switch_on:
-                time_note = f" 🏖 已累计刮削 {count}/{count_all}，已连续刮削 {count - Flags.rest_now_begin_count}/{manager.config.rest_count}..."
-                signal.show_log_text(time_note)
-                if count - Flags.rest_now_begin_count >= manager.config.rest_count:
-                    if Flags.scrape_starting > count:
-                        time_note = f" 🏖 当前还存在 {Flags.scrape_starting - count} 个已经在刮削的任务，等待这些任务结束将进入休息状态...\n"
-                        signal.show_log_text(time_note)
-                        await Flags.sleep_end.wait()  # 等待休眠结束
+                async with self._rest_lock:
+                    time_note = f" 🏖 已累计刮削 {count}/{count_all}，已连续刮削 {count - Flags.rest_now_begin_count}/{manager.config.rest_count}..."
+                    signal.show_log_text(time_note)
+                    if count - Flags.rest_now_begin_count >= manager.config.rest_count:
+                        if Flags.scrape_starting > count:
+                            time_note = f" 🏖 当前还存在 {Flags.scrape_starting - count} 个已经在刮削的任务，等待这些任务结束将进入休息状态...\n"
+                            signal.show_log_text(time_note)
+                        await Flags.sleep_end.wait() # 等待休眠结束
                     elif Flags.sleep_end.is_set() and count < count_all:
-                        Flags.sleep_end.clear()  # 开始休眠
-                        Flags.rest_next_begin_time = time.time()  # 下一轮倒计时开始时间
+                        Flags.sleep_end.clear() # 开始休眠
+                        Flags.rest_next_begin_time = time.time() # 下一轮倒计时开始时间
                         time_note = f'\n ⏸ 休息 {Flags.rest_time_convert} 秒，将在 <font color="red">{get_real_time(Flags.rest_next_begin_time + Flags.rest_time_convert)}</font> 继续刮削剩余的 {count_all - count} 个任务...\n'
                         signal.show_log_text(time_note)
                         while (
                             Switch.REST_SCRAPE in manager.config.switch_on
                             and time.time() - Flags.rest_next_begin_time < Flags.rest_time_convert
                         ):
-                            if Flags.scrape_starting > count:  # 如果突然调大了文件数量，这时跳出休眠
+                            if Flags.scrape_starting > count: # 如果突然调大了文件数量，这时跳出休眠
                                 break
                             await asyncio.sleep(1)
                         Flags.rest_now_begin_count = count
-                        Flags.sleep_end.set()  # 休眠结束，下一轮开始
+                        Flags.sleep_end.set() # 休眠结束，下一轮开始
                         Flags.next_start_time = time.time() - manager.config.thread_time
                     else:
                         await Flags.sleep_end.wait()
@@ -518,8 +528,6 @@ class Scraper:
             signal.show_traceback_log(traceback.format_exc())
             signal.show_log_text(traceback.format_exc())
             signal.show_log_text(str(e))
-
-        LogBuffer.clear_thread()
 
     async def _process_one_file(
         self, file_info: FileInfo, file_mode: FileMode
@@ -720,14 +728,24 @@ class Scraper:
                 Flags.json_get_set.add(movie_number)
                 Flags.json_get_status[movie_number] = None
                 LogBuffer.log().write(f"\n 🟡 [Same Number] 首次刮削，开始共享番号数据：{movie_number}")
-            else:
-                # 同番号任务等待首个任务完成；若首个任务失败，直接结束等待，避免线程卡死
-                LogBuffer.log().write(f"\n 🟡 [Same Number] 等待同番号任务完成：{movie_number}")
-                while Flags.json_get_status.get(movie_number) is None:
-                    await asyncio.sleep(1)
-                if Flags.json_get_status.get(movie_number) is False:
-                    LogBuffer.error().write(f"同番号任务失败，取消等待：{movie_number}")
+        else:
+            # 同番号任务等待首个任务完成；若首个任务失败，直接结束等待，避免线程卡死
+            LogBuffer.log().write(f"\n 🟡 [Same Number] 等待同番号任务完成：{movie_number}")
+            wait_timeout = 300
+            waited = 0
+            while Flags.json_get_status.get(movie_number) is None:
+                if Flags.stop_requested or signal.stop:
+                    LogBuffer.log().write(f"\n 🟡 [Same Number] 检测到停止请求，取消等待：{movie_number}")
                     return None, None
+                if waited >= wait_timeout:
+                    LogBuffer.error().write(f"同番号等待超时（{wait_timeout}秒），取消等待：{movie_number}")
+                    Flags.json_get_status[movie_number] = False
+                    return None, None
+                await asyncio.sleep(1)
+                waited += 1
+            if Flags.json_get_status.get(movie_number) is False:
+                LogBuffer.error().write(f"同番号任务失败，取消等待：{movie_number}")
+                return None, None
 
         pre_data = Flags.json_data_dic.get(movie_number)
         # 已存在该番号数据时直接使用该数据

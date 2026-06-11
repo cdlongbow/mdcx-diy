@@ -1,3 +1,4 @@
+import asyncio
 from asyncio import Event
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -18,8 +19,20 @@ class FileDoneDict(TypedDict):
     local_trailer: Path | None
 
 
+def _new_lock():
+    return asyncio.Lock()
+
+
 @dataclass
 class _Flags:
+    _counter_lock: asyncio.Lock = field(default_factory=_new_lock, repr=False)
+
+    async def increment(self, name: str, value: int = 1) -> int:
+        async with self._counter_lock:
+            current = getattr(self, name, 0) + value
+            setattr(self, name, current)
+            return current
+
     # 指定刮削 #todo 改为传参
     appoint_url: str = ""
     website_name: str = ""
@@ -31,69 +44,58 @@ class _Flags:
     now_kill: int = 0
     success_save_time: float = 0.0
     next_start_time: float = 0.0
-    count_claw: int = 0  # 批量刮削次数
-    can_save_remain: bool = False  # 保存剩余任务
+    count_claw: int = 0
+    can_save_remain: bool = False
     remain_list: list[Path] = field(default_factory=list)
     new_again_dic: dict[Path, tuple[str, str, str]] = field(default_factory=dict)
-    again_dic: dict[Path, tuple[str, str, str]] = field(default_factory=dict)  # 待重新刮削的字典
+    again_dic: dict[Path, tuple[str, str, str]] = field(default_factory=dict)
     start_time: float = 0.0
-    file_mode: FileMode = FileMode.Default  # 默认刮削待刮削目录
-    counting_order: int = 0  # 刮削顺序
-    total_count: int = 0  # 总数
-    rest_now_begin_count: int = 0  # 本轮刮削开始统计的线程序号（实际-1）
-    sleep_end: Event = field(default_factory=Event)  # 本轮休眠标识
-    rest_next_begin_time: float = 0.0  # 下一轮开始时间
-    scrape_starting: int = 0  # 已进入过刮削流程的数量
-    scrape_started: int = 0  # 已进入过刮削流程并开始的数量
-    scrape_done: int = 0  # 已完成刮削数量
-    succ_count: int = 0  # 成功数量
-    fail_count: int = 0  # 失败数量
-    # 所有文件最终输出路径的字典（如已存在，则视为重复文件，直接跳过）
+    file_mode: FileMode = FileMode.Default
+    counting_order: int = 0
+    total_count: int = 0
+    rest_now_begin_count: int = 0
+    sleep_end: Event = field(default_factory=Event)
+    rest_next_begin_time: float = 0.0
+    scrape_starting: int = 0
+    scrape_started: int = 0
+    scrape_done: int = 0
+    succ_count: int = 0
+    fail_count: int = 0
     file_new_path_dic: dict[Path, list[Path]] = field(default_factory=dict)
-    # 当前文件的图片最终输出路径的字典（如已存在，则最终图片文件视为已处理过）
     pic_catch_set: set[Path] = field(default_factory=set)
-    # 当前番号的图片已下载完成的标识（如已存在，视为图片已下载完成）
     file_done_dic: dict[str, FileDoneDict] = field(default_factory=dict)
-    # 当前文件夹剧照已处理的标识（如已存在，视为剧照已处理过）
     extrafanart_deal_set: set[Path] = field(default_factory=set)
-    # 当前文件trailer已处理的标识（如已存在，视为剧照已处理过）
     trailer_deal_set: set[Path] = field(default_factory=set)
-    # 当前文件夹剧照已下载的标识（如已存在，视为剧照已处理过）
     theme_videos_deal_set: set[Path] = field(default_factory=set)
-    # 当前文件nfo已处理的标识（如已存在，视为剧照已处理过）
     nfo_deal_set: set[Path] = field(default_factory=set)
-    # 去获取json的番号列表
     json_get_set: set[str] = field(default_factory=set)
-    # 番号的json刮削状态（None: 进行中，True: 成功，False: 失败）
     json_get_status: dict[str, bool | None] = field(default_factory=dict)
-    # 获取成功的json
     json_data_dic: dict[str, ScrapeResult] = field(default_factory=dict)
     img_path: str = ""
-    # 失败文件及其错误原因
     failed_list: list[tuple[Path, str]] = field(default_factory=list)
     scrape_start_time: float = 0.0
     success_list: set[Path] = field(default_factory=set)
-    stop_other: bool = True  # 非刮削线程停止标识
-    stop_requested: bool = False  # 手动停止刮削请求标识
+    stop_other: bool = True
+    stop_requested: bool = False
 
     # show
-    log_txt: Any = None  # 日志文件对象
+    log_txt: Any = None
     scrape_like_text: str = ""
     main_mode_text: str = ""
 
-    single_file_path: Path = field(default_factory=Path)  # 工具-单文件刮削的文件路径
+    single_file_path: Path = field(default_factory=Path)
 
     # for missing
-    actor_numbers_dic: dict[str, list[str]] = field(default_factory=dict)  # 每个演员所有番号的字典
-    local_number_set: set[str] = field(default_factory=set)  # 本地所有番号的集合
-    local_number_cnword_set: set[str] = field(default_factory=set)  # 本地所有有字幕的番号的集合
+    actor_numbers_dic: dict[str, list[str]] = field(default_factory=dict)
+    local_number_set: set[str] = field(default_factory=set)
+    local_number_cnword_set: set[str] = field(default_factory=set)
 
     def reset(self) -> None:
         self.failed_list = []
         self.counting_order = 0
         self.total_count = 0
         self.rest_now_begin_count = 0
-        self.sleep_end.set()  # 初始状态为未休眠
+        self.sleep_end.set()
         self.scrape_starting = 0
         self.scrape_started = 0
         self.scrape_done = 0

@@ -20,6 +20,7 @@ from ..signals import signal
 from ..utils import get_used_time
 from ..utils.file import delete_file_async
 from ..utils.language import is_japanese
+from ..utils.xml import build_cdata, escape_xml_text, normalize_xml_text
 from .mosaic import normalize_mosaic
 from .naming import NameRenderOptions, NamingTarget, render_name
 from .tag_priority import prioritize_nfo_tags
@@ -98,41 +99,6 @@ async def write_nfo(file_info: FileInfo, data: CrawlersResult, nfo_file: Path, o
         nfo_title_template = manager.config.update_titletemplate
     else:
         nfo_title_template = manager.config.naming_media
-
-    # 先将已转义实体还原为实际字符，避免写入时出现二次转义
-    rep_word = {
-        "&amp;": "&",
-        "&lt;": "<",
-        "&gt;": ">",
-        "&apos;": "'",
-        "&quot;": '"',
-        "&lsquo;": "「",
-        "&rsquo;": "」",
-        "&hellip;": "…",
-    }
-
-    escape_word = {
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        "'": "&apos;",
-        '"': "&quot;",
-    }
-
-    def normalize_xml_text(raw: str) -> str:
-        for key, value in rep_word.items():
-            raw = raw.replace(key, value)
-        return raw
-
-    def escape_xml_text(raw: str) -> str:
-        raw = normalize_xml_text(raw)
-        for key, value in escape_word.items():
-            raw = raw.replace(key, value)
-        return raw
-
-    def build_cdata(raw: str) -> str:
-        normalized = normalize_xml_text(raw)
-        return "<![CDATA[" + normalized.replace("]]>", "]]]]><![CDATA[>") + "]]>"
 
     def normalize_linebreaks(raw: str) -> str:
         raw = (
@@ -440,8 +406,14 @@ async def get_nfo_data(file_path: Path, movie_number: str) -> tuple[CrawlersResu
         content = await f.read()
         content = content.replace("<![CDATA[", "").replace("]]>", "")
 
-    parser = etree.HTMLParser(encoding="utf-8")
-    xml_nfo = etree.HTML(content.encode("utf-8"), parser)
+    parser = etree.XMLParser(encoding="utf-8", recover=True)
+    try:
+        xml_nfo = etree.fromstring(content.encode("utf-8"), parser)
+    except etree.XMLSyntaxError:
+        LogBuffer.error().write("nfo文件XML解析失败")
+        json_data.outline = file_path.name
+        json_data.tag = str(file_path)
+        return None, None
 
     title = "".join(xml_nfo.xpath("//title/text()"))
     # 获取不到标题，表示xml错误，重新刮削

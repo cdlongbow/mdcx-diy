@@ -14,6 +14,7 @@ from ..models.log_buffer import LogBuffer
 from ..models.types import CrawlerInput, CrawlerResponse, CrawlerResult, CrawlersResult, CrawlTask
 from ..number import is_uncensored
 from ..utils.dataclass import update
+from ..utils.xml import XML_TEXT_FIELDS, normalize_xml_text
 from .mosaic import is_guochan_mosaic, is_plain_uncensored_mosaic, normalize_mosaic
 
 if TYPE_CHECKING:
@@ -181,38 +182,8 @@ def _deal_res(res: CrawlersResult) -> CrawlersResult:
         res.publisher = res.studio
 
     # 字符转义，避免显示问题
-    key_word = [
-        "title",
-        "originaltitle",
-        "number",
-        "outline",
-        "originalplot",
-        "series",
-        "studio",
-        "publisher",
-    ]
-    rep_word = {
-        "&amp;": "&",
-        "&lt;": "<",
-        "&gt;": ">",
-        "&apos;": "'",
-        "&quot;": '"',
-        "&lsquo;": "「",
-        "&rsquo;": "」",
-        "&hellip;": "…",
-        "<br/>": "",
-        "・": "·",
-        """: "「",
-        """: "」",
-        "...": "…",
-        "\xa0": "",
-        "\u3000": "",
-        "\u2800": "",
-    }
-    for each in key_word:
-        for key, value in rep_word.items():
-            # res[each] = res[each].replace(key, value)
-            setattr(res, each, getattr(res, each).replace(key, value))
+    for each in XML_TEXT_FIELDS:
+        setattr(res, each, normalize_xml_text(getattr(res, each)))
 
     return res
 
@@ -310,6 +281,51 @@ class FileScraper:
             and getattr(self.config, "field_priority_try_all_images", False)
         )
         image_fields = {CrawlerResultFields.THUMB, CrawlerResultFields.POSTER}
+
+        # 预收集所有需要请求的 (site, language) 键，并发请求去重网站
+        all_needed_keys: set[tuple[Website, Language]] = set()
+        for field in ManualConfig.REDUCED_FIELDS:
+            f_config = self.config.get_field_config(field)
+            if use_type_field_config and hasattr(self.config, "get_type_field_config"):
+                type_field_config = self.config.get_type_field_config(classification.scraping_type, field)
+            else:
+                type_field_config = f_config
+            f_sites = [s for s in type_field_config.site_prority if s in type_site_set]
+            f_lang = f_config.language
+            for site in f_sites:
+                key = (site, f_lang)
+                if site not in MULTI_LANGUAGE_WEBSITES:
+                    key = (site, Language.UNDEFINED)
+                all_needed_keys.add(key)
+
+        # 并发请求所有尚未请求的网站
+        import asyncio
+
+        async def _fetch_site(key: tuple[Website, Language]) -> None:
+            site, lang = key
+            try:
+                task_input.language = lang
+                task_input.org_language = lang
+                if site in MULTI_LANGUAGE_WEBSITES and lang == Language.UNDEFINED:
+                    task_input.language = Language.JP
+                    task_input.org_language = Language.JP
+                web_data = await self._call_crawler(task_input, site)
+                req_info.append(f"{sprint_source(*key)} ({web_data.debug_info.execution_time:.2f}s)")
+                if web_data.data is None:
+                    if e := web_data.debug_info.error:
+                        raise e
+                    raise ValueError(f"{site} 返回了空数据")
+                all_res[key] = web_data.data
+                if site in MULTI_LANGUAGE_WEBSITES and (site, Language.UNDEFINED) not in all_res:
+                    all_res[(site, Language.UNDEFINED)] = web_data.data
+            except TimeoutError:
+                failed.add(key)
+            except Exception as e:
+                failed.add(key)
+
+        pending_keys = [k for k in all_needed_keys if k not in all_res and k not in failed]
+        if pending_keys:
+            await asyncio.gather(*[_fetch_site(k) for k in pending_keys])
 
         # 按字段分别处理，每个字段按优先级尝试获取
         for field in ManualConfig.REDUCED_FIELDS:

@@ -57,6 +57,21 @@ class LogBuffer:
             LogBuffer.all_buffers.pop(task_id, None)
 
     @staticmethod
+    def clear_stale_buffers(max_size: int = 200) -> int:
+        """清理过期或过多的缓冲区条目, 防止内存泄漏.
+
+        当 all_buffers 中的条目数超过 max_size 时, 清除最早的一半条目.
+        返回被清除的条目数.
+        """
+        if len(LogBuffer.all_buffers) <= max_size:
+            return 0
+        keys = list(LogBuffer.all_buffers.keys())
+        remove_count = len(keys) // 2
+        for key in keys[:remove_count]:
+            LogBuffer.all_buffers.pop(key, None)
+        return remove_count
+
+    @staticmethod
     def clear_thread():
         """兼容旧版 API，实际上调用 clear_task()"""
         LogBuffer.clear_task()

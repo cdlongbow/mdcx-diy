@@ -152,6 +152,19 @@ def default_field_config(language: Language = Language.UNDEFINED, translate: boo
     return FieldConfig(site_prority=list(DEFAULT_FIELD_SITE_PRIORITY), language=language, translate=translate)
 
 
+SENSITIVE_FIELDS = frozenset({
+    "baidu_key",
+    "deepl_key",
+    "llm_key",
+    "api_key",
+    "theporndb_api_token",
+    "tmdb_api_key",
+    "javdb",
+    "fc2ppvdb",
+    "javbus",
+})
+
+
 class Config(BaseModel):
     model_config = ConfigDict()
     # region: General Settings
@@ -967,6 +980,21 @@ class Config(BaseModel):
             website_schema["enum"] = registered_sites
             website_schema["showNames"] = registered_sites
         return schema
+
+    def model_dump(self, *, mask_secrets: bool = False, **kwargs: Any) -> dict[str, Any]:
+        data = super().model_dump(**kwargs)
+        if mask_secrets:
+            for field_name in SENSITIVE_FIELDS:
+                if field_name in data and data[field_name]:
+                    data[field_name] = "***"
+        return data
+
+    def model_dump_json(self, *, mask_secrets: bool = False, **kwargs: Any) -> str:
+        import json
+
+        data = self.model_dump(mask_secrets=mask_secrets, **kwargs)
+        indent = kwargs.get("indent", None)
+        return json.dumps(data, indent=indent, ensure_ascii=False)
 
 
 @dataclass

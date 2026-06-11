@@ -253,7 +253,6 @@ async def translate_title_outline(json_data: CrawlersResult, cd_part: str, movie
     title_translate = manager.config.get_field_config(CrawlerResultFields.TITLE).translate
     outline_language = manager.config.get_field_config(CrawlerResultFields.OUTLINE).language
     outline_translate = manager.config.get_field_config(CrawlerResultFields.OUTLINE).translate
-    translate_by = manager.config.translate_config.translate_by
     if title_language == Language.JP and outline_language == Language.JP:
         return
     trans_title = ""
@@ -284,36 +283,40 @@ async def translate_title_outline(json_data: CrawlersResult, cd_part: str, movie
     ):
         start_time = time.time()
         translate_by_list = manager.config.translate_config.translate_by.copy()
-        random.shuffle(translate_by_list)
-        for each in translate_by_list:
-            if skip_reason := get_translator_skip_reason(each):
-                LogBuffer.log().write(f"\n 🟡 Translation skipped!({each.capitalize()}) {skip_reason}")
-                continue
-            result = await translate_with_engine(
-                each,
-                trans_title,
-                trans_outline,
-                title_language=title_language,
-                outline_language=outline_language,
-            )
-            if result.error:
-                LogBuffer.log().write(
-                    f"\n 🔴 Translation failed!({each.capitalize()})({get_used_time(start_time)}s) Error: {result.error}"
-                )
-                continue
-            if result.translated_title:
-                json_data.title = result.title
-                title_translation_applied = True
-            if result.translated_outline:
-                json_data.outline = result.outline
-                outline_translation_applied = True
-            LogBuffer.log().write(f"\n 🍀 Translation done!({each.capitalize()})({get_used_time(start_time)}s)")
-            json_data.outline_from = each
-            break
+        if not translate_by_list:
+            LogBuffer.log().write("\n 🟡 Translation skipped: 未配置任何翻译引擎")
         else:
-            LogBuffer.log().write(
-                f"\n 🔴 Translation failed! {translate_by} 均失败或不可用！({get_used_time(start_time)}s)"
-            )
+            random.shuffle(translate_by_list)
+            for each in translate_by_list:
+                if skip_reason := get_translator_skip_reason(each):
+                    LogBuffer.log().write(f"\n 🟡 Translation skipped!({each.capitalize()}) {skip_reason}")
+                    continue
+                result = await translate_with_engine(
+                    each,
+                    trans_title,
+                    trans_outline,
+                    title_language=title_language,
+                    outline_language=outline_language,
+                )
+                if result.error:
+                    LogBuffer.log().write(
+                        f"\n 🔴 Translation failed!({each.capitalize()})({get_used_time(start_time)}s) Error: {result.error}"
+                    )
+                    continue
+                if result.translated_title:
+                    json_data.title = result.title
+                    title_translation_applied = True
+                if result.translated_outline:
+                    json_data.outline = result.outline
+                    outline_translation_applied = True
+                LogBuffer.log().write(f"\n 🍀 Translation done!({each.capitalize()})({get_used_time(start_time)}s)")
+                json_data.outline_from = each
+                break
+            else:
+                engine_names = "、".join(e.capitalize() for e in translate_by_list)
+                LogBuffer.log().write(
+                    f"\n 🔴 Translation failed! {engine_names} 均失败或不可用！({get_used_time(start_time)}s)"
+                )
 
     # 简繁转换
     if title_language == "zh_cn" and (not trans_title or title_translation_applied or not (title_is_jp or title_is_en)):

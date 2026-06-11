@@ -24,7 +24,18 @@ class GenericBaseCrawler[T: Context = Context](ABC):
     `Context` 是默认类型, 必要时可实现子类并通过泛型参数 T 指定.
 
     由于爬取逻辑因网站而异, 在最极端情况下可以重写 `_run` 方法以完全自定义爬取流程.
+
+    子类定义后会自动注册到 crawler_registry, 无需手动调用 register_crawler().
     """
+
+    def __init_subclass__(cls, **kwargs: Any) -> None:
+        super().__init_subclass__(**kwargs)
+        try:
+            site = cls.site()
+            if site is not None and not getattr(cls, "_skip_auto_register", False):
+                crawler_registry[site] = cls  # type: ignore[assignment]
+        except (TypeError, NotImplementedError):
+            pass
 
     def __init__(self, client: "AsyncWebClient", base_url: str = "", browser=None):
         """
@@ -247,3 +258,12 @@ def get_registered_crawler_sites(*, include_hidden: bool = False) -> list[Websit
         if include_hidden or not crawler_cls.hidden_in_ui():
             sites.append(site)
     return sites
+
+
+def validate_crawler_registry() -> list[str]:
+    """检查所有 Website 枚举值是否都有对应的已注册爬虫, 返回缺失的网站值列表."""
+    missing = []
+    for site in Website:
+        if site not in crawler_registry:
+            missing.append(site.value)
+    return missing
