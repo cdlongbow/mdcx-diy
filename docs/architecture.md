@@ -12,11 +12,16 @@
 ├── pyproject.toml                  # 项目配置和依赖管理
 ├── mdcx/                           # 主源码目录
 │   ├── __init__.py
-│   ├── consts.py                   # 常量定义（版本号、平台检测等）
-│   ├── crawler.py                  # 爬虫提供器
-│   ├── number.py                   # 番号解析和验证
-│   ├── signals.py                  # 信号机制(Qt 信号)
-│   ├── web_async.py                # 异步网络客户端
+│ ├── consts.py # 常量定义（版本号、平台检测等）
+│ ├── crawler.py # 爬虫提供器
+│ ├── number.py # 番号解析和验证
+│ ├── signals.py # 信号机制(Qt 信号)
+│ ├── web_async.py # 异步网络客户端
+│ ├── browser.py # 浏览器相关模块
+│ ├── llm.py # LLM 翻译核心实现
+│ ├── manual.py # 手动操作模块
+│ ├── image.py # 顶层图片模块
+│ ├── network_fingerprint.py # 网络指纹模块
 │   ├── base/                       # 基础功能模块
 │   │   ├── file.py                 # 文件操作
 │   │   ├── image.py                # 图片处理
@@ -75,8 +80,9 @@
 │   │   │   ├── parser.py           # 解析器
 │   │   │   └── types.py            # 类型定义
 │   │   ├── airav_cc.py             # Airav.cc 爬虫
-│   │   ├── avbase_new.py           # AVBase 爬虫
-│   │   ├── avsox.py                # AVSoX 爬虫
+│ │ ├── avbase_new.py # AVBase 爬虫
+│ │ ├── avsex.py # AVSex 爬虫
+│ │ ├── avsox.py # AVSoX 爬虫
 │   │   ├── cableav.py              # CableAV 爬虫
 │   │   ├── cnmdb.py                # CNMDB 爬虫
 │   │   ├── dahlia.py               # Dahlia 爬虫
@@ -88,8 +94,9 @@
 │   │   ├── fc2hub.py               # FC2Hub 爬虫
 │   │   ├── fc2ppvdb.py             # FC2PPVDB 爬虫
 │   │   ├── freejavbt.py            # FreeJAVBT 爬虫
-│   │   ├── getchu.py               # Getchu 爬虫
-│   │   ├── getchu_dmm.py           # Getchu DMM 爬虫
+│ │ ├── getchu.py # Getchu 爬虫
+│ │ ├── getchu_dl.py # Getchu 下载站爬虫
+│ │ ├── getchu_dmm.py # Getchu DMM 爬虫
 │   │   ├── giga.py                 # Giga 爬虫
 │   │   ├── guochan.py              # 国产爬虫
 │   │   ├── hdouban.py              # 豆瓣爬虫
@@ -102,8 +109,9 @@
 │   │   ├── javdbapi.py             # JavDB API 爬虫
 │   │   ├── javlibrary.py           # JavLibrary 爬虫
 │   │   ├── kin8.py                 # Kin8 爬虫
-│   │   ├── libredmm.py             # LibreDMM 爬虫
-│   │   ├── lulubar.py              # 芦芦吧爬虫
+│ │ ├── libredmm.py # LibreDMM 爬虫
+│ │ ├── love6.py # Love6 爬虫
+│ │ ├── lulubar.py # 芦芦吧爬虫
 │   │   ├── madouqu.py              # 马豆区爬虫
 │   │   ├── mdtv.py                 # MDTV 爬虫
 │   │   ├── mgstage.py              # MGStage 爬虫
@@ -135,10 +143,12 @@
 │   │   ├── language.py             # 语言工具
 │   │   ├── path.py                 # 路径工具
 │   │   └── video.py                # 视频工具
-│   └── views/                      # UI 视图
-│       ├── CustomClass.py          # 自定义类
-│       ├── MDCx.py                 # 主视图
-│       └── posterCutTool.py        # 海报裁剪工具
+│ └── views/ # UI 视图
+│   ├── CustomClass.py # 自定义类
+│   ├── MDCx.py # 主视图
+│   ├── MDCx.ui # 主窗口 UI 定义
+│   ├── posterCutTool.py # 海报裁剪工具
+│   └── posterCutTool.ui # 海报裁剪窗口 UI 定义
 ├── resources/                      # 资源文件
 │   ├── config/                     # 默认配置
 │   ├── c_number/                   # C 番号数据

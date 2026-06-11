@@ -726,7 +726,7 @@ for row in ws.iter_rows(min_row=2, values_only=True):
    - 标题、简介、标签等
 
 5. **配置映射表**
-   - 编辑 `resources/mapping_info.xml` 演员/制作商/标签映射表
+   - 编辑 `resources/info_database.xlsx` 演员/制作商/标签映射表
 
 #### 5. 测试翻译
 

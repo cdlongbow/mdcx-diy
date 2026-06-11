@@ -10,105 +10,112 @@
 - macOS 11 或更高版本
 
 ### Python 环境
-- Python 3.13 或更高版本
-- pip 包管理器
+- Python 3.13.4 或更高版本
+- [uv](https://docs.astral.sh/uv/getting-started/installation/) 包管理器
 
 ### 依赖项
 - PyQt6（GUI 框架）
+- httpx / curl-cffi（HTTP 请求）
 - openpyxl（Excel 文件处理）
-- requests（HTTP 请求）
-- lxml（HTML/XML 解析）
-- Pillow（图像处理）
+- lxml / parsel / beautifulsoup4（HTML/XML 解析）
+- Pillow / OpenCV（图像处理）
 
 ## 安装步骤
 
 ### Windows
 
 1. **安装 Python**
-   ```powershell
-   # 从 https://www.python.org/downloads/ 下载并安装 Python 3.13+
-   # 安装时勾选 "Add Python to PATH"
-   ```
+```powershell
+# 从 https://www.python.org/downloads/ 下载并安装 Python 3.13+
+# 安装时勾选 "Add Python to PATH"
+```
 
-2. **克隆仓库**
-   ```powershell
-   git clone https://github.com/cdlongbow/mdcx.git
-   cd mdcx
-   ```
+2. **安装 uv**
+```powershell
+# 参考 https://docs.astral.sh/uv/getting-started/installation/
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
 
-3. **安装依赖**
-   ```powershell
-   pip install -e .
-   ```
+3. **克隆仓库**
+```powershell
+git clone https://github.com/sqzw-x/mdcx.git
+cd mdcx
+```
 
-4. **运行程序**
-   ```powershell
-   python main.py
-   ```
+4. **安装依赖**
+```powershell
+uv sync --all-extras --dev
+uv pip install -e .
+```
+
+5. **运行程序**
+```powershell
+uv run main.py
+```
 
 ### Linux
 
 1. **安装系统依赖**
-   ```bash
-   # Ubuntu/Debian
-   sudo apt update
-   sudo apt install python3 python3-pip python3-venv libxcb-xinerama0
+```bash
+# Ubuntu/Debian
+sudo apt update
+sudo apt install python3 python3-pip python3-venv libxcb-xinerama0
 
-   # CentOS/RHEL
-   sudo yum install python3 python3-pip libxcb-xinerama0
-   ```
+# CentOS/RHEL
+sudo yum install python3 python3-pip libxcb-xinerama0
+```
 
-2. **克隆仓库**
-   ```bash
-   git clone https://github.com/cdlongbow/mdcx.git
-   cd mdcx
-   ```
+2. **安装 uv**
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
 
-3. **创建虚拟环境（推荐）**
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
+3. **克隆仓库**
+```bash
+git clone https://github.com/sqzw-x/mdcx.git
+cd mdcx
+```
 
 4. **安装依赖**
-   ```bash
-   pip install -e .
-   ```
+```bash
+uv sync --all-extras --dev
+uv pip install -e .
+```
 
 5. **运行程序**
-   ```bash
-   python main.py
-   ```
+```bash
+uv run main.py
+```
 
 ### macOS
 
 1. **安装 Python**
-   ```bash
-   # 使用 Homebrew
-   brew install python@3.13
-   ```
+```bash
+# 使用 Homebrew
+brew install python@3.13
+```
 
-2. **克隆仓库**
-   ```bash
-   git clone https://github.com/cdlongbow/mdcx.git
-   cd mdcx
-   ```
+2. **安装 uv**
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
 
-3. **创建虚拟环境（推荐）**
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
+3. **克隆仓库**
+```bash
+git clone https://github.com/sqzw-x/mdcx.git
+cd mdcx
+```
 
 4. **安装依赖**
-   ```bash
-   pip install -e .
-   ```
+```bash
+uv sync --all-extras --dev
+uv pip install -e .
+```
 
 5. **运行程序**
-   ```bash
-   python main.py
-   ```
+```bash
+uv run main.py
+```
 
 ## 配置
 
@@ -122,6 +129,7 @@
 
 ```bash
 pip install PyQt6
+uv pip install PyQt6
 ```
 
 ### 权限问题（Linux/macOS）
@@ -154,7 +162,7 @@ sudo yum install libxcb-xinerama0 libxcb-cursor0
 
 ```bash
 git pull origin main
-pip install -e . --upgrade
+uv sync --all-extras --dev
 ```
 
 ## 下一步

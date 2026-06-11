@@ -150,7 +150,7 @@ TAG_PRIORITIES = {
 |---------|---------|------|
 | `kin8` | KIN8 | KIN8 无码 |
 | `love6` | Love6 | Love6 无码 |
-| `javbase_new` | AVBase | AVBase 无码 |
+| `avbase_new` | AVBase | AVBase 无码 |
 
 ### FC2 类 (4 个)
 

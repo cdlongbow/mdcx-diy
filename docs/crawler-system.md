@@ -53,11 +53,12 @@
 
 ## 爬虫实现目录 ([mdcx/crawlers/](../mdcx/crawlers/))
 
-每个网站一个爬虫文件,共 39 个站点
+每个网站一个爬虫文件,共 42+ 个站点
 
 **支持的网站**:
 - Airav.cc
 - AVBase
+- AVSex
 - AVSoX
 - CableAV
 - CNMDB
@@ -71,6 +72,8 @@
 - FC2PPVDB
 - FreeJAVBT
 - Getchu
+- Getchu DL
+- Getchu DMM
 - Giga
 - 国产
 - 豆瓣
@@ -84,6 +87,7 @@
 - JavLibrary
 - Kin8
 - LibreDMM
+- Love6
 - 芦芦吧
 - 马豆区
 - MDTV

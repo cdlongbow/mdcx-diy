@@ -119,9 +119,11 @@ brew install python@3.13
 ### Q: 配置文件在哪里？
 
 **A**:
-- Windows: `%APPDATA%/mdcx/config.ini` 或 `~/.config/mdcx/config.ini`
-- Linux: `~/.config/mdcx/config.ini`
-- macOS: `~/Library/Application Support/mdcx/config.ini`
+- Windows: `%APPDATA%/mdcx/config.json`
+- Linux: `~/.config/mdcx/config.json`
+- macOS: `~/Library/Application Support/mdcx/config.json`
+
+> 注: V1 版本使用 `config.ini`（INI 格式），V2 版本已迁移为 `config.json`（JSON 格式）。
 
 ### Q: 如何重置配置？
 
@@ -221,7 +223,7 @@ brew install python@3.13
 **A**:
 ```bash
 git pull origin master
-pip install -r requirements.txt --upgrade
+uv sync --all-extras --dev
 ```
 
 ### Q: 更新后配置会丢失吗？

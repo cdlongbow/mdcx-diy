@@ -16,40 +16,34 @@
 
 ### 系统要求
 
-- Python 3.8+
+- Python 3.13.4+
+- [uv](https://docs.astral.sh/uv/getting-started/installation/) 包管理器
 - Git
 - 文本编辑器（推荐 VSCode 或 PyCharm）
 
 ### 环境配置
 
 1. **克隆仓库**
-   ```bash
-   git clone https://github.com/cdlongbow/mdcx.git
-   cd mdcx
-   ```
+```bash
+git clone https://github.com/sqzw-x/mdcx.git
+cd mdcx
+```
 
-2. **创建虚拟环境**
-   ```bash
-   python -m venv venv
+2. **安装依赖**
+```bash
+uv sync --all-extras --dev
+uv pip install -e .
+```
 
-   # 激活虚拟环境
-   # Windows
-   venv\Scripts\activate
-
-   # Linux/macOS
-   source venv/bin/activate
-   ```
-
-3. **安装开发依赖**
-   ```bash
-   pip install -r requirements.txt
-   pip install -r requirements-dev.txt
-   ```
+3. **配置 Git Hooks**
+```bash
+uv run pre-commit install
+```
 
 4. **配置开发工具**
-   - 安装 Python 扩展（VSCode）
-   - 配置代码格式化工具（black、isort）
-   - 配置代码检查工具（flake8、pylint）
+- 安装 Python 扩展（VSCode）
+- 配置代码格式化工具（ruff）
+- 配置代码检查工具（ruff）
 
 ### IDE 配置
 
@@ -57,36 +51,49 @@
 
 ```json
 {
-  "python.defaultInterpreterPath": "./venv/bin/python",
-  "python.linting.enabled": true,
-  "python.linting.flake8Enabled": true,
-  "python.formatting.provider": "black",
-  "editor.formatOnSave": true
+  "python.defaultInterpreterPath": "./.venv/bin/python",
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true
+  },
+  "ruff.format.args": ["--config", "ruff.toml"],
+  "ruff.lint.args": ["--config", "ruff.toml"]
 }
 ```
 
 ## 项目结构
 
 ```
-mdcx/
-├── mdcx/                    # 主程序目录
-│   ├── core/               # 核心模块
-│   │   ├── tmdb_actor.py   # TMDB 演员数据刮削
-│   │   ├── tmdb_movie.py   # TMDB 电影数据刮削
-│   │   └── ...
-│   ├── gui/                # GUI 模块
-│   ├── utils/              # 工具函数
-│   └── __init__.py
-├── resources/              # 资源文件
-│   └── userdata/          # 用户数据
-│       └── actor_database.xlsx
-├── docs/                   # 文档目录
-├── tests/                  # 测试目录
-├── requirements.txt        # 生产依赖
-├── requirements-dev.txt    # 开发依赖
-├── README.md              # 项目说明
-├── CODE_WIKI.md           # 技术文档
-└── main.py               # 程序入口
+./
+├── main.py                # 程序入口
+├── pyproject.toml         # 项目配置和依赖管理
+├── ruff.toml              # Ruff 代码检查和格式化配置
+├── mdcx/                  # 主源码目录
+│   ├── __init__.py
+│   ├── consts.py          # 常量定义（版本号、平台检测等）
+│   ├── crawler.py         # 爬虫提供器
+│   ├── number.py          # 番号解析和验证
+│   ├── signals.py         # 信号机制(Qt 信号)
+│   ├── web_async.py       # 异步网络客户端
+│   ├── browser.py         # 浏览器相关模块
+│   ├── llm.py             # LLM 翻译核心实现
+│   ├── manual.py          # 手动操作模块
+│   ├── image.py           # 顶层图片模块
+│   ├── network_fingerprint.py  # 网络指纹模块
+│   ├── base/              # 基础功能模块
+│   ├── config/            # 配置管理
+│   ├── controllers/       # 控制器(业务逻辑)
+│   ├── core/              # 核心功能
+│   ├── crawlers/          # 爬虫实现(42+ 个站点)
+│   ├── gen/               # 自动生成的枚举
+│   ├── models/            # 数据模型
+│   ├── tools/             # 工具模块
+│   ├── utils/             # 工具函数
+│   └── views/             # UI 视图
+├── resources/             # 资源文件
+├── scripts/               # 脚本工具
+├── tests/                 # 测试代码
+└── docs/                  # 项目文档
 ```
 
 详细架构说明请参阅 [架构设计文档](architecture.md)。
@@ -104,65 +111,59 @@ mdcx/
 ### 开发流程
 
 1. **创建功能分支**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
+```bash
+git checkout -b feature/your-feature-name
+```
 
 2. **编写代码**
-   - 遵循代码规范
-   - 添加必要的注释
-   - 编写测试
+- 遵循代码规范
+- 添加必要的注释
+- 编写测试
 
 3. **本地测试**
-   ```bash
-   # 运行测试
-   pytest
+```bash
+# 运行测试
+uv run pytest
 
-   # 代码检查
-   flake8 mdcx/
-   black mdcx/
-   ```
+# 代码检查
+uv run ruff check mdcx/
+
+# 代码格式化
+uv run ruff format mdcx/
+```
 
 4. **提交代码**
-   ```bash
-   git add .
-   git commit -m "feat: 添加新功能描述"
-   ```
+```bash
+git add .
+git commit -m "feat: 添加新功能描述"
+```
 
 5. **推送并创建 PR**
-   ```bash
-   git push origin feature/your-feature-name
-   ```
+```bash
+git push origin feature/your-feature-name
+```
 
 6. **代码审查**
-   - 等待代码审查
-   - 根据反馈修改代码
+- 等待代码审查
+- 根据反馈修改代码
 
 7. **合并到主分支**
-   - 通过审查后合并
-   - 删除功能分支
+- 通过审查后合并
+- 删除功能分支
 
 ## 代码规范
 
 ### Python 代码规范
 
-遵循 PEP 8 规范：
+遵循 PEP 8 规范，使用 ruff 进行自动格式化和检查（配置见 `ruff.toml`）：
 
 ```python
-# 好的命名
 def get_actor_name(actor_id: int) -> str:
     """获取演员名称"""
     pass
 
 class ActorManager:
     """演员管理器"""
-    pass
-
-# 不好的命名
-def get_name(id):
-    pass
-
-class manager:
     pass
 ```
 
@@ -175,7 +176,7 @@ import sys
 from typing import Optional
 
 # 第三方库导入
-import requests
+import httpx
 from openpyxl import Workbook
 
 # 本地导入
@@ -201,8 +202,6 @@ def batch_update_actors(actors: list[dict], batch_size: int = 10) -> None:
     """
     if not actors:
         raise ValueError("演员列表不能为空")
-
-    # 实现代码...
 ```
 
 ### 类型提示
@@ -210,13 +209,11 @@ def batch_update_actors(actors: list[dict], batch_size: int = 10) -> None:
 使用类型提示提高代码可读性：
 
 ```python
-from typing import List, Dict, Optional
-
-def search_actors(query: str, limit: int = 10) -> List[Dict]:
+def search_actors(query: str, limit: int = 10) -> list[dict]:
     """搜索演员"""
     pass
 
-def get_actor(id: int) -> Optional[Dict]:
+def get_actor(id: int) -> dict | None:
     """获取演员信息，不存在时返回 None"""
     pass
 ```
@@ -225,9 +222,9 @@ def get_actor(id: int) -> Optional[Dict]:
 
 ```python
 try:
-    response = requests.get(url, timeout=10)
+    response = await client.get(url, timeout=10)
     response.raise_for_status()
-except requests.RequestException as e:
+except httpx.HTTPStatusError as e:
     logger.error(f"请求失败: {e}")
     raise
 ```
@@ -239,36 +236,14 @@ except requests.RequestException as e:
 使用 pytest 作为测试框架：
 
 ```bash
-# 安装 pytest
-pip install pytest pytest-cov
-
 # 运行所有测试
-pytest
+uv run pytest
 
 # 运行特定测试
-pytest tests/test_tmdb_actor.py
+uv run pytest tests/test_tmdb_actor.py
 
 # 生成覆盖率报告
-pytest --cov=mdcx --cov-report=html
-```
-
-### 测试示例
-
-```python
-import pytest
-from mdcx.core.tmdb_actor import TmdbActor
-
-def test_search_actor():
-    """测试演员搜索"""
-    actor = TmdbActor("test_api_key")
-    result = actor.search("松下纱荣子")
-    assert result is not None
-    assert "松下纱荣子" in result or "松下紗栄子" in result
-
-def test_rate_limit():
-    """测试限速"""
-    actor = TmdbActor("test_api_key")
-    assert actor._rate_limiter.rate == 3.5
+uv run pytest --cov=mdcx --cov-report=html
 ```
 
 详细测试说明请参阅 [测试文档](TEST_COVERAGE_SUMMARY.md)。
@@ -312,8 +287,8 @@ Closes #123
 提交前请确保：
 
 1. 代码通过所有测试
-2. 代码通过代码检查（flake8）
-3. 代码格式正确（black）
+2. 代码通过代码检查（`uv run ruff check`）
+3. 代码格式正确（`uv run ruff format`）
 4. 更新了相关文档
 5. 编写了测试用例
 
@@ -324,36 +299,36 @@ Closes #123
 使用语义化版本（Semantic Versioning）：
 
 - `MAJOR.MINOR.PATCH`
-  - MAJOR: 不兼容的 API 变更
-  - MINOR: 向后兼容的功能性新增
-  - PATCH: 向后兼容的问题修复
+- MAJOR: 不兼容的 API 变更
+- MINOR: 向后兼容的功能性新增
+- PATCH: 向后兼容的问题修复
 
 ### 发布步骤
 
 1. **更新版本号**
-   ```bash
-   # 更新版本号（例如 v1.2.3）
-   git tag -a v1.2.3 -m "Release v1.2.3"
-   ```
+```bash
+uv run bump <new_version>
+```
 
 2. **更新 CHANGELOG**
-   - 添加新版本的变更记录
-   - 列出所有新增功能、修复和改进
+```bash
+uv run changelog
+```
 
-3. **创建发布包**
-   ```bash
-   python setup.py sdist bdist_wheel
-   ```
+3. **创建 Git Tag**
+```bash
+git tag -a v<version> -m "Release v<version>"
+```
 
-4. **推送到 PyPI（如果适用）**
-   ```bash
-   twine upload dist/*
-   ```
+4. **构建发布包**
+```bash
+uv run build
+```
 
 5. **发布 GitHub Release**
-   - 在 GitHub 创建 Release
-   - 关联对应的 tag
-   - 添加发布说明
+- 在 GitHub 创建 Release
+- 关联对应的 tag
+- 添加发布说明
 
 ## 文档
 
@@ -419,12 +394,8 @@ def profile_function():
 ### 敏感信息管理
 
 ```python
-# 好的做法
 import os
 API_KEY = os.getenv('TMDB_API_KEY')
-
-# 不好的做法
-API_KEY = 'your_api_key_here'
 ```
 
 ## 调试技巧
@@ -478,7 +449,3 @@ import pdb; pdb.set_trace()
 - 提交 GitHub Issue
 - 查看 [FAQ](FAQ.md)
 - 阅读其他文档
-
----
-
-感谢你对 MDCX 项目的贡献！

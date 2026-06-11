@@ -50,19 +50,22 @@ uv run pytest
 ```bash
 mdcx
 ├── mdcx # 源代码目录
-│   ├── config # 配置管理
-│   ├── controllers # Qt UI 控制器
-│   │   └── main_window
-│   ├── crawlers # 各网站爬虫
-│   ├── models # 业务逻辑
-│   │   ├── base
-│   │   ├── core
-│   │   └── tools
-│   ├── utils
-│   └── views # Qt UI 定义
+│ ├── base # 基础功能模块（文件、图片、视频、翻译）
+│ ├── config # 配置管理
+│ ├── controllers # Qt UI 控制器
+│ │ └── main_window
+│ ├── core # 核心功能（刮削、翻译、NFO、Amazon、命名）
+│ ├── crawlers # 各网站爬虫（42+ 个站点）
+│ ├── gen # 自动生成的枚举
+│ ├── models # 数据模型
+│ ├── tools # 工具模块（演员数据库、Emby、字幕）
+│ ├── utils # 工具函数
+│ └── views # Qt UI 定义
 ├── scripts # 开发/构建脚本
-│   ├── build.sh # 构建 Qt 版本
-│   ├── changelog.sh # 生成变更日志模板
+│   ├── build.py # 构建发布包
+│   ├── bump.py # 版本号管理
+│   ├── changelog.py # 生成变更日志
+│   ├── check.py # 代码检查
 │   └── pyuic.sh # 从 Qt UI 生成 Python 代码
 └── tests # 测试
 ```

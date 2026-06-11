@@ -148,6 +148,7 @@ uv run pytest tests/crawlers
 - `iqqtv`
 - `airav_cc`
 - `getchu`
+- `getchu_dl`
 - `getchu_dmm`
 - `mywife`
 - `javlibrary`
