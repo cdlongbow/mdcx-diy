@@ -162,6 +162,7 @@ class MyMAinWindow(QMainWindow):
         self.json_array: dict[str, ShowData] = {}  # 主界面右侧结果树状数据
         self.preview_request_id = 0  # 主界面图片预览请求序号，用于丢弃过期加载结果
         self._did_apply_initial_size = False
+        self._user_initiated_close = False  # 标记是否为用户主动关闭窗口
 
         self.window_radius = 0  # 窗口四角弧度，为0时表示显示窗口标题栏
         self.window_border = 0  # 窗口描边，为0时表示显示窗口标题栏
@@ -656,7 +657,8 @@ class MyMAinWindow(QMainWindow):
         # activeAppName = AppKit.NSWorkspace.sharedWorkspace().activeApplication()['NSApplicationName'] # 活动窗口的标题
 
     def closeEvent(self, a0):
-        self.ready_to_exit()
+        if self._user_initiated_close:
+            self.ready_to_exit()
         if a0:
             a0.ignore()
 
@@ -759,6 +761,7 @@ class MyMAinWindow(QMainWindow):
     # region 关闭
     # 关闭按钮点击事件响应函数
     def pushButton_close_clicked(self):
+        self._user_initiated_close = True
         if Switch.HIDE_CLOSE in manager.config.switch_on:
             self.hide()
         else:
