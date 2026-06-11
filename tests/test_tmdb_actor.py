@@ -202,9 +202,7 @@ def test_load_actor_db_derives_tmdb_url_from_tmdbid(_tmp_actor_db: Path):
     wb = Workbook()
     ws = wb.active
     ws.append(tmdb_actor.DB_HEADERS)
-    ws.append(
-        ["错位演员", "", "", "", "", 6233846, "https://www.themoviedb.org/person/6215799"]
-    )
+    ws.append(["错位演员", "", "", "", "", 6233846, "https://www.themoviedb.org/person/6215799"])
     wb.save(_tmp_actor_db)
     wb.close()
 
@@ -219,9 +217,7 @@ async def test_update_actor_db_row_repairs_mismatched_tmdb_url(_tmp_actor_db: Pa
     wb = Workbook()
     ws = wb.active
     ws.append(tmdb_actor.DB_HEADERS)
-    ws.append(
-        ["错位演员", "", "", "", "", 6233846, "https://www.themoviedb.org/person/6215799"]
-    )
+    ws.append(["错位演员", "", "", "", "", 6233846, "https://www.themoviedb.org/person/6215799"])
     ws.cell(row=2, column=7).hyperlink = "https://www.themoviedb.org/person/6215799"
     wb.save(_tmp_actor_db)
     wb.close()
