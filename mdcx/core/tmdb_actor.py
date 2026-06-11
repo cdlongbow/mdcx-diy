@@ -703,8 +703,8 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
     async def _translate_and_update(actor_name: str, jp_name: str, tid: int) -> None:
         try:
             translations = await _fetch_person_translations(tid, base_url, tmdb_api_key, client)
-            zh_cn = translations.get("zh_cn", "")
-            zh_tw = translations.get("zh_tw", "")
+            zh_cn = _normalize_translation(translations.get("zh_cn", ""))
+            zh_tw = _normalize_translation(translations.get("zh_tw", ""))
             if not zh_cn and zh_tw:
                 zh_cn = zhconv.convert(zh_tw, "zh-cn")
             if not zh_tw and zh_cn:
@@ -743,8 +743,8 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
                 result[actor_name] = tmdbid
 
                 translations = query_result.get("translations", {})
-                zh_cn = translations.get("zh_cn", "")
-                zh_tw = translations.get("zh_tw", "")
+                zh_cn = _normalize_translation(translations.get("zh_cn", ""))
+                zh_tw = _normalize_translation(translations.get("zh_tw", ""))
                 if not zh_cn and zh_tw:
                     zh_cn = zhconv.convert(zh_tw, "zh-cn")
                 if not zh_tw and zh_cn:
@@ -949,11 +949,11 @@ async def _fetch_person_translations(pid: int, base_url: str, api_key: str, clie
             native_name = data.get("name", "")
 
             if iso == "zh" and region == "CN":
-                result["zh_cn"] = data.get("name") or en_name or ""
+                result["zh_cn"] = _normalize_translation(data.get("name") or en_name or "")
             elif iso == "zh" and region == "TW":
-                result["zh_tw"] = data.get("name") or en_name or ""
+                result["zh_tw"] = _normalize_translation(data.get("name") or en_name or "")
             elif iso == "zh":
-                name_to_use = native_name or en_name
+                name_to_use = _normalize_translation(native_name or en_name)
                 if name_to_use:
                     if not result["zh_cn"]:
                         result["zh_cn"] = name_to_use
@@ -963,6 +963,30 @@ async def _fetch_person_translations(pid: int, base_url: str, api_key: str, clie
         pass
 
     return result
+
+
+# ============= TMDB 翻译过滤 =============
+
+_INVALID_TRANSLATIONS = frozenset(
+    {
+        "Mandarin",
+        "Chinese",
+        "Japanese",
+        "English",
+        "Korean",
+        "Cantonese",
+        "Taiwanese",
+        "Min Nan",
+        "Hokkien",
+    }
+)
+
+
+def _normalize_translation(value: str) -> str:
+    normalized = value.strip()
+    if normalized in _INVALID_TRANSLATIONS:
+        return ""
+    return normalized
 
 
 # ============= Info XML → xlsx 迁移 =============

@@ -25,6 +25,7 @@ from ..config.enums import DownloadableFile, EmbyAction, FixedScrapingType, Keep
 from ..config.extend import get_movie_path_setting, parse_media_paths
 from ..config.manager import manager
 from ..config.resources import resources
+from ..core.tmdb_actor import _normalize_translation
 from ..crawler import CrawlerProvider
 from ..models.enums import FileMode
 from ..models.flags import FileDoneDict, Flags
@@ -676,8 +677,8 @@ class Scraper:
                                             aka = query_result.get("also_known_as", [])
                                             write_status = await update_actor_db_row(
                                                 jp=jp_name,
-                                                zh_cn=translations.get("zh_cn", ""),
-                                                zh_tw=translations.get("zh_tw", ""),
+                                                zh_cn=_normalize_translation(translations.get("zh_cn", "")),
+                                                zh_tw=_normalize_translation(translations.get("zh_tw", "")),
                                                 keyword=",".join(aka) if aka else "",
                                                 tmdbid=tmdbid,
                                                 append_keyword=True,
