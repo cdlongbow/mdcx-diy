@@ -43,5 +43,14 @@ Agent 在任务执行过程中发现的条目应遵循以下格式：
 - Date: 2026-06-09
 - Context: 用户希望尽量自动执行，减少手动命令操作
 - Instructions:
-  - 优先把重复性的本地检查配置为自动执行。
-  - 对推送前校验这类工作流，优先提供自动拦截方案，减少手动步骤。
+- 优先把重复性的本地检查配置为自动执行。
+- 对推送前校验这类工作流，优先提供自动拦截方案，减少手动步骤。
+
+[提交前必须运行 ruff format + ruff check]
+- Date: 2026-06-11
+- Context: CI 因 ruff format 不合规报错，用户提醒应自动做推送前检查
+- Category: 工作流协作
+- Instructions:
+- 每次修改 Python 代码后、提交前，必须运行 `ruff format` 和 `ruff check --fix`，确认通过后再提交推送。
+- 项目有 `.pre-commit-config.yaml` 配置了 ruff 钩子，但 MonkeyCode 沙箱环境不持久化 git hooks，新会话需手动 `pre-commit install`。
+- 不要依赖 CI 来发现格式问题，本地先拦截。
