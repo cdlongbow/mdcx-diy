@@ -11306,6 +11306,7 @@ class Ui_MDCx(object):
         self.lineEdit_cf_bypass_proxy.setPlaceholderText(_translate("MDCx", "例如: http://127.0.0.1:7890（可选）"))
         self.label_65.setText(_translate("MDCx", "重试次数："))
         self.label_64.setText(_translate("MDCx", "代理地址："))
+        self.label_no_proxy_sites.setText(_translate("MDCx", "不使用代理："))
         self.label_cf_bypass.setText(_translate("MDCx", "CF Bypass："))
         self.label_cf_bypass_proxy.setText(_translate("MDCx", "CF Bypass代理："))
         self.groupBox_44.setTitle(_translate("MDCx", "网站设置"))
