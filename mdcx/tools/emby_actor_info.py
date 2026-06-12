@@ -33,6 +33,7 @@ from .emby_actor_image import (
     _is_jellyfin_server,
     update_emby_actor_photo,
 )
+from .minnano_crawler import get_minnano_info, load_cache
 from .wiki import get_detail, search_wiki
 
 
@@ -75,6 +76,8 @@ async def creat_kodi_actors(add: bool) -> None:
 
 async def update_emby_actor_info() -> None:
     signal.change_buttons_status.emit()
+    # 加载缓存
+    load_cache()
     start_time = time.time()
     tasks: list[asyncio.Task[tuple[int, str]]] = []
     try:
@@ -109,7 +112,7 @@ async def update_emby_actor_info() -> None:
             signal.show_log_text(msg)
 
         signal.show_log_text(
-            f"\n🎉🎉🎉 补全完成！！！ 用时 {get_used_time(start_time)} 秒 共更新: {updated} Wiki 获取: {wiki} 数据库: {db}"
+            f"\n🎉🎉🎉 补全完成！！！ 用时 {get_used_time(start_time)} 秒 共更新: {updated} Minnano: {sum(1 for t in tasks if t.done() and (t.result()[0] & 4))} Wiki: {wiki} DB: {db}"
         )
 
         if EmbyAction.ACTOR_INFO_PHOTO in emby_on:
@@ -153,27 +156,41 @@ async def _process_actor_async(actor: dict, emby_on: list[EmbyAction]) -> tuple[
         actor_info = EMbyActressInfo(name=actor_name, server_id=server_id, id=actor_id)
         db_exist = 0
         wiki_found = 0
-        # wiki
+        minnano_found = 0
+        # minnano-av (优先) + wiki (补充)
         logs = []
-        res, msg = await search_wiki(actor_info)
         _raise_if_stop_requested()
-        logs.append(msg)
-        if res is not None:
-            result, error = await get_detail(res, msg, actor_info)
+        
+        # 先尝试 wiki 获取简介
+        wiki_intro = ""
+        res_wiki, msg_wiki = await search_wiki(actor_info)
+        logs.append(msg_wiki)
+        if res_wiki is not None:
+            result_wiki, error_wiki = await get_detail(res_wiki, msg_wiki, actor_info)
             _raise_if_stop_requested()
-            if result:  # 成功
+            if result_wiki:
+                wiki_intro = res_wiki.get("intro", "") if res_wiki else ""
                 wiki_found = 1
+        
+        # 再用 minnano-av 获取详细信息
+        _raise_if_stop_requested()
+        res, msg = await get_minnano_info(actor_info, wiki_intro)
+        logs.append(msg)
+        if res:
+            minnano_found = 1
+        
         # db
-        if manager.config.use_database:
+        if manager.config.use_database and not res and wiki_found == 0:
             if "数据库补全" in overview and EmbyAction.ACTOR_INFO_MISS in emby_on:  # 已有数据库信息
                 db_exist = 0
                 logs.append(f"{actor_name}: 已有数据库信息")
             else:
+                _raise_if_stop_requested()
                 db_exist, msg = ActressDB.update_actor_info_from_db(actor_info)
                 logs.append(msg)
         # summary
         summary = "\n    " + "\n".join(logs) if logs else ""
-        if db_exist or wiki_found:
+        if minnano_found or db_exist or wiki_found:
             headers = _build_jellyfin_headers() if _is_jellyfin_server() else None
             async with manager.acquire_computed() as computed:
                 res, error = await computed.async_client.post_text(
@@ -182,7 +199,7 @@ async def _process_actor_async(actor: dict, emby_on: list[EmbyAction]) -> tuple[
             _raise_if_stop_requested()
             if res is not None:
                 return (
-                    wiki_found + (db_exist << 1),
+                    wiki_found + (db_exist << 1) + (minnano_found << 2),
                     f"✅ {actor_name} 更新成功.{summary}\n主页: {actor_homepage}",
                 )
             else:

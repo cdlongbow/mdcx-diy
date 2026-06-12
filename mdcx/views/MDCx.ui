@@ -20123,7 +20123,7 @@
                         <string notr="true">color: rgb(8, 128, 128);</string>
                       </property>
                       <property name="text">
-                        <string>使用维基百科补全 Emby/Jellyfin 演员信息，包括：演员介绍、资料、简历、生平、Imdb主页等。</string>
+                        <string>使用minnano-av和维基百科补全 Emby/Jellyfin 演员信息，包括：演员三围/血型/出身地、简历资料等。</string>
                       </property>
                       <property name="wordWrap">
                         <bool>true</bool>
