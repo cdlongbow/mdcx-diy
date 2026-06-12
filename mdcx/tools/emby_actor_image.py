@@ -300,14 +300,20 @@ async def _get_graphis_pic(actor_name: str) -> tuple[Path | None, Path | None, s
             return not pic_cached
         return not (pic_cached and bd_cached)
 
-    def _download_and_return(pic_p: Path, bd_p: Path, small: str, big: str, logs_list: list) -> tuple[Path | None, Path | None, str] | None:
+    def _download_and_return(
+        pic_p: Path, bd_p: Path, small: str, big: str, logs_list: list
+    ) -> tuple[Path | None, Path | None, str] | None:
         """下载图片并返回结果"""
-        pic_ok = asyncio.get_event_loop().run_in_executor(None, lambda: download_file_with_filepath(small, pic_p, actor_folder))
+        pic_ok = asyncio.get_event_loop().run_in_executor(
+            None, lambda: download_file_with_filepath(small, pic_p, actor_folder)
+        )
         if not isinstance(pic_ok, bool):
             pic_ok = asyncio.run(pic_ok)
         bd_ok = False
         if EmbyAction.GRAPHIS_BACKDROP in emby_on:
-            bd_ok = asyncio.get_event_loop().run_in_executor(None, lambda: download_file_with_filepath(big, bd_p, actor_folder))
+            bd_ok = asyncio.get_event_loop().run_in_executor(
+                None, lambda: download_file_with_filepath(big, bd_p, actor_folder)
+            )
             if not isinstance(bd_ok, bool):
                 bd_ok = asyncio.run(bd_ok)
         if pic_ok:
@@ -341,7 +347,9 @@ async def _get_graphis_pic(actor_name: str) -> tuple[Path | None, Path | None, s
             if jp_name and actor_name in jp_name:
                 small_pic = src[jp_name.index(actor_name)]
                 big_pic = small_pic.replace("/prof.jpg", "/model.jpg")
-                result = await _do_download_and_return(pic_primary, backdrop_primary, small_pic, big_pic, emby_on, actor_folder)
+                result = await _do_download_and_return(
+                    pic_primary, backdrop_primary, small_pic, big_pic, emby_on, actor_folder
+                )
                 if result:
                     return result
 
@@ -357,7 +365,9 @@ async def _get_graphis_pic(actor_name: str) -> tuple[Path | None, Path | None, s
             if jp_name and actor_name in jp_name:
                 small_pic = src[jp_name.index(actor_name)]
                 big_pic = small_pic.replace("/prof.jpg", "/model.jpg")
-                result = await _do_download_and_return(pic_secondary, backdrop_secondary, small_pic, big_pic, emby_on, actor_folder)
+                result = await _do_download_and_return(
+                    pic_secondary, backdrop_secondary, small_pic, big_pic, emby_on, actor_folder
+                )
                 if result:
                     return result
 
@@ -382,13 +392,19 @@ async def _get_graphis_pic(actor_name: str) -> tuple[Path | None, Path | None, s
 
 
 async def _do_download_and_return(
-    pic_p: Path, bd_p: Path, small: str, big: str,
-    emby_on: list, actor_folder: Path,
+    pic_p: Path,
+    bd_p: Path,
+    small: str,
+    big: str,
+    emby_on: list,
+    actor_folder: Path,
 ) -> tuple[Path, Path, str] | None:
     """下载图片并返回结果"""
     logs = []
     pic_ok = await download_file_with_filepath(small, pic_p, actor_folder)
-    bd_ok = await download_file_with_filepath(big, bd_p, actor_folder) if EmbyAction.GRAPHIS_BACKDROP in emby_on else False
+    bd_ok = (
+        await download_file_with_filepath(big, bd_p, actor_folder) if EmbyAction.GRAPHIS_BACKDROP in emby_on else False
+    )
     if pic_ok:
         logs.append("🍊 使用 graphis.ne.jp 头像！ ")
         if EmbyAction.GRAPHIS_BACKDROP not in emby_on:
