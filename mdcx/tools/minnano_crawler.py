@@ -22,13 +22,11 @@
 - Wikipedia 个人经历段落（补充）
 """
 
-import datetime
 import re
 import threading
 from pathlib import Path
 from typing import Any
 
-import aiofiles
 from bs4 import BeautifulSoup
 
 from ..config.manager import manager
@@ -91,17 +89,32 @@ COL_MINNANO_URL = 20
 
 HIRAGANA_SET = frozenset(
     "あいうえお"
-    "かきくけこ" "がぎぐげご"
-    "さしすせそ" "ざじずぜぞ"
-    "たちつてと" "だぢづでど"
+    "かきくけこ"
+    "がぎぐげご"
+    "さしすせそ"
+    "ざじずぜぞ"
+    "たちつてと"
+    "だぢづでど"
     "なにぬねの"
-    "はひふへほ" "ばびぶべぼ" "ぱぴぺぽ"
+    "はひふへほ"
+    "ばびぶべぼ"
+    "ぱぴぺぽ"
     "まみむめも"
     "やゆよ"
     "らりるれろ"
     "わをん"
-    "ぁぃぅぇぉ" "ゃゅょ" "っ" "ー" "ゔ"
-    "ァィゥェォ" "ャュョ" "ッ" "ー" "ヴ" "ヴァヴィヴェヴォ" "ン"
+    "ぁぃぅぇぉ"
+    "ゃゅょ"
+    "っ"
+    "ー"
+    "ゔ"
+    "ァィゥェォ"
+    "ャュョ"
+    "ッ"
+    "ー"
+    "ヴ"
+    "ヴァヴィヴェヴォ"
+    "ン"
 )
 
 # ============= 缓存读写 =============
@@ -169,7 +182,7 @@ def save_cache_row(row: dict) -> bool:
     cache_path = _get_cache_path()
     try:
         import openpyxl
-        from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+        from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
         data_fill = PatternFill("solid", fgColor="F2F2F2")
         link_font = Font(color="0563C1", u="single")
@@ -182,9 +195,27 @@ def save_cache_row(row: dict) -> bool:
         )
         # 列宽（与手动格式化一致）
         col_widths = {
-            1: 12, 2: 10, 3: 10, 4: 40, 5: 14, 6: 8, 7: 6,
-            8: 6, 9: 6, 10: 6, 11: 6, 12: 6, 13: 6, 14: 10, 15: 15,
-            16: 10, 17: 10, 18: 10, 19: 60, 20: 200, 21: 45,
+            1: 12,
+            2: 10,
+            3: 10,
+            4: 40,
+            5: 14,
+            6: 8,
+            7: 6,
+            8: 6,
+            9: 6,
+            10: 6,
+            11: 6,
+            12: 6,
+            13: 6,
+            14: 10,
+            15: 15,
+            16: 10,
+            17: 10,
+            18: 10,
+            19: 60,
+            20: 200,
+            21: 45,
         }
 
         with _cache_lock:
@@ -527,7 +558,6 @@ def parse_minnano_page(html: str, minnano_id: str) -> dict[str, Any] | None:
     # 解析个人信息表
     tables = soup.find_all("table")
     profile_table = None
-    tags_table = None
     for table in tables:
         rows = table.find_all("tr")
         if len(rows) >= 5:
@@ -540,8 +570,6 @@ def parse_minnano_page(html: str, minnano_id: str) -> dict[str, Any] | None:
         profile = _parse_profile_table(profile_table)
         result["name"] = profile["name"]
         result["aliases"] = profile["aliases"]
-        jp_name = profile.get("jp_name", "")
-        en_name = profile.get("en_name", "")
         result["birthday_raw"] = profile.get("birthday_raw", "")
         result["size_raw"] = profile.get("size_raw", "")
         result["blood"] = profile.get("blood", "")
@@ -643,7 +671,9 @@ def _build_cache_row(parsed: dict) -> dict:
     # 合并标签
     tags_str = ",".join(parsed.get("tags", []))
 
-    minnano_url = f"https://www.minnano-av.com/actress{parsed.get('minnano_id', '')}.html" if parsed.get("minnano_id") else ""
+    minnano_url = (
+        f"https://www.minnano-av.com/actress{parsed.get('minnano_id', '')}.html" if parsed.get("minnano_id") else ""
+    )
 
     return {
         COL_JP: parsed.get("name", ""),
@@ -819,6 +849,7 @@ def _lookup_japanese_name(actor_name: str) -> str | None:
         if not db_path.exists():
             return None
         import openpyxl
+
         wb = openpyxl.load_workbook(db_path, read_only=True)
         ws = wb.active
         for row in ws.iter_rows(min_row=2, max_row=ws.max_row, max_col=4):
@@ -859,7 +890,9 @@ async def _search_minnano_by_name(actor_name: str) -> tuple[str | None, str | No
     1. 用 search_result.php API 精确匹配名字
     2. 失败时回退到五十音搜索
     """
-    search_url = f"https://www.minnano-av.com/search_result.php?search_scope=actress&search_word={actor_name}&search=+Go+"
+    search_url = (
+        f"https://www.minnano-av.com/search_result.php?search_scope=actress&search_word={actor_name}&search=+Go+"
+    )
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36",
         "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
@@ -878,7 +911,13 @@ async def _search_minnano_by_name(actor_name: str) -> tuple[str | None, str | No
     for a in soup.find_all("a", href=True):
         href = a["href"]
         text = a.get_text(strip=True)
-        if text == actor_name and "actress" in href and "ranking" not in href and "works" not in href and "list" not in href:
+        if (
+            text == actor_name
+            and "actress" in href
+            and "ranking" not in href
+            and "works" not in href
+            and "list" not in href
+        ):
             minnano_id = re.search(r"actress(\d+)", href)
             if minnano_id:
                 mid = minnano_id.group(1)
@@ -892,8 +931,13 @@ async def _search_minnano_by_name(actor_name: str) -> tuple[str | None, str | No
     for a in soup.find_all("a", href=True):
         href = a["href"]
         text = a.get_text(strip=True)
-        if ("actress" in href and "ranking" not in href and "works" not in href
-                and "list" not in href and text != actor_name):
+        if (
+            "actress" in href
+            and "ranking" not in href
+            and "works" not in href
+            and "list" not in href
+            and text != actor_name
+        ):
             # 模糊匹配：actor_name 中的汉字部分与 text 中的假名部分有重叠
             # 或者 text 包含 actor_name 的任一字符
             if _name_matches(actor_name, text):
@@ -907,16 +951,54 @@ async def _search_minnano_by_name(actor_name: str) -> tuple[str | None, str | No
 
     # 3. 精确匹配失败，回退到五十音搜索
     first_char = actor_name[0] if actor_name else ""
-    gojuon_map = {"あ": "a", "い": "i", "う": "u", "え": "e", "お": "o",
-                  "か": "ka", "き": "ki", "く": "ku", "け": "ke", "こ": "ko",
-                  "さ": "sa", "し": "shi", "す": "su", "せ": "se", "そ": "so",
-                  "た": "ta", "ち": "chi", "つ": "tsu", "て": "te", "と": "to",
-                  "な": "na", "に": "ni", "ぬ": "nu", "ね": "ne", "の": "no",
-                  "は": "ha", "ひ": "hi", "ふ": "fu", "へ": "he", "ほ": "ho",
-                  "ま": "ma", "み": "mi", "む": "mu", "め": "me", "も": "mo",
-                  "や": "ya", "ゆ": "yu", "よ": "yo",
-                  "ら": "ra", "り": "ri", "る": "ru", "れ": "re", "ろ": "ro",
-                  "わ": "wa", "を": "wo", "ん": "n"}
+    gojuon_map = {
+        "あ": "a",
+        "い": "i",
+        "う": "u",
+        "え": "e",
+        "お": "o",
+        "か": "ka",
+        "き": "ki",
+        "く": "ku",
+        "け": "ke",
+        "こ": "ko",
+        "さ": "sa",
+        "し": "shi",
+        "す": "su",
+        "せ": "se",
+        "そ": "so",
+        "た": "ta",
+        "ち": "chi",
+        "つ": "tsu",
+        "て": "te",
+        "と": "to",
+        "な": "na",
+        "に": "ni",
+        "ぬ": "nu",
+        "ね": "ne",
+        "の": "no",
+        "は": "ha",
+        "ひ": "hi",
+        "ふ": "fu",
+        "へ": "he",
+        "ほ": "ho",
+        "ま": "ma",
+        "み": "mi",
+        "む": "mu",
+        "め": "me",
+        "も": "mo",
+        "や": "ya",
+        "ゆ": "yu",
+        "よ": "yo",
+        "ら": "ra",
+        "り": "ri",
+        "る": "ru",
+        "れ": "re",
+        "ろ": "ro",
+        "わ": "wa",
+        "を": "wo",
+        "ん": "n",
+    }
 
     # 确定要查的五十音首字列表
     if first_char in gojuon_map:

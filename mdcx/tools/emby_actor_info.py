@@ -160,7 +160,7 @@ async def _process_actor_async(actor: dict, emby_on: list[EmbyAction]) -> tuple[
         # minnano-av (优先) + wiki (补充)
         logs = []
         _raise_if_stop_requested()
-        
+
         # 先尝试 wiki 获取简介
         wiki_intro = ""
         res_wiki, msg_wiki = await search_wiki(actor_info)
@@ -171,14 +171,14 @@ async def _process_actor_async(actor: dict, emby_on: list[EmbyAction]) -> tuple[
             if result_wiki:
                 wiki_intro = res_wiki.get("intro", "") if res_wiki else ""
                 wiki_found = 1
-        
+
         # 再用 minnano-av 获取详细信息
         _raise_if_stop_requested()
         res, msg = await get_minnano_info(actor_info, wiki_intro)
         logs.append(msg)
         if res:
             minnano_found = 1
-        
+
         # db
         if manager.config.use_database and not res and wiki_found == 0:
             if "数据库补全" in overview and EmbyAction.ACTOR_INFO_MISS in emby_on:  # 已有数据库信息
