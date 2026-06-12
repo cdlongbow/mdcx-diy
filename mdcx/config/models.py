@@ -995,6 +995,7 @@ class Config(BaseModel):
         import json
 
         indent = kwargs.pop("indent", None)
+        kwargs.setdefault("mode", "json")
         data = self.model_dump(mask_secrets=mask_secrets, **kwargs)
         return json.dumps(data, indent=indent, ensure_ascii=False)
 
