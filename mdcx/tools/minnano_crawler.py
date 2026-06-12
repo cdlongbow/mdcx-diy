@@ -726,6 +726,35 @@ def _fill_emby_info(actor_info: EMbyActressInfo, cached: dict, wiki_intro: str =
 # ============= 搜索映射 =============
 
 
+def _name_matches(actor_name: str, minnano_name: str) -> bool:
+    """判断 actor_name 和 minnano_name 是否匹配同一人。
+
+    匹配规则（任一满足即匹配）：
+    1. actor_name 中的所有字符都出现在 minnano_name 中
+    2. minnano_name 中的所有字符都出现在 actor_name 中
+    3. 两名字有至少2个重叠字符且至少1个是汉字，且重叠字符数 <= 2
+    """
+    if not actor_name or not minnano_name:
+        return False
+
+    # 规则1&2: 完全包含
+    if all(c in minnano_name for c in actor_name):
+        return True
+    if all(c in actor_name for c in minnano_name):
+        return True
+
+    # 规则3: 至少2个共同字符且至少1个是汉字，重叠数<=2，且不超过短名长度的60%
+    common = set(actor_name) & set(minnano_name)
+    if len(common) >= 2 and len(common) <= 2:
+        common_kanji = [c for c in common if re.match(r"[\u4e00-\u9fff]", c)]
+        if common_kanji:
+            min_len = min(len(set(actor_name)), len(set(minnano_name)))
+            if len(common) <= min_len * 0.6:
+                return True
+
+    return False
+
+
 def _lookup_japanese_name(actor_name: str) -> str | None:
     """在 actor_database.xlsx 中查找演员的日文名。
 
@@ -781,6 +810,7 @@ async def _search_minnano_by_name(actor_name: str) -> tuple[str | None, str | No
 
     搜索策略:
     1. 用 search_result.php API 精确匹配名字
+    2. 模糊匹配名字（支持部分重叠，解决异体字/写法差异）
     """
     search_url = (
         f"https://www.minnano-av.com/search_result.php?search_scope=actress&search_word={actor_name}&search=+Go+"
@@ -817,6 +847,27 @@ async def _search_minnano_by_name(actor_name: str) -> tuple[str | None, str | No
                 detail_html, detail_error = await computed.async_client.get_text(detail_url)
                 if detail_html:
                     return mid, detail_html
+
+    # 2. 模糊匹配名字（解决异体字/写法差异，如 绫瀬舞菜 vs あやせ舞菜）
+    for a in soup.find_all("a", href=True):
+        href = a["href"]
+        text = a.get_text(strip=True)
+        if (
+            "actress" in href
+            and "ranking" not in href
+            and "works" not in href
+            and "list" not in href
+            and text != actor_name
+            and text
+        ):
+            if _name_matches(actor_name, text):
+                minnano_id = re.search(r"actress(\d+)", href)
+                if minnano_id:
+                    mid = minnano_id.group(1)
+                    detail_url = f"https://www.minnano-av.com/actress{mid}.html"
+                    detail_html, detail_error = await computed.async_client.get_text(detail_url)
+                    if detail_html:
+                        return mid, detail_html
 
     return None, None
 
