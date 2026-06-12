@@ -85,38 +85,6 @@ COL_WIKI = 19
 COL_MINNANO_URL = 20
 
 
-# ============= 常量 =============
-
-HIRAGANA_SET = frozenset(
-    "あいうえお"
-    "かきくけこ"
-    "がぎぐげご"
-    "さしすせそ"
-    "ざじずぜぞ"
-    "たちつてと"
-    "だぢづでど"
-    "なにぬねの"
-    "はひふへほ"
-    "ばびぶべぼ"
-    "ぱぴぺぽ"
-    "まみむめも"
-    "やゆよ"
-    "らりるれろ"
-    "わをん"
-    "ぁぃぅぇぉ"
-    "ゃゅょ"
-    "っ"
-    "ー"
-    "ゔ"
-    "ァィゥェォ"
-    "ャュョ"
-    "ッ"
-    "ー"
-    "ヴ"
-    "ヴァヴィヴェヴォ"
-    "ン"
-)
-
 # ============= 缓存读写 =============
 
 _cache_lock = threading.Lock()
@@ -765,7 +733,6 @@ def _name_matches(actor_name: str, minnano_name: str) -> bool:
     1. actor_name 中的所有字符都出现在 minnano_name 中
     2. minnano_name 中的所有字符都出现在 actor_name 中
     3. 两名字有至少2个重叠字符且至少1个是汉字，且重叠字符数 <= 2
-    4. actor_name 含汉字且 minnano_name 是假名名，有至少1个重叠汉字
     """
     if not actor_name or not minnano_name:
         return False
@@ -784,51 +751,6 @@ def _name_matches(actor_name: str, minnano_name: str) -> bool:
             min_len = min(len(set(actor_name)), len(set(minnano_name)))
             if len(common) <= min_len * 0.6:
                 return True
-
-    # 规则4: 中文→假名转换场景，至少1个共同汉字
-    actor_kanji = re.findall(r"[\u4e00-\u9fff]", actor_name)
-    if actor_kanji:
-        minnano_non_hiragana = [c for c in minnano_name if c not in HIRAGANA_SET]
-        if len(minnano_non_hiragana) <= 1:
-            if any(k in minnano_name for k in actor_kanji):
-                return True
-
-    return False
-
-    # 规则1&2: 完全包含
-    if all(c in minnano_name for c in actor_name):
-        return True
-    if all(c in actor_name for c in minnano_name):
-        return True
-
-    # 规则3: 至少2个共同字符且至少1个是汉字
-    common = set(actor_name) & set(minnano_name)
-    if len(common) >= 2:
-        common_kanji = [c for c in common if re.match(r"[\u4e00-\u9fff]", c)]
-        if common_kanji:
-            return True
-
-    # 规则4: 中文→假名转换场景，至少1个共同汉字
-    actor_kanji = re.findall(r"[\u4e00-\u9fff]", actor_name)
-    if actor_kanji:
-        minnano_non_hiragana = [c for c in minnano_name if c not in HIRAGANA_SET]
-        if len(minnano_non_hiragana) <= 1:
-            if any(k in minnano_name for k in actor_kanji):
-                return True
-
-    return False
-
-    # 规则1&2: 完全包含
-    if all(c in minnano_name for c in actor_name):
-        return True
-    if all(c in actor_name for c in minnano_name):
-        return True
-
-    # 规则3: 至少1个共同字符（兜底匹配，解决中文→日文假名转换问题）
-    # 例: "赤城碧" vs "あかぎ碧" -> "碧" 是共同字符
-    common = set(actor_name) & set(minnano_name)
-    if common:
-        return True
 
     return False
 
@@ -888,7 +810,7 @@ async def _search_minnano_by_name(actor_name: str) -> tuple[str | None, str | No
 
     搜索策略:
     1. 用 search_result.php API 精确匹配名字
-    2. 失败时回退到五十音搜索
+    2. 模糊匹配名字（支持部分重叠）
     """
     search_url = (
         f"https://www.minnano-av.com/search_result.php?search_scope=actress&search_word={actor_name}&search=+Go+"
@@ -946,86 +868,8 @@ async def _search_minnano_by_name(actor_name: str) -> tuple[str | None, str | No
                     mid = minnano_id.group(1)
                     detail_url = f"https://www.minnano-av.com/actress{mid}.html"
                     detail_html, detail_error = await computed.async_client.get_text(detail_url)
-                    if detail_html:
-                        return mid, detail_html
-
-    # 3. 精确匹配失败，回退到五十音搜索
-    first_char = actor_name[0] if actor_name else ""
-    gojuon_map = {
-        "あ": "a",
-        "い": "i",
-        "う": "u",
-        "え": "e",
-        "お": "o",
-        "か": "ka",
-        "き": "ki",
-        "く": "ku",
-        "け": "ke",
-        "こ": "ko",
-        "さ": "sa",
-        "し": "shi",
-        "す": "su",
-        "せ": "se",
-        "そ": "so",
-        "た": "ta",
-        "ち": "chi",
-        "つ": "tsu",
-        "て": "te",
-        "と": "to",
-        "な": "na",
-        "に": "ni",
-        "ぬ": "nu",
-        "ね": "ne",
-        "の": "no",
-        "は": "ha",
-        "ひ": "hi",
-        "ふ": "fu",
-        "へ": "he",
-        "ほ": "ho",
-        "ま": "ma",
-        "み": "mi",
-        "む": "mu",
-        "め": "me",
-        "も": "mo",
-        "や": "ya",
-        "ゆ": "yu",
-        "よ": "yo",
-        "ら": "ra",
-        "り": "ri",
-        "る": "ru",
-        "れ": "re",
-        "ろ": "ro",
-        "わ": "wa",
-        "を": "wo",
-        "ん": "n",
-    }
-
-    # 确定要查的五十音首字列表
-    if first_char in gojuon_map:
-        gojuon_list = [first_char]
-    else:
-        # 中文/其他字符：优先查"あ"行（假名首字最常见），其次其他
-        gojuon_list = ["あ", "か", "さ", "た", "な", "は", "ま", "ら", "わ"]
-
-    for fc in gojuon_list:
-        gojuon_url = f"https://www.minnano-av.com/actress_list.php?gojuon={gojuon_map[fc]}"
-        async with manager.acquire_computed() as computed:
-            list_html, error = await computed.async_client.get_text(gojuon_url)
-        if list_html:
-            list_soup = BeautifulSoup(list_html, "lxml")
-            for a in list_soup.find_all("a", href=True):
-                href = a["href"]
-                text = a.get_text(strip=True)
-                if "actress" in href and "ranking" not in href and "works" not in href and "list" not in href:
-                    # 精确匹配 or 模糊匹配
-                    if text == actor_name or _name_matches(actor_name, text):
-                        minnano_id = re.search(r"actress(\d+)", href)
-                        if minnano_id:
-                            mid = minnano_id.group(1)
-                            detail_url = f"https://www.minnano-av.com/actress{mid}.html"
-                            detail_html, detail_error = await computed.async_client.get_text(detail_url)
-                            if detail_html:
-                                return mid, detail_html
+                if detail_html:
+                    return mid, detail_html
 
     return None, None
 
