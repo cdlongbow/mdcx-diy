@@ -516,6 +516,12 @@ def save_config(self: "MyMAinWindow"):
     elif "://" not in gfriends_github:
         gfriends_github = "https://" + gfriends_github
     manager.config.gfriends_github = HttpUrl(gfriends_github)
+    manager.config.gfriends_local_path = self.Ui.lineEdit_gfriends_local_path.text().strip()
+    # 预检：本地仓库和网络仓库至少有一个
+    if not manager.config.gfriends_local_path:
+        net_addr = str(manager.config.gfriends_github)
+        if not net_addr or "github.com" not in net_addr:
+            signal_qt.show_log_text("⚠️ 请设置 Gfriends 本地仓库路径或网络仓库地址")
     manager.config.info_database_path = self.Ui.lineEdit_actor_db_path.text()  # 信息数据库
     manager.config.use_database = self.Ui.checkBox_actor_db.isChecked()
     if manager.config.use_database:

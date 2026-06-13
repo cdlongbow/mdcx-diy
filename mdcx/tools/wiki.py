@@ -45,7 +45,7 @@ async def search_wiki(actor_info: EMbyActressInfo) -> tuple[str | None, str]:
             actor_name = zhconv.convert(actor_name, "zh-hant")
 
         # 请求维基百科搜索页接口
-        url = f"https://www.wikidata.org/w/api.php?action=wbsearchentities&search={actor_name}&language=zh&format=json"
+        url = f"https://www.wikidata.org/w/api.php?action=wbsearchentities&search={urllib.parse.quote(actor_name)}&language=zh&format=json"
         async with manager.acquire_computed() as computed:
             res, error = await computed.async_client.get_json(url, headers=computed.random_headers)
         if res is None:
@@ -57,7 +57,7 @@ async def search_wiki(actor_info: EMbyActressInfo) -> tuple[str | None, str]:
         if not search_results:
             if not actor_name_tw:
                 return None, "维基百科暂未收录"
-            url = f"https://www.wikidata.org/w/api.php?action=wbsearchentities&search={actor_name_tw}&language=zh&format=json"
+            url = f"https://www.wikidata.org/w/api.php?action=wbsearchentities&search={urllib.parse.quote(actor_name_tw)}&language=zh&format=json"
             async with manager.acquire_computed() as computed:
                 res, error = await computed.async_client.get_json(url)
             if res is None:

@@ -590,6 +590,7 @@ class Config(BaseModel):
     use_database: bool = Field(default=False, title="使用数据库")
     info_database_path: str = Field(default="", title="信息数据库路径")
     gfriends_github: HttpUrl = Field(default=HttpUrl("https://github.com/gfriends/gfriends"), title="Gfriends Github")
+    gfriends_local_path: str = Field(default="", title="Gfriends 本地仓库路径")
     actor_photo_folder: str = Field(default="", title="演员照片目录")
     actor_photo_kodi_auto: bool = Field(default=False, title="演员照片Kodi自动")
     # endregion

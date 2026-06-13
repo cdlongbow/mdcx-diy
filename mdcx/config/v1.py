@@ -256,6 +256,7 @@ class ConfigV1:
     use_database: bool = False
     info_database_path: str = r""
     gfriends_github: str = r"https://github.com/gfriends/gfriends"
+    gfriends_local_path: str = ""
     actor_photo_folder: str = r""
     actor_photo_kodi_auto: bool = False
 

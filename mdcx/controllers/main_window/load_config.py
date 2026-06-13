@@ -801,6 +801,8 @@ def load_config(self: "MyMAinWindow"):
         self.Ui.checkBox_actor_photo_kodi.setChecked(manager.config.actor_photo_kodi_auto)
         # 网络头像库 gfriends 项目地址
         self.Ui.lineEdit_net_actor_photo.setText(str(manager.config.gfriends_github))
+        # 本地仓库路径
+        self.Ui.lineEdit_gfriends_local_path.setText(manager.config.gfriends_local_path)
         # 本地头像目录
         self.Ui.lineEdit_actor_photo_folder.setText(manager.config.actor_photo_folder)
         # 演员数据库路径

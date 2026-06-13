@@ -176,7 +176,30 @@ async def _get_gfriends_actor_data() -> dict[str, str] | Literal[False] | None:
     _raise_if_stop_requested()
     emby_on = manager.config.emby_on
     gfriends_github = manager.config.gfriends_github
+    gfriends_local_path = manager.config.gfriends_local_path
     raw_url = f"{gfriends_github}".replace("github.com/", "raw.githubusercontent.com/").replace("://www.", "://")
+
+    # 优先使用本地仓库
+    if gfriends_local_path and os.path.isdir(gfriends_local_path):
+        local_filetree = os.path.join(gfriends_local_path, "Filetree.json")
+        if os.path.isfile(local_filetree):
+            signal.show_log_text("⏳ 使用本地 Gfriends 仓库...")
+            try:
+                async with aiofiles.open(local_filetree, encoding="utf-8") as f:
+                    content = await f.read()
+                    gfriends_actor_data = json.loads(content)
+                content = gfriends_actor_data.get("Content")
+                new_gfriends_actor_data = {}
+                content_list = list(content.keys())
+                content_list.sort()
+                for each_key in content_list:
+                    for key, value in content.get(each_key).items():
+                        if key not in new_gfriends_actor_data:
+                            actor_url = f"{raw_url}/master/Content/{each_key}/{value}"
+                            new_gfriends_actor_data[key] = actor_url
+                return new_gfriends_actor_data
+            except Exception as e:
+                signal.show_log_text(f"🔴 本地仓库解析失败: {e}，回退到网络")
     # 'https://raw.githubusercontent.com/gfriends/gfriends'
 
     if EmbyAction.ACTOR_PHOTO_NET in emby_on:
@@ -287,10 +310,10 @@ async def _get_graphis_pic(actor_name: str) -> tuple[Path | None, Path | None, s
     # 优先新版（最新数据排前面），搜不到再 fallback 到旧版
     pic_primary = pic_new
     backdrop_primary = big_new if EmbyAction.GRAPHIS_BACKDROP in emby_on else fix_new
-    url_primary = f"https://graphis.ne.jp/monthly/?K={actor_name}"
+    url_primary = f"https://graphis.ne.jp/monthly/?K={quote(actor_name)}"
     pic_secondary = pic_old
     backdrop_secondary = big_old if EmbyAction.GRAPHIS_BACKDROP in emby_on else fix_old
-    url_secondary = f"https://graphis.ne.jp/monthly/?S=1&K={actor_name}"
+    url_secondary = f"https://graphis.ne.jp/monthly/?S=1&K={quote(actor_name)}"
 
     def _needs_network(pic_cached: bool, bd_cached: bool) -> bool:
         """判断是否需要从网络获取"""
@@ -464,7 +487,9 @@ async def _update_emby_actor_photo_execute(actor_list: list[dict], gfriends_acto
 
         # 要上传的头像图片未找到时
         if not pic_path:
-            pic_path = gfriends_actor_data.get(f"{jp_name}.jpg")
+            pic_path = gfriends_actor_data.get(f"AI-Fix-{jp_name}.jpg")
+            if not pic_path:
+                pic_path = gfriends_actor_data.get(f"{jp_name}.jpg")
             if not pic_path:
                 pic_path = gfriends_actor_data.get(f"{jp_name}.png")
             if not pic_path:

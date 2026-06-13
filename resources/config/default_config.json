@@ -774,6 +774,7 @@
   "use_database": false,
   "info_database_path": "D:/Data/MDCX/Actress.db",
   "gfriends_github": "https://github.com/gfriends/gfriends",
+  "gfriends_local_path": "",
   "actor_photo_folder": "",
   "actor_photo_kodi_auto": false,
   "poster_mark": 1,
