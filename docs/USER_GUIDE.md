@@ -145,7 +145,7 @@ TMDB API 配置：
 
 1. **TMDB API**：电影数据库信息
 2. **Wikidata**：维基百科数据
-3. **Gfriends**：演员头像和写真
+3. **Gfriends**：演员头像和写真（支持本地仓库或 GitHub 镜像）
 4. **graphis.ne.jp**：写真集信息
 
 详细说明请参阅 [TMDB 数据流文档](CODE_WIKI.md#tmdb-数据流)。

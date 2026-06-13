@@ -878,7 +878,7 @@ FileInfo → CrawlerInput → CrawlTask
 
 **图片来源**：
 - graphis.ne.jp：日本写真网站
-- Gfriends GitHub：头像库
+- Gfriends 本地仓库/GitHub：头像库
 - 本地文件夹
 
 ### 缺失文件检测 ([mdcx/tools/missing.py](../mdcx/tools/missing.py))
@@ -933,7 +933,7 @@ emby_info.update_actor(actor_id, tmdb_id)
 
 **图片来源**：
 - graphis.ne.jp：日本写真网站
-- Gfriends GitHub：头像库
+- Gfriends 本地仓库/GitHub：头像库
 - 本地文件夹
 
 **主要功能**：
@@ -1008,7 +1008,7 @@ emby_on = actor_info,actor_image
 ```
 1. graphis.ne.jp（优先）
    ↓
-2. Gfriends GitHub（备选）
+2. Gfriends 本地仓库（优先）/ Gfriends GitHub（备选）
    ↓
 3. 本地文件夹（兜底）
 ```
@@ -1019,7 +1019,7 @@ emby_on = actor_info,actor_image
 # 在代码中配置图片来源
 IMAGE_SOURCES = [
     'graphis.ne.jp',
-    'github.com/Gfriends',
+    'github.com/gfriends',  # 或本地仓库路径
     'local'
 ]
 ```

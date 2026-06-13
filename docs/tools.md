@@ -27,7 +27,7 @@
 
 **图片来源**:
 - graphis.ne.jp:日本写真网站
-- Gfriends GitHub:头像库
+- Gfriends 本地仓库/GitHub:头像库
 - 本地文件夹
 
 ## 缺失文件检测 ([mdcx/tools/missing.py](../mdcx/tools/missing.py))
