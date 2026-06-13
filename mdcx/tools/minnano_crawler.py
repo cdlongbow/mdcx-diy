@@ -52,7 +52,6 @@ CACHE_HEADERS = [
     "Twitter",
     "活动年份",
     "出道作品",
-    "标签",
     "维基百科简介",
     "みんなのAV",
 ]
@@ -70,9 +69,8 @@ COL_AGENCY = 9
 COL_TWITTER = 10
 COL_CAREER = 11
 COL_DEBUT = 12
-COL_TAGS = 13
-COL_WIKI = 14
-COL_MINNANO_URL = 15
+COL_WIKI = 13
+COL_MINNANO_URL = 14
 
 
 # ============= 缓存读写 =============
@@ -116,7 +114,6 @@ def load_cache() -> dict[str, dict]:
                 "twitter": str(row[COL_TWITTER] or "").strip() if len(row) > COL_TWITTER else "",
                 "career": str(row[COL_CAREER] or "").strip() if len(row) > COL_CAREER else "",
                 "debut": str(row[COL_DEBUT] or "").strip() if len(row) > COL_DEBUT else "",
-                "tags": str(row[COL_TAGS] or "").strip() if len(row) > COL_TAGS else "",
                 "wiki": str(row[COL_WIKI] or "").strip() if len(row) > COL_WIKI else "",
                 "minnano_url": str(row[COL_MINNANO_URL] or "").strip() if len(row) > COL_MINNANO_URL else "",
             }
@@ -160,9 +157,8 @@ def save_cache_row(row: dict) -> bool:
             10: 15,
             11: 10,
             12: 10,
-            13: 60,
-            14: 200,
-            15: 45,
+            13: 200,
+            14: 45,
         }
 
         with _cache_lock:
@@ -185,7 +181,6 @@ def save_cache_row(row: dict) -> bool:
                     row.get(COL_TWITTER, ""),
                     row.get(COL_CAREER, ""),
                     row.get(COL_DEBUT, ""),
-                    row.get(COL_TAGS, ""),
                     row.get(COL_WIKI, ""),
                     row.get(COL_MINNANO_URL, ""),
                 ]
@@ -195,8 +190,8 @@ def save_cache_row(row: dict) -> bool:
                     cell.fill = data_fill
                     cell.alignment = data_align
                     cell.border = full_border
-                    # 第15列超链接
-                    if col_idx == 15 and str(val or "").startswith("http"):
+                    # 第14列超链接
+                    if col_idx == 14 and str(val or "").startswith("http"):
                         cell.hyperlink = val
                         cell.font = link_font
                 wb.save(cache_path)
@@ -238,7 +233,6 @@ def save_cache_row(row: dict) -> bool:
                     row.get(COL_TWITTER, ""),
                     row.get(COL_CAREER, ""),
                     row.get(COL_DEBUT, ""),
-                    row.get(COL_TAGS, ""),
                     row.get(COL_WIKI, ""),
                     row.get(COL_MINNANO_URL, ""),
                 ]
@@ -247,7 +241,7 @@ def save_cache_row(row: dict) -> bool:
                     cell.fill = data_fill
                     cell.alignment = data_align
                     cell.border = full_border
-                    if col_idx == 15 and str(val or "").startswith("http"):
+                    if col_idx == 14 and str(val or "").startswith("http"):
                         cell.hyperlink = val
                         cell.font = link_font
 
@@ -605,9 +599,6 @@ def _build_cache_row(parsed: dict) -> dict:
             seen.add(clean)
     alias_str = ",".join(aliases)
 
-    # 合并标签
-    tags_str = ",".join(parsed.get("tags", []))
-
     minnano_url = (
         f"https://www.minnano-av.com/actress{parsed.get('minnano_id', '')}.html" if parsed.get("minnano_id") else ""
     )
@@ -626,7 +617,6 @@ def _build_cache_row(parsed: dict) -> dict:
         COL_TWITTER: parsed.get("twitter", ""),
         COL_CAREER: parsed.get("career", ""),
         COL_DEBUT: parsed.get("debut", ""),
-        COL_TAGS: tags_str,
         COL_WIKI: parsed.get("wiki", ""),
         COL_MINNANO_URL: minnano_url,
     }
