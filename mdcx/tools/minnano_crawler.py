@@ -746,9 +746,7 @@ async def _search_minnano_by_name(actor_name: str) -> tuple[str | None, str | No
     1. 用 search_result.php API 精确匹配名字
     2. 模糊匹配名字（支持部分重叠，解决异体字/写法差异）
     """
-    search_url = (
-        f"https://www.minnano-av.com/search_result.php?search_scope=actress&search_word={urllib.parse.quote(actor_name)}&search=+Go+"
-    )
+    search_url = f"https://www.minnano-av.com/search_result.php?search_scope=actress&search_word={urllib.parse.quote(actor_name)}&search=+Go+"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36",
         "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
@@ -782,7 +780,9 @@ async def _search_minnano_by_name(actor_name: str) -> tuple[str | None, str | No
                 if detail_html:
                     # Title 验证：详情页标题应包含演员名
                     detail_soup = BeautifulSoup(detail_html, "lxml")
-                    detail_title = detail_soup.title.string.strip() if detail_soup.title and detail_soup.title.string else ""
+                    detail_title = (
+                        detail_soup.title.string.strip() if detail_soup.title and detail_soup.title.string else ""
+                    )
                     if actor_name and actor_name not in detail_title:
                         LogBuffer.log().write(f"  ⚠️ [minnano] 详情页标题不含演员名: '{detail_title[:60]}'")
                     return mid, detail_html

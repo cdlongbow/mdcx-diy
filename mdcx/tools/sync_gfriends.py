@@ -1,4 +1,5 @@
 """Gfriends 本地仓库同步脚本。"""
+
 import os
 import subprocess
 from pathlib import Path
