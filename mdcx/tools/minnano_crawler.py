@@ -40,18 +40,13 @@ CACHE_FILE = "resources/userdata/minnano_cache.xlsx"
 # 表头
 CACHE_HEADERS = [
     "日文名",
-    "简体中文",
-    "繁体中文",
     "别名",
     "生日",
-    "星座",
     "身高",
     "胸围",
     "腰围",
     "臀围",
-    "鞋码",
     "罩杯",
-    "血型",
     "出身地",
     "所属事务所",
     "Twitter",
@@ -63,26 +58,21 @@ CACHE_HEADERS = [
 ]
 
 COL_JP = 0
-COL_ZH_CN = 1
-COL_ZH_TW = 2
-COL_ALIAS = 3
-COL_BIRTHDAY = 4
-COL_ZODIAC = 5
-COL_HEIGHT = 6
-COL_BUST = 7
-COL_WAIST = 8
-COL_HIP = 9
-COL_SHOE = 10
-COL_CUP = 11
-COL_BLOOD = 12
-COL_PLACE = 13
-COL_AGENCY = 14
-COL_TWITTER = 15
-COL_CAREER = 16
-COL_DEBUT = 17
-COL_TAGS = 18
-COL_WIKI = 19
-COL_MINNANO_URL = 20
+COL_ALIAS = 1
+COL_BIRTHDAY = 2
+COL_HEIGHT = 3
+COL_BUST = 4
+COL_WAIST = 5
+COL_HIP = 6
+COL_CUP = 7
+COL_PLACE = 8
+COL_AGENCY = 9
+COL_TWITTER = 10
+COL_CAREER = 11
+COL_DEBUT = 12
+COL_TAGS = 13
+COL_WIKI = 14
+COL_MINNANO_URL = 15
 
 
 # ============= 缓存读写 =============
@@ -114,18 +104,13 @@ def load_cache() -> dict[str, dict]:
             if not jp:
                 continue
             _cache_data[jp] = {
-                "zh_cn": str(row[COL_ZH_CN] or "").strip() if len(row) > COL_ZH_CN else "",
-                "zh_tw": str(row[COL_ZH_TW] or "").strip() if len(row) > COL_ZH_TW else "",
                 "alias": str(row[COL_ALIAS] or "").strip() if len(row) > COL_ALIAS else "",
                 "birthday": str(row[COL_BIRTHDAY] or "").strip() if len(row) > COL_BIRTHDAY else "",
-                "zodiac": str(row[COL_ZODIAC] or "").strip() if len(row) > COL_ZODIAC else "",
                 "height": str(row[COL_HEIGHT] or "").strip() if len(row) > COL_HEIGHT else "",
                 "bust": str(row[COL_BUST] or "").strip() if len(row) > COL_BUST else "",
                 "waist": str(row[COL_WAIST] or "").strip() if len(row) > COL_WAIST else "",
                 "hip": str(row[COL_HIP] or "").strip() if len(row) > COL_HIP else "",
-                "shoe": str(row[COL_SHOE] or "").strip() if len(row) > COL_SHOE else "",
                 "cup": str(row[COL_CUP] or "").strip() if len(row) > COL_CUP else "",
-                "blood": str(row[COL_BLOOD] or "").strip() if len(row) > COL_BLOOD else "",
                 "place": str(row[COL_PLACE] or "").strip() if len(row) > COL_PLACE else "",
                 "agency": str(row[COL_AGENCY] or "").strip() if len(row) > COL_AGENCY else "",
                 "twitter": str(row[COL_TWITTER] or "").strip() if len(row) > COL_TWITTER else "",
@@ -164,26 +149,20 @@ def save_cache_row(row: dict) -> bool:
         # 列宽（与手动格式化一致）
         col_widths = {
             1: 12,
-            2: 10,
-            3: 10,
-            4: 40,
-            5: 14,
-            6: 8,
+            2: 40,
+            3: 14,
+            4: 6,
+            5: 6,
+            6: 6,
             7: 6,
             8: 6,
-            9: 6,
-            10: 6,
-            11: 6,
-            12: 6,
-            13: 6,
-            14: 10,
-            15: 15,
-            16: 10,
-            17: 10,
-            18: 10,
-            19: 60,
-            20: 200,
-            21: 45,
+            9: 10,
+            10: 15,
+            11: 10,
+            12: 10,
+            13: 60,
+            14: 200,
+            15: 45,
         }
 
         with _cache_lock:
@@ -194,18 +173,13 @@ def save_cache_row(row: dict) -> bool:
                 # 准备值
                 values = [
                     row.get(COL_JP, ""),
-                    row.get(COL_ZH_CN, ""),
-                    row.get(COL_ZH_TW, ""),
                     row.get(COL_ALIAS, ""),
                     row.get(COL_BIRTHDAY, ""),
-                    row.get(COL_ZODIAC, ""),
                     row.get(COL_HEIGHT, ""),
                     row.get(COL_BUST, ""),
                     row.get(COL_WAIST, ""),
                     row.get(COL_HIP, ""),
-                    row.get(COL_SHOE, ""),
                     row.get(COL_CUP, ""),
-                    row.get(COL_BLOOD, ""),
                     row.get(COL_PLACE, ""),
                     row.get(COL_AGENCY, ""),
                     row.get(COL_TWITTER, ""),
@@ -221,8 +195,8 @@ def save_cache_row(row: dict) -> bool:
                     cell.fill = data_fill
                     cell.alignment = data_align
                     cell.border = full_border
-                    # 第21列超链接
-                    if col_idx == 21 and str(val or "").startswith("http"):
+                    # 第15列超链接
+                    if col_idx == 15 and str(val or "").startswith("http"):
                         cell.hyperlink = val
                         cell.font = link_font
                 wb.save(cache_path)
@@ -252,18 +226,13 @@ def save_cache_row(row: dict) -> bool:
 
                 values = [
                     row.get(COL_JP, ""),
-                    row.get(COL_ZH_CN, ""),
-                    row.get(COL_ZH_TW, ""),
                     row.get(COL_ALIAS, ""),
                     row.get(COL_BIRTHDAY, ""),
-                    row.get(COL_ZODIAC, ""),
                     row.get(COL_HEIGHT, ""),
                     row.get(COL_BUST, ""),
                     row.get(COL_WAIST, ""),
                     row.get(COL_HIP, ""),
-                    row.get(COL_SHOE, ""),
                     row.get(COL_CUP, ""),
-                    row.get(COL_BLOOD, ""),
                     row.get(COL_PLACE, ""),
                     row.get(COL_AGENCY, ""),
                     row.get(COL_TWITTER, ""),
@@ -278,7 +247,7 @@ def save_cache_row(row: dict) -> bool:
                     cell.fill = data_fill
                     cell.alignment = data_align
                     cell.border = full_border
-                    if col_idx == 21 and str(val or "").startswith("http"):
+                    if col_idx == 15 and str(val or "").startswith("http"):
                         cell.hyperlink = val
                         cell.font = link_font
 
@@ -304,7 +273,7 @@ def get_cached_actor(name: str) -> dict | None:
     # 模糊匹配：别名中包含
     for jp, data in _cache_data.items():
         alias = data.get("alias", "")
-        if name in alias or (data.get("zh_cn", "") and name in data["zh_cn"]):
+        if name in alias:
             return data
     return None
 
@@ -645,18 +614,13 @@ def _build_cache_row(parsed: dict) -> dict:
 
     return {
         COL_JP: parsed.get("name", ""),
-        COL_ZH_CN: "",
-        COL_ZH_TW: "",
         COL_ALIAS: alias_str,
         COL_BIRTHDAY: parsed.get("birthday", ""),
-        COL_ZODIAC: parsed.get("zodiac", ""),
         COL_HEIGHT: parsed.get("height", ""),
         COL_BUST: parsed.get("bust", ""),
         COL_WAIST: parsed.get("waist", ""),
         COL_HIP: parsed.get("hip", ""),
-        COL_SHOE: parsed.get("shoe", ""),
         COL_CUP: parsed.get("cup", ""),
-        COL_BLOOD: parsed.get("blood", ""),
         COL_PLACE: parsed.get("place", ""),
         COL_AGENCY: parsed.get("agency", ""),
         COL_TWITTER: parsed.get("twitter", ""),
@@ -690,13 +654,9 @@ def _fill_emby_info(actor_info: EMbyActressInfo, cached: dict, wiki_intro: str =
         if cached.get("hip"):
             parts.append(cached["hip"])
         tags.append(f"三围: {'/'.join(parts)}")
-    if cached.get("blood"):
-        tags.append(f"血型: {cached['blood']}")
     if cached.get("career"):
         career_clean = cached["career"].replace("年", "").replace(" ", "").replace("-", "~")
         tags.append(f"生涯: {career_clean}")
-    if cached.get("tags"):
-        tags.append(f"标签: {cached['tags']}")
 
     if tags:
         actor_info.tags.extend(tags)
