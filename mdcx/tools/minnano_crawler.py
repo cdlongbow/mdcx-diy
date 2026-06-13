@@ -53,7 +53,7 @@ CACHE_HEADERS = [
     "活动年份",
     "出道作品",
     "维基百科简介",
-    "みんなのAV",
+    "minnano url",
 ]
 
 COL_JP = 0
