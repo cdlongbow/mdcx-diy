@@ -144,22 +144,7 @@ def save_cache_row(row: dict) -> bool:
             right=Side(style="thin"),
         )
         # 列宽（与手动格式化一致）
-        col_widths = {
-            1: 12,
-            2: 40,
-            3: 14,
-            4: 6,
-            5: 6,
-            6: 6,
-            7: 6,
-            8: 6,
-            9: 10,
-            10: 15,
-            11: 10,
-            12: 10,
-            13: 200,
-            14: 45,
-        }
+        col_widths = {}
 
         with _cache_lock:
             if cache_path.exists():
