@@ -9280,7 +9280,7 @@ class Ui_MDCx:
             | QtCore.Qt.AlignmentFlag.AlignVCenter
         )
         self.label_101.setObjectName("label_101")
-        self.gridLayout.addWidget(self.label_101, 5, 0, 1, 1)
+        self.gridLayout.addWidget(self.label_101, 8, 0, 1, 1)
         self.horizontalLayout_93 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_93.setObjectName("horizontalLayout_93")
         self.checkBox_actor_photo_ne_backdrop = QtWidgets.QCheckBox(self.layoutWidget_8)
@@ -9434,16 +9434,6 @@ class Ui_MDCx:
         self.label_123.setStyleSheet("color: rgb(8, 128, 128);")
         self.label_123.setObjectName("label_123")
         self.gridLayout.addWidget(self.label_123, 4, 1, 1, 1)
-        self.label_159 = QtWidgets.QLabel(self.layoutWidget_8)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.label_159.sizePolicy().hasHeightForWidth())
-        self.label_159.setSizePolicy(sizePolicy)
-        self.label_159.setMinimumSize(QtCore.QSize(0, 0))
-        self.label_159.setStyleSheet("color: rgb(8, 128, 128);")
-        self.label_159.setObjectName("label_159")
-        self.gridLayout.addWidget(self.label_159, 7, 1, 1, 1)
         self.label_gfriends_local = QtWidgets.QLabel(self.layoutWidget_8)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -12972,9 +12962,6 @@ class Ui_MDCx:
                 "MDCx",
                 "<p>支持优先使用 Graphis.ne.jp 的图片作为演员头像和演员背景；<br>Graphis.ne.jp 提供了演员不同时期的图片，默认请求早期的图片。</p>",
             )
-        )
-        self.label_159.setText(
-            _translate("MDCx", "建议 Fork 该项目到你的 Github，当项目故障时，可填写你 Fork 后的项目地址")
         )
         self.groupBox_64.setTitle(_translate("MDCx", "补全 Emby/Jellyfin 演员信息"))
         self.radioButton_actor_info_zh_cn.setText(_translate("MDCx", "中文简体"))

@@ -195,6 +195,8 @@ def Init_Singal(self: "MyMAinWindow"):
     self.Ui.pushButton_view_success_file.clicked.connect(self.pushButton_view_success_file_clicked)
     self.Ui.pushButton_select_subtitle_folder.clicked.connect(self.pushButton_select_subtitle_folder_clicked)
     self.Ui.pushButton_select_actor_photo_folder.clicked.connect(self.pushButton_select_actor_photo_folder_clicked)
+    self.Ui.pushButton_select_gfriends_local.clicked.connect(self.pushButton_select_gfriends_local_clicked)
+    self.Ui.pushButton_sync_gfriends.clicked.connect(self.pushButton_sync_gfriends_clicked)
     self.Ui.pushButton_select_config_folder.clicked.connect(self.pushButton_select_config_folder_clicked)
     self.Ui.pushButton_select_actor_info_db.clicked.connect(self.pushButton_select_actor_info_db_clicked)
     self.Ui.pushButton_select_file.clicked.connect(self.pushButton_select_file_clicked)

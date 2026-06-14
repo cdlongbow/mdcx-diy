@@ -2589,6 +2589,28 @@ class MyMAinWindow(QMainWindow):
             self.Ui.lineEdit_actor_photo_folder.setText(media_folder_path)
             self.pushButton_save_config_clicked()
 
+    # 设置-演员-Gfriends本地仓库-点选择目录
+    def pushButton_select_gfriends_local_clicked(self):
+        gfriends_path = self._get_select_folder_path(self.Ui.lineEdit_gfriends_local_path)
+        if gfriends_path:
+            self.Ui.lineEdit_gfriends_local_path.setText(gfriends_path)
+            self.pushButton_save_config_clicked()
+
+    # 设置-演员-Gfriends本地仓库-点更新
+    def pushButton_sync_gfriends_clicked(self):
+        local_path = self.Ui.lineEdit_gfriends_local_path.text().strip()
+        if not local_path:
+            QMessageBox.warning(self, "提示", "请先选择 Gfriends 本地仓库目录")
+            return
+        from mdcx.tools.sync_gfriends import sync_gfriends as do_sync
+
+        success, msg = do_sync(local_path)
+        if success:
+            signal_qt.show_scrape_info(f"✅ {msg}")
+        else:
+            QMessageBox.warning(self, "更新失败", msg)
+        self.Ui.label_gfriends_update_time.setText(f"最后更新: {get_current_time()}")
+
     # 设置-其他-配置文件目录-点选择目录
     def pushButton_select_config_folder_clicked(self):
         p = self._get_select_folder_path(self.Ui.lineEdit_config_folder)

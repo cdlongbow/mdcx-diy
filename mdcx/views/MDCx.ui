@@ -19314,11 +19314,11 @@
                         <rect>
                           <x>20</x>
                           <y>60</y>
-                          <width>661</width>
-                          <height>301</height>
-                        </rect>
-                      </property>
-                      <layout class="QGridLayout" name="gridLayout">
+                       <width>661</width>
+                       <height>266</height>
+                     </rect>
+                   </property>
+                   <layout class="QGridLayout" name="gridLayout">
                         <item row="6" column="1">
                           <widget class="QLabel" name="label_77">
                             <property name="sizePolicy">
@@ -19546,47 +19546,50 @@
                           </layout>
                         </item>
                          <item row="8" column="1">
-                                <property name="sizePolicy">
-                                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                  </sizepolicy>
-                                </property>
-                                <property name="minimumSize">
-                                  <size>
-                                    <width>300</width>
-                                    <height>30</height>
-                                  </size>
-                                </property>
-                                <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
-                                    border: 1px solid rgba(0,0,0, 50);
-                                    border-radius: 15px;
+                           <layout class="QHBoxLayout" name="horizontalLayout_96">
+                             <item>
+                               <widget class="QLineEdit" name="lineEdit_actor_photo_folder">
+                                 <property name="sizePolicy">
+                                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                                     <horstretch>0</horstretch>
+                                     <verstretch>0</verstretch>
+                                   </sizepolicy>
+                                 </property>
+                                 <property name="minimumSize">
+                                   <size>
+                                     <width>300</width>
+                                     <height>30</height>
+                                   </size>
+                                 </property>
+                                 <property name="styleSheet">
+                                   <string notr="true"> font: &quot;Courier&quot;;
+                                     border: 1px solid rgba(0,0,0, 50);
+                                     border-radius: 15px;
 </string>
-                                </property>
-                              </widget>
-                            </item>
-                            <item>
-                              <widget class="QPushButton" name="pushButton_select_actor_photo_folder">
-                                <property name="sizePolicy">
-                                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                  </sizepolicy>
-                                </property>
-                                <property name="minimumSize">
-                                  <size>
-                                    <width>110</width>
-                                    <height>40</height>
-                                  </size>
-                                </property>
-                                <property name="text">
-                                  <string>选择目录</string>
-                                </property>
-                              </widget>
-                            </item>
-                          </layout>
-                        </item>
+                                 </property>
+                               </widget>
+                             </item>
+                             <item>
+                               <widget class="QPushButton" name="pushButton_select_actor_photo_folder">
+                                 <property name="sizePolicy">
+                                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                                     <horstretch>0</horstretch>
+                                     <verstretch>0</verstretch>
+                                   </sizepolicy>
+                                 </property>
+                                 <property name="minimumSize">
+                                   <size>
+                                     <width>110</width>
+                                     <height>40</height>
+                                   </size>
+                                 </property>
+                                 <property name="text">
+                                   <string>选择目录</string>
+                                 </property>
+                               </widget>
+                             </item>
+                           </layout>
+                         </item>
                         <item row="1" column="0">
                           <widget class="QLabel" name="label_303">
                             <property name="sizePolicy">
@@ -19652,7 +19655,7 @@
                               <enum>Qt::LeftToRight</enum>
                             </property>
                             <property name="text">
-                              <string>Gfriends 仓库：</string>
+                              <string>Gfriends 本地仓库：</string>
                             </property>
                             <property name="alignment">
                               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -19734,31 +19737,9 @@
                             </item>
                           </layout>
                         </item>
-                        <item row="7" column="1">
-                          <widget class="QLabel" name="label_159">
-                            <property name="sizePolicy">
-                              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                                <horstretch>0</horstretch>
-                                <verstretch>0</verstretch>
-                              </sizepolicy>
-                            </property>
-                            <property name="minimumSize">
-                              <size>
-                                <width>0</width>
-                                <height>0</height>
-                              </size>
-                            </property>
-                            <property name="styleSheet">
-                              <string notr="true">color: rgb(8, 128, 128);</string>
-                            </property>
-                            <property name="text">
-                              <string>建议 Fork 该项目到你的 Github，当项目故障时，可填写你 Fork 后的项目地址</string>
-                            </property>
-                          </widget>
-                        </item>
-                      </layout>
-                    </widget>
-                    <zorder>pushButton_add_actor_pic</zorder>
+                       </layout>
+                     </widget>
+                     <zorder>pushButton_add_actor_pic</zorder>
                     <zorder>label_297</zorder>
                     <zorder>checkBox_actor_photo_auto</zorder>
                     <zorder>layoutWidget_8</zorder>
