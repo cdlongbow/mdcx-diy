@@ -32,7 +32,7 @@ from bs4 import BeautifulSoup
 
 from ..config.manager import manager
 from ..models.emby import EMbyActressInfo
-from ..utils import LogBuffer
+from ..models.log_buffer import LogBuffer
 
 # ============= 常量定义 =============
 
