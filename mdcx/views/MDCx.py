@@ -12981,7 +12981,7 @@ class Ui_MDCx:
         self.pushButton_add_actor_info.setText(_translate("MDCx", "开始补全"))
         self.label_295.setText(
             _translate(
-                "MDCx", "使用维基百科补全 Emby/Jellyfin 演员信息，包括：演员介绍、资料、简历、生平、Imdb主页等。"
+                "MDCx", "使用minnano-av和维基百科补全Emby/Jellyfin演员信息，包括:生日、身高、三围、出道时间和作品等。"
             )
         )
         self.radioButton_actor_info_all.setText(_translate("MDCx", "所有女优"))
