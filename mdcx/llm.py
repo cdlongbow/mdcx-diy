@@ -23,7 +23,7 @@ class LLMClient:
         self.client = AsyncOpenAI(
             api_key=api_key,
             base_url=base_url,
-            http_client=AsyncClient(proxy=proxy, verify=False, timeout=timeout, follow_redirects=True),
+            http_client=AsyncClient(proxy=proxy, timeout=timeout, follow_redirects=True),
             timeout=timeout,
         )
         self.limiter = AsyncLimiter(*rate)

@@ -1675,7 +1675,7 @@ class AsyncWebClient:
         file_size = None if self._is_dmm_image_url(url) else await self.get_filesize(url, use_proxy=use_proxy)
         # 判断是不是webp文件
         webp = False
-        if file_path.suffix == "jpg" and ".webp" in url:
+        if file_path.suffix.lower() == ".jpg" and ".webp" in url.lower():
             webp = True
 
         MB = 1024**2

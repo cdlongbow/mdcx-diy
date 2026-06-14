@@ -1,9 +1,11 @@
 import asyncio
+from io import BytesIO
 from types import SimpleNamespace
 
 import aiofiles
 import pytest
 from curl_cffi.requests.exceptions import Timeout
+from PIL import Image
 
 from mdcx.config.models import Config
 from mdcx.crawler import CrawlerProvider
@@ -432,6 +434,29 @@ async def test_chunk_download_uses_closed_range_boundaries(monkeypatch: pytest.M
     assert await client._download_chunks("https://example.test/video.mp4", target, chunk_size + 3) is True
 
     assert calls == [(0, chunk_size - 1, 0), (chunk_size, chunk_size + 2, 1)]
+
+
+@pytest.mark.asyncio
+async def test_download_converts_webp_to_jpg(monkeypatch: pytest.MonkeyPatch, tmp_path):
+    client = AsyncWebClient(timeout=1, retry=1)
+    target = tmp_path / "poster.jpg"
+    webp = BytesIO()
+    Image.new("RGBA", (1, 1), (255, 0, 0, 255)).save(webp, format="WEBP")
+
+    async def fake_get_filesize(url, *, use_proxy=True):
+        return None
+
+    async def fake_get_content(url, *, use_proxy=True):
+        return webp.getvalue(), ""
+
+    monkeypatch.setattr(client, "get_filesize", fake_get_filesize)
+    monkeypatch.setattr(client, "get_content", fake_get_content)
+
+    assert await client.download("https://example.test/poster.WEBP", target) is True
+
+    with Image.open(target) as img:
+        assert img.format == "JPEG"
+        assert img.mode == "RGB"
 
 
 @pytest.mark.asyncio
