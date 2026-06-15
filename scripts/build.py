@@ -156,6 +156,8 @@ class BuildManager:
             self._app_icon_path(),
             "--hidden-import",
             "_cffi_backend",
+            "--hidden-import",
+            "defusedxml",
             "--collect-all",
             "openpyxl",
             "--collect-all",
