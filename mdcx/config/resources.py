@@ -249,6 +249,12 @@ class Resources:
             self.actor_db = _read_actor_db_xlsx(db_path)
             self.actor_db_reverse_index = None
             signal.show_traceback_log(f"[演员数据库] 初始化成功: 已加载 {len(self.actor_db)} 条记录 (路径: {db_path})")
+        except ImportError as e:
+            signal.show_traceback_log(
+                f"[演员数据库] 初始化失败 (模块缺失): {e}\n"
+                f"  请确认打包时已包含: {e.name if hasattr(e, 'name') else 'unknown'}\n"
+                f"  常见缺失模块: openpyxl, defusedxml, lxml"
+            )
         except Exception as e:
             signal.show_traceback_log(f"[演员数据库] 重载失败，保留当前缓存: {e}")
 
