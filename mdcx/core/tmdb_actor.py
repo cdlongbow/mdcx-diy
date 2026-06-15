@@ -677,16 +677,12 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
 
     if resources.actor_db is None:
         signal.show_log_text(
-            f"\n ⚠️ [TMDB DEBUG] resources.actor_db 为 None —— openpyxl 未正确加载或 actor_database.xlsx 文件不可读"
+            "\n ⚠️ [TMDB DEBUG] resources.actor_db 为 None —— openpyxl 未正确加载或 actor_database.xlsx 文件不可读"
         )
     elif len(actor_db) == 0:
-        signal.show_log_text(
-            f"\n ⚠️ [TMDB DEBUG] resources.actor_db 为空 (0 条记录) —— 文件可能为空或格式不匹配"
-        )
+        signal.show_log_text("\n ⚠️ [TMDB DEBUG] resources.actor_db 为空 (0 条记录) —— 文件可能为空或格式不匹配")
     else:
-        signal.show_log_text(
-            f"\n ℹ️ [TMDB DEBUG] resources.actor_db 已加载 {len(actor_db)} 条记录"
-        )
+        signal.show_log_text(f"\n ℹ️ [TMDB DEBUG] resources.actor_db 已加载 {len(actor_db)} 条记录")
 
     result: dict[str, int] = {}
     need_query: list[tuple[str, str]] = []
@@ -699,15 +695,22 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
         actor_stripped = actor.strip()
 
         in_actor_db = actor_stripped in actor_db
-        signal.show_log_text(f"  🔍 [TMDB DEBUG] '{actor_stripped}' in actor_db: {in_actor_db}" + (
-            f", tmdbid={actor_db[actor_stripped].get('tmdbid')}" if in_actor_db else f", actor_db size={len(actor_db)}"
-        ))
+        signal.show_log_text(
+            f"  🔍 [TMDB DEBUG] '{actor_stripped}' in actor_db: {in_actor_db}"
+            + (
+                f", tmdbid={actor_db[actor_stripped].get('tmdbid')}"
+                if in_actor_db
+                else f", actor_db size={len(actor_db)}"
+            )
+        )
 
         row = None
         if actor_stripped in actor_db and actor_db[actor_stripped].get("tmdbid"):
             result[actor_stripped] = actor_db[actor_stripped]["tmdbid"]
             row_data = actor_db[actor_stripped]
-            signal.show_log_text(f"  ✅ [TMDB DEBUG] '{actor_stripped}' 从 actor_db 直接匹配, tmdbid={actor_db[actor_stripped]['tmdbid']}")
+            signal.show_log_text(
+                f"  ✅ [TMDB DEBUG] '{actor_stripped}' 从 actor_db 直接匹配, tmdbid={actor_db[actor_stripped]['tmdbid']}"
+            )
             if not row_data.get("zh_cn") or not row_data.get("zh_tw"):
                 need_translate.append((actor_stripped, actor_stripped, row_data["tmdbid"]))
             continue
