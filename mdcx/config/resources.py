@@ -235,26 +235,20 @@ class Resources:
         if openpyxl is None:
             self.actor_db = None
             self.actor_db_reverse_index = None
-            signal.show_traceback_log(
-                "[演员数据库] 初始化失败: openpyxl 模块未加载，请确认打包时已包含 openpyxl"
-            )
+            signal.show_traceback_log("[演员数据库] 初始化失败: openpyxl 模块未加载，请确认打包时已包含 openpyxl")
             return
         db_path = self.u("actor_database.xlsx")
         if not db_path.exists():
             self.actor_db = None
             self.actor_db_reverse_index = None
-            signal.show_traceback_log(
-                f"[演员数据库] 初始化失败: 文件不存在 {db_path}"
-            )
+            signal.show_traceback_log(f"[演员数据库] 初始化失败: 文件不存在 {db_path}")
             return
         try:
             from ..core.tmdb_actor import _read_actor_db_xlsx
 
             self.actor_db = _read_actor_db_xlsx(db_path)
             self.actor_db_reverse_index = None
-            signal.show_traceback_log(
-                f"[演员数据库] 初始化成功: 已加载 {len(self.actor_db)} 条记录 (路径: {db_path})"
-            )
+            signal.show_traceback_log(f"[演员数据库] 初始化成功: 已加载 {len(self.actor_db)} 条记录 (路径: {db_path})")
         except Exception as e:
             signal.show_traceback_log(f"[演员数据库] 重载失败，保留当前缓存: {e}")
 
