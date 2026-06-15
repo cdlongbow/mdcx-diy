@@ -750,9 +750,10 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
         await asyncio.gather(*trans_tasks)
 
     if not need_query:
+        LogBuffer.log().write("  ℹ️ [TMDB] 所有演员已在 actor_db 中匹配，无需 API 查询")
         return result
 
-    LogBuffer.log().write(f"\n 🎬 [TMDB] 开始查询 {len(need_query)} 个演员的 TMDB ID")
+    LogBuffer.log().write(f"\n 🎬 [TMDB] 开始查询 {len(need_query)} 个演员的 TMDB ID: {[a[0] for a in need_query]}")
 
     async def _query_and_update(actor_name: str, query_name: str) -> None:
         try:
@@ -798,7 +799,7 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
                         f"  ⚠️ [演员数据库] 写入失败，未保存 {actor_name} 的 tmdbid: {write_status.split(':', 1)[1]}"
                     )
             else:
-                LogBuffer.log().write(f"  ⚠️ [TMDB] {actor_name} 未找到匹配的 TMDB 演员")
+                LogBuffer.log().write(f"  ❌ [TMDB] {actor_name} (搜索名:{query_name}) 未找到匹配的 TMDB 演员")
         except Exception as e:
             LogBuffer.log().write(f"  ❌ [TMDB] {actor_name} 查询失败: {e}")
 
@@ -927,7 +928,8 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
     matched = [c for c in candidates if c["is_match"]]
 
     if not matched:
-        LogBuffer.log().write(f"  ⚠️ [TMDB] 演员「{actor_name}」所有候选均未通过名字匹配")
+        reason = "无候选通过名字匹配" if candidates else "候选列表为空 (搜索失败/性别过滤/detail请求失败)"
+        LogBuffer.log().write(f"  ⚠️ [TMDB] 演员「{actor_name}」{reason}，候选数={len(candidates)}")
         return None
 
     matched.sort(
