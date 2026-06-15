@@ -4,6 +4,7 @@ import sys
 import traceback
 from pathlib import Path
 
+import defusedxml  # noqa: F401 - ensure PyInstaller bundles defusedxml for openpyxl XML parsing
 import zhconv
 from PyQt6.QtGui import QFontDatabase
 

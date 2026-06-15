@@ -370,7 +370,6 @@ def _build_actor_db_reverse_index(actor_db: dict[str, dict]) -> dict[str, str]:
 def _read_actor_db_xlsx(db_path: Path) -> dict[str, dict]:
     db: dict[str, dict] = {}
 
-    import defusedxml  # noqa: F401 - ensures PyInstaller bundles defusedxml
     import openpyxl
 
     wb = openpyxl.load_workbook(db_path, read_only=True, data_only=True)
