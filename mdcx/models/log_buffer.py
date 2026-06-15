@@ -111,7 +111,16 @@ class LogBuffer:
         self.buffer.append(message)
 
     def get(self):
-        return "".join(self.buffer)
+        result = "".join(self.buffer)
+        # 也收集其他 task 的 buffer（跨协程日志收集）
+        task_id = LogBuffer._get_task_id()
+        for tid, categories in LogBuffer.all_buffers.items():
+            if tid == task_id:
+                continue
+            for category, buf in categories.items():
+                if isinstance(buf, LogBuffer):
+                    result += "".join(buf.buffer)
+        return result
 
     def last(self):
         if len(self.buffer) == 0:
