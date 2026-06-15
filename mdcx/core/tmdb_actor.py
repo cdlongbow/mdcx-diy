@@ -15,7 +15,6 @@ import zhconv
 from ..config.manager import manager
 from ..config.resources import resources
 from ..models.log_buffer import LogBuffer
-from ..signals import signal
 from ..utils import convert_half
 
 
@@ -676,13 +675,11 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
     actor_db = resources.actor_db or {}
 
     if resources.actor_db is None:
-        signal.show_log_text(
-            "\n ⚠️ [TMDB DEBUG] resources.actor_db 为 None —— openpyxl 未正确加载或 actor_database.xlsx 文件不可读"
-        )
+        LogBuffer.log().write("  ⚠️ [TMDB] actor_db 为 None —— 演员数据库未加载，请检查 openpyxl 是否正确打包")
     elif len(actor_db) == 0:
-        signal.show_log_text("\n ⚠️ [TMDB DEBUG] resources.actor_db 为空 (0 条记录) —— 文件可能为空或格式不匹配")
+        LogBuffer.log().write("  ⚠️ [TMDB] actor_db 为空 (0 条记录) —— 文件可能为空或格式不匹配")
     else:
-        signal.show_log_text(f"\n ℹ️ [TMDB DEBUG] resources.actor_db 已加载 {len(actor_db)} 条记录")
+        LogBuffer.log().write(f"  ℹ️ [TMDB] actor_db 已加载 {len(actor_db)} 条记录")
 
     result: dict[str, int] = {}
     need_query: list[tuple[str, str]] = []
@@ -695,21 +692,15 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
         actor_stripped = actor.strip()
 
         in_actor_db = actor_stripped in actor_db
-        signal.show_log_text(
-            f"  🔍 [TMDB DEBUG] '{actor_stripped}' in actor_db: {in_actor_db}"
-            + (
-                f", tmdbid={actor_db[actor_stripped].get('tmdbid')}"
-                if in_actor_db
-                else f", actor_db size={len(actor_db)}"
-            )
-        )
+        if not in_actor_db:
+            LogBuffer.log().write(f"  🔍 [TMDB] '{actor_stripped}' 不在 actor_db 中 (actor_db size={len(actor_db)})")
 
         row = None
         if actor_stripped in actor_db and actor_db[actor_stripped].get("tmdbid"):
             result[actor_stripped] = actor_db[actor_stripped]["tmdbid"]
             row_data = actor_db[actor_stripped]
-            signal.show_log_text(
-                f"  ✅ [TMDB DEBUG] '{actor_stripped}' 从 actor_db 直接匹配, tmdbid={actor_db[actor_stripped]['tmdbid']}"
+            LogBuffer.log().write(
+                f"  ✅ [TMDB] '{actor_stripped}' 从 actor_db 直接匹配, tmdbid={actor_db[actor_stripped]['tmdbid']}"
             )
             if not row_data.get("zh_cn") or not row_data.get("zh_tw"):
                 need_translate.append((actor_stripped, actor_stripped, row_data["tmdbid"]))
@@ -718,13 +709,13 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
         row = search_actor_db_reverse(actor_stripped)
         if row and row.get("tmdbid"):
             result[actor_stripped] = row["tmdbid"]
-            signal.show_log_text(f"  ✅ [TMDB DEBUG] '{actor_stripped}' 从反查匹配, tmdbid={row['tmdbid']}")
+            LogBuffer.log().write(f"  ✅ [TMDB] '{actor_stripped}' 从反查匹配, tmdbid={row['tmdbid']}")
             LogBuffer.log().write(f" ℹ️ [TMDB] {actor_stripped} -> tmdbid={row['tmdbid']} (xlsx反查缓存)")
             if not row.get("zh_cn") or not row.get("zh_tw"):
                 need_translate.append((actor_stripped, row.get("jp", actor_stripped), row["tmdbid"]))
             continue
 
-        signal.show_log_text(f"  ⚠️ [TMDB DEBUG] '{actor_stripped}' 未匹配，将进入 TMDB API 搜索")
+        LogBuffer.log().write(f"  ⚠️ [TMDB] '{actor_stripped}' 未匹配，将进入 TMDB API 搜索")
         need_query.append((actor_stripped, row.get("jp") if row and row.get("jp") else actor_stripped))
 
     async def _translate_and_update(actor_name: str, jp_name: str, tid: int) -> None:
