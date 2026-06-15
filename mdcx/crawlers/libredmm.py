@@ -387,7 +387,7 @@ class LibredmmCrawler(BaseCrawler):
             all_actors=actors,
             directors=directors,
             outline=outline,
-            originalplot="",
+            originalplot=outline,
             tags=tags,
             release=release,
             year=get_year(release),
