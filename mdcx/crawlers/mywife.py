@@ -4,6 +4,7 @@ from typing import override
 
 from lxml import etree
 
+from ..base.types import split_csv
 from ..base.web import check_url
 from ..config.enums import Website
 from .base import BaseCrawler, Context, CrawlerData, CrawlerException
@@ -58,10 +59,6 @@ def get_actor(html):
 
 def get_extrafanart(html):
     return html.xpath("//div[@class='modelsample_photowaku']/img/@src")
-
-
-def split_csv(value: str) -> list[str]:
-    return [item.strip() for item in value.split(",") if item.strip()]
 
 
 class MywifeCrawler(BaseCrawler):

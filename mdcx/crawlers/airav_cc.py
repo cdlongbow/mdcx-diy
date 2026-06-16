@@ -6,6 +6,7 @@ from typing import override
 
 from lxml import etree
 
+from ..base.types import split_csv
 from ..config.enums import Website
 from ..config.manager import manager
 from ..signals import signal
@@ -123,10 +124,6 @@ def get_real_url(html, number):
         if number.upper() in title and all(keyword not in title for keyword in ["克破", "无码破解", "無碼破解"]):
             return detail_url
     return ""
-
-
-def split_csv(value: str) -> list[str]:
-    return [item.strip() for item in value.split(",") if item.strip()]
 
 
 def normalize_language(language: str) -> str:

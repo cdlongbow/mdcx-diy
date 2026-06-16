@@ -4,6 +4,7 @@ from typing import override
 
 from lxml import etree
 
+from ..base.types import split_csv
 from ..config.manager import manager
 from ..config.models import Website
 from .base import BaseCrawler, Context, CrawlerData, CrawlerException
@@ -84,10 +85,6 @@ def getMosaic(html):  # 获取马赛克
 
 def normalize_fc2_number(number: str) -> str:
     return number.upper().replace("FC2PPV", "").replace("FC2-PPV-", "").replace("FC2-", "").replace("-", "").strip()
-
-
-def split_csv(value: str) -> list[str]:
-    return [item.strip() for item in value.split(",") if item.strip()]
 
 
 class Fc2clubCrawler(BaseCrawler):

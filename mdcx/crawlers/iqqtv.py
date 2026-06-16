@@ -4,6 +4,7 @@ from typing import override
 
 from lxml import etree
 
+from ..base.types import split_csv
 from ..config.enums import Website
 from ..config.manager import manager
 from .base import BaseCrawler, Context, CrawlerData, CrawlerException
@@ -144,10 +145,6 @@ def get_real_url(html, number):
 
 def _normalize_language(language: str) -> str:
     return language if language in _SUPPORTED_LANGUAGES else "zh_cn"
-
-
-def split_csv(value: str) -> list[str]:
-    return [item.strip() for item in value.split(",") if item.strip()]
 
 
 class IqqtvCrawler(BaseCrawler):

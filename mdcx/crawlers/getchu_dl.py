@@ -6,6 +6,7 @@ import urllib.parse
 
 from lxml import etree
 
+from ..base.types import split_csv
 from .base import Context, CrawlerData, CrawlerException
 
 
@@ -62,10 +63,6 @@ def get_extrafanart(html):
     for each in result_list:
         result.append(f"https://dl.getchu.com{each}")
     return result
-
-
-def split_csv(value: str) -> list[str]:
-    return [item.strip() for item in value.split(",") if item.strip()]
 
 
 async def scrape_dl_getchu(client, number: str, appoint_url: str = "", ctx: Context | None = None) -> CrawlerData:

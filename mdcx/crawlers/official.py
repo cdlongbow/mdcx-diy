@@ -4,6 +4,7 @@ from typing import override
 
 from lxml import etree
 
+from ..base.types import split_csv
 from ..config.enums import Website
 from ..config.manager import manager
 from ..number import get_number_letters
@@ -100,10 +101,6 @@ def get_real_url(html, number):
 def get_cover(html):
     result = html.xpath('//img[@class="swiper-lazy"]/@data-src')
     return (result.pop(0), result) if result else ("", [])
-
-
-def split_csv(value: str) -> list[str]:
-    return [item.strip() for item in value.split(",") if item.strip()]
 
 
 class OfficialCrawler(BaseCrawler):

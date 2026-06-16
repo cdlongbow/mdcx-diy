@@ -215,21 +215,14 @@ def get_file_number(filepath: str, escape_string_list: list[str]) -> str:
     ):
         file_number = r.group()
 
-    elif "FC2" in filename:
-        filename = filename.replace("PPV", "").replace("_", "-").replace("--", "-")
-        if r := re.search(r"FC2-\d{5,}", filename):  # 提取类似fc2-111111番号
-            file_number = r.group()
-        elif r := re.search(r"FC2\d{5,}", filename):
-            file_number = r.group().replace("FC2", "FC2-")
-        else:
-            file_number = filename
-
-    elif "HEYZO" in filename:
-        filename = filename.replace("_", "-").replace("--", "-")
-        if r := re.search(r"HEYZO-\d{3,}", filename):  # HEYZO-1111番号
-            file_number = r.group()
-        elif r := re.search(r"HEYZO\d{3,}", filename):
-            file_number = r.group().replace("HEYZO", "HEYZO-")
+    elif "FC2" in filename or "HEYZO" in filename:
+        prefix = "FC2" if "FC2" in filename else "HEYZO"
+        cleaned = filename.replace("PPV", "").replace("_", "-").replace("--", "-")
+        min_digits = 5 if prefix == "FC2" else 3
+        if r := re.search(rf"{prefix}-(\d{{{min_digits},}})", cleaned):
+            file_number = f"{prefix}-{r.group(1)}"
+        elif r := re.search(rf"{prefix}(\d{{{min_digits},}})", cleaned):
+            file_number = f"{prefix}-{r.group(1)}"
         else:
             file_number = filename
 

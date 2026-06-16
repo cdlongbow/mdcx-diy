@@ -5,6 +5,7 @@ from typing import override
 
 from lxml import etree
 
+from ..base.types import split_csv
 from ..config.enums import Language, Website
 from ..config.manager import manager
 from ..gen.field_enums import CrawlerResultFields
@@ -100,10 +101,6 @@ def get_director(html):
 def get_wanted(html):
     result = html.xpath('//a[contains(@href, "userswanted.php?")]/text()')
     return str(result[0]) if result else ""
-
-
-def split_csv(value: str) -> list[str]:
-    return [item.strip() for item in value.split(",") if item.strip()]
 
 
 def normalize_language(language: Language | str) -> Language:

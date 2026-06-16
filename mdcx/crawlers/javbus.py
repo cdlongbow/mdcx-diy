@@ -5,6 +5,7 @@ from typing import override
 
 from lxml import etree
 
+from ..base.types import split_csv
 from ..config.enums import Website
 from ..config.manager import manager
 from ..core.mosaic import is_plain_uncensored_mosaic
@@ -112,10 +113,6 @@ def getExtraFanart(html, url):  # 获取封面链接
 def getTag(html):  # 获取标签
     result = html.xpath('//span[@class="genre"]/label/a[contains(@href, "/genre/")]/text()')
     return str(result).strip(" ['']").replace("'", "").replace(", ", ",") if result else ""
-
-
-def split_csv(value: str) -> list[str]:
-    return [item.strip() for item in value.split(",") if item.strip()]
 
 
 def get_actress_video_list(html: etree._Element, base_url: str) -> dict:

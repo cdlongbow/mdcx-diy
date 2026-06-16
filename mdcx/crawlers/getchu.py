@@ -8,6 +8,7 @@ from typing import override
 
 from lxml import etree
 
+from ..base.types import split_csv
 from ..config.enums import Website
 from . import getchu_dl
 from .base import BaseCrawler, Context, CrawlerData, CrawlerException
@@ -135,10 +136,6 @@ def get_extrafanart(html):
             each = "https://www.getchu.com" + each
         result.append(each)
     return result
-
-
-def split_csv(value: str) -> list[str]:
-    return [item.strip() for item in value.split(",") if item.strip()]
 
 
 class GetchuCrawler(BaseCrawler):

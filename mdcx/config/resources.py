@@ -353,22 +353,14 @@ class Resources:
 
     def _get_mark_icon(self):
         mark_folder = self.u("watermark")
-        if not os.path.isdir(mark_folder):
-            os.makedirs(mark_folder)
-        if not os.path.isfile(self.icon_4k_path):
-            copy_file_sync(self.mark_4k, self.icon_4k_path)
-        if not os.path.isfile(self.icon_8k_path):
-            copy_file_sync(self.mark_8k, self.icon_8k_path)
-        if not os.path.isfile(self.icon_sub_path):
-            copy_file_sync(self.mark_sub, self.icon_sub_path)
-        if not os.path.isfile(self.icon_youma_path):
-            copy_file_sync(self.mark_youma, self.icon_youma_path)
-        if not os.path.isfile(self.icon_umr_path):
-            copy_file_sync(self.mark_umr, self.icon_umr_path)
-        if not os.path.isfile(self.icon_leak_path):
-            copy_file_sync(self.mark_leak, self.icon_leak_path)
-        if not os.path.isfile(self.icon_wuma_path):
-            copy_file_sync(self.mark_wuma, self.icon_wuma_path)
+        os.makedirs(mark_folder, exist_ok=True)
+        mark_names = ["4k", "8k", "sub", "youma", "umr", "leak", "wuma"]
+        for name in mark_names:
+            attr_src = f"mark_{name}"
+            attr_dst = f"icon_{name}_path"
+            dst_path = getattr(self, attr_dst)
+            if not os.path.isfile(dst_path):
+                copy_file_sync(getattr(self, attr_src), dst_path)
 
 
 resources = Resources()

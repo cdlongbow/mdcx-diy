@@ -36,6 +36,10 @@ def r(pattern: str) -> Pattern:
     return re.compile(pattern)
 
 
+def split_csv(value: str) -> list[str]:
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+
 def is_valid[T](v: FieldValue[T]) -> bool:
     return bool(v) and not isinstance(v, NotSupport)
 

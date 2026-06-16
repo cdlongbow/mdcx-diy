@@ -6,6 +6,7 @@ from typing import override
 from lxml import etree
 from lxml.html import soupparser
 
+from ..base.types import split_csv
 from ..base.web import get_dmm_trailer
 from ..config.models import Website
 from .base import BaseCrawler, Context, CrawlerData, CrawlerException
@@ -237,10 +238,6 @@ def get_actor(html):
     actor = actor if "暫無" not in actor else ""
     all_actor = all_actor if "暫無" not in all_actor else ""
     return actor, all_actor
-
-
-def split_csv(value: str) -> list[str]:
-    return [item.strip() for item in value.split(",") if item.strip()]
 
 
 def parse_detail_html(html_info: str):
