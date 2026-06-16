@@ -34,20 +34,19 @@ jobs:
           # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners
 
           items+=('{"build": "macos", "os": "macos-latest", "arch": "aarch64"}')
-          items+=('{"build": "windows", "os": "windows-2025", "arch": "x86_64"}')
+          items+=('{"build": "windows", "os": "windows-latest", "arch": "x86_64"}')
 
           # 合并items到json数组
           matrix="matrix=["
           for ((i=0; i<${#items[@]}; i++)); do
-            matrix+=" ${items[i]}"
-            if ((i != ${#items[@]}-1)); then
+            if ((i > 0)); then
               matrix+=","
             fi
+            matrix+="${items[i]}"
           done
           matrix+="]"
 
-          # 输出matrix到GITHUB_OUTPUT
-          echo $matrix >> $GITHUB_OUTPUT
+          echo "$matrix" >> "$GITHUB_OUTPUT"
 
   build-app:
     needs: init-matrix
