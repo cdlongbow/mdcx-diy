@@ -52,5 +52,5 @@ Agent 在任务执行过程中发现的条目应遵循以下格式：
 - Category: 工作流协作
 - Instructions:
 - 每次修改 Python 代码后、提交前，必须运行 `ruff format` 和 `ruff check --fix`，确认通过后再提交推送。
-- 项目有 `.pre-commit-config.yaml` 配置了 ruff 钩子，但 MonkeyCode 沙箱环境不持久化 git hooks，新会话需手动 `pre-commit install`。
+- 项目有 `.pre-commit-config.yaml` 配置了 ruff 钩子，MonkeyCode 沙箱环境不持久化 git hooks，每次新会话开始时必须先执行 `pre-commit install` 安装钩子，然后再执行 `ruff format` 和 `ruff check --fix`。
 - 不要依赖 CI 来发现格式问题，本地先拦截。
