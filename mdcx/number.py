@@ -224,7 +224,7 @@ def get_file_number(filepath: str, escape_string_list: list[str]) -> str:
         elif r := re.search(rf"{prefix}(\d{{{min_digits},}})", cleaned):
             file_number = f"{prefix}-{r.group(1)}"
         else:
-            file_number = filename
+            file_number = cleaned
 
     elif r := re.search(
         r"(H4610|C0930|H0930)-[A-Z]+\d{4,}", filename
