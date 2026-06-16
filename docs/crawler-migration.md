@@ -15,7 +15,7 @@
 新版框架核心文件：
 
 - `mdcx/crawlers/base/base.py`：生命周期、搜索、详情、异常捕获、注册表。
-- `mdcx/crawlers/base/types.py`：`Context`、`CrawlerData`、`NOT_SUPPORT`。
+- `mdcx/crawlers/base/types.py`：`Context`、`CrawlerData`、`NOT_SUPPORT`、`split_csv`。
 - `mdcx/crawlers/base/parser.py`：`DetailPageParser` 和解析 helper。
 - `mdcx/crawlers/__init__.py`：新版和旧版注册入口。
 

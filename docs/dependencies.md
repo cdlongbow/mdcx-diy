@@ -21,6 +21,7 @@
 | `av` | >=15.0.0 | 视频处理 |
 | `Jinja2` | >=3.1.6 | 模板引擎 |
 | `openpyxl` | >=3.1.0 | Excel 处理 |
+| `defusedxml` | >=0.7.1 | 安全 XML 解析（防止 XXE 攻击） |
 | `aiolimiter` | ==1.2.1 | 异步限流器 |
 | `oshash` | ==0.1.1 | OpenSubtitles 哈希 |
 | `ping3` | ==4.0.4 | 网络延迟检测 |

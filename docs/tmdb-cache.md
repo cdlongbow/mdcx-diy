@@ -326,8 +326,8 @@ TMDB 相关日志位于：
 
 | 文件 | 职责 |
 |------|------|
-| `./mdcx/core/tmdb_actor.py` | TMDB 缓存核心实现 |
-| `./mdcx/config/resources.py` | 内存缓存管理与重载 |
+| `./mdcx/core/tmdb_actor.py` | TMDB API 查询、xlsx 写入更新 |
+| `./mdcx/config/resources.py` | 内存缓存管理、xlsx 文件读取加载、重载 |
 | `./mdcx/core/nfo.py` | NFO 生成时读取 TMDB ID |
 | `./mdcx/models/types.py` | 数据模型定义 |
 | `./userdata/actor_database.xlsx` | 用户数据中的演员数据库（含 TMDB ID） |

@@ -38,7 +38,7 @@
 │   │   ├── migrations.py           # 配置迁移
 │   │   ├── models.py               # 配置模型
 │   │   ├── resource_policy.py      # 资源策略
-│   │   ├── resources.py            # 资源管理
+│   │   ├── resources.py            # 资源管理（含演员/信息数据库 xlsx 加载）
 │   │   └── v1.py                   # V1 配置兼容
 │   ├── controllers/                # 控制器(业务逻辑)
 │   │   ├── cut_window.py           # 裁剪窗口控制器
