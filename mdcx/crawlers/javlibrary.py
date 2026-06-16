@@ -5,11 +5,11 @@ from typing import override
 
 from lxml import etree
 
-from ..base.types import split_csv
 from ..config.enums import Language, Website
 from ..config.manager import manager
 from ..gen.field_enums import CrawlerResultFields
 from .base import BaseCrawler, Context, CrawlerData, CrawlerException
+from .base.types import split_csv
 
 
 def get_real_url(html, number, domain_2):

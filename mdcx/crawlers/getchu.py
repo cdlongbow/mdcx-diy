@@ -8,10 +8,10 @@ from typing import override
 
 from lxml import etree
 
-from ..base.types import split_csv
 from ..config.enums import Website
 from . import getchu_dl
 from .base import BaseCrawler, Context, CrawlerData, CrawlerException
+from .base.types import split_csv
 
 
 def normalize_detail_url(url: str) -> str:

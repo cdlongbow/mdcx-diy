@@ -6,8 +6,8 @@ import urllib.parse
 
 from lxml import etree
 
-from ..base.types import split_csv
 from .base import Context, CrawlerData, CrawlerException
+from .base.types import split_csv
 
 
 def get_title(html):

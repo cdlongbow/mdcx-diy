@@ -4,11 +4,11 @@ from typing import override
 
 from lxml import etree
 
-from ..base.types import split_csv
 from ..config.enums import Website
 from ..config.manager import manager
 from ..number import get_number_letters
 from .base import BaseCrawler, Context, CrawlerData, CrawlerException
+from .base.types import split_csv
 from .prestige import PrestigeCrawler
 
 DIRECTOR_PLACEHOLDER_CHARS = frozenset("-—－ー―‐~～·•. ")

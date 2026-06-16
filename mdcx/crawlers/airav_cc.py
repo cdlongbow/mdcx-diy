@@ -6,11 +6,11 @@ from typing import override
 
 from lxml import etree
 
-from ..base.types import split_csv
 from ..config.enums import Website
 from ..config.manager import manager
 from ..signals import signal
 from .base import BaseCrawler, Context, CrawlerData, CrawlerException
+from .base.types import split_csv
 
 
 def get_web_number(html):

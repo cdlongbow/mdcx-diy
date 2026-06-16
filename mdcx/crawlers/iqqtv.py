@@ -4,10 +4,10 @@ from typing import override
 
 from lxml import etree
 
-from ..base.types import split_csv
 from ..config.enums import Website
 from ..config.manager import manager
 from .base import BaseCrawler, Context, CrawlerData, CrawlerException
+from .base.types import split_csv
 
 _SUPPORTED_LANGUAGES = {"zh_cn", "zh_tw", "jp"}
 _OUTLINE_PREFIX_PATTERN = re.compile(r"^(?:简介|簡介|介绍|介紹|紹介)\s*[:：]?\s*")

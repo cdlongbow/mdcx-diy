@@ -4,10 +4,10 @@ from typing import override
 
 from lxml import etree
 
-from ..base.types import split_csv
 from ..config.manager import manager
 from ..config.models import Website
 from .base import BaseCrawler, Context, CrawlerData, CrawlerException
+from .base.types import split_csv
 
 
 def getTitle(html, number):  # 获取标题
