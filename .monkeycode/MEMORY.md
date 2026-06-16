@@ -55,3 +55,11 @@ Agent 在任务执行过程中发现的条目应遵循以下格式：
 - 项目有 `.pre-commit-config.yaml` 配置了 ruff 钩子，MonkeyCode 沙箱环境不持久化 git hooks，每次新会话开始时必须先执行 `pre-commit install` 安装钩子，然后再执行 `ruff format` 和 `ruff check --fix`。
 - 项目有 `.githooks/pre-push` 推送前自检脚本（运行 `uv run check`），每次新会话开始时必须先执行 `git config core.hooksPath .githooks` 启用它，否则推送不会触发自检。
 - 不要依赖 CI 来发现格式问题，本地先拦截。
+
+[每次新会话自动安装 pre-commit 钩子]
+- Date: 2026-06-16
+- Context: 用户希望每次新会话开始时自动安装 pre-commit 钩子，无需手动执行
+- Instructions:
+  - 每次新会话开始时，自动执行 `pre-commit install` 命令安装 git hooks。
+  - 如果 pre-commit 工具未安装，先执行 `pip install pre-commit --break-system-packages` 安装。
+  - 安装完成后确认 `.git/hooks/pre-commit` 文件存在且可执行。
