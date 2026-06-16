@@ -53,4 +53,5 @@ Agent 在任务执行过程中发现的条目应遵循以下格式：
 - Instructions:
 - 每次修改 Python 代码后、提交前，必须运行 `ruff format` 和 `ruff check --fix`，确认通过后再提交推送。
 - 项目有 `.pre-commit-config.yaml` 配置了 ruff 钩子，MonkeyCode 沙箱环境不持久化 git hooks，每次新会话开始时必须先执行 `pre-commit install` 安装钩子，然后再执行 `ruff format` 和 `ruff check --fix`。
+- 项目有 `.githooks/pre-push` 推送前自检脚本（运行 `uv run check`），每次新会话开始时必须先执行 `git config core.hooksPath .githooks` 启用它，否则推送不会触发自检。
 - 不要依赖 CI 来发现格式问题，本地先拦截。
