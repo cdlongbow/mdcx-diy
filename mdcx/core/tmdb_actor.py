@@ -679,7 +679,13 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
     actor_db = resources.actor_db or {}
 
     if resources.actor_db is None:
-        LogBuffer.log().write("  ⚠️ [TMDB] actor_db 为 None —— 演员数据库未加载，请检查 openpyxl 是否正确打包")
+        LogBuffer.log().write("  ⚠️ [TMDB] actor_db 为 None —— 尝试重新加载演员数据库...")
+        resources.reload_actor_db()
+        actor_db = resources.actor_db or {}
+        if resources.actor_db is not None:
+            LogBuffer.log().write(f"  ✅ [TMDB] 延迟加载成功: actor_db 已加载 {len(actor_db)} 条记录")
+        else:
+            LogBuffer.log().write("  ⚠️ [TMDB] actor_db 重新加载后仍为 None，将走 TMDB API 搜索")
     elif len(actor_db) == 0:
         LogBuffer.log().write("  ⚠️ [TMDB] actor_db 为空 (0 条记录) —— 文件可能为空或格式不匹配")
     else:

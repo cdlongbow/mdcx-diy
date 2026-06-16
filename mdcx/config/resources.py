@@ -10,6 +10,7 @@ from PyQt6.QtGui import QFontDatabase
 
 from ..consts import IS_PYINSTALLER, MAIN_PATH
 from ..manual import ManualConfig
+from ..models.log_buffer import LogBuffer
 from ..signals import signal
 from ..utils import singleton
 from ..utils.file import copy_file_sync
@@ -237,12 +238,14 @@ class Resources:
             old = self.actor_db
             self.actor_db = None
             self.actor_db_reverse_index = None
+            LogBuffer.log().write("  ❌ [演员数据库] 初始化失败: openpyxl 模块未加载")
             signal.show_traceback_log("[演员数据库] 初始化失败: openpyxl 模块未加载，请确认打包时已包含 openpyxl")
             return
         db_path = self.u("actor_database.xlsx")
         if not db_path.exists():
             # 文件不存在时不重置 actor_db，保留旧值（如空备份尚未创建）
             if self.actor_db is None:
+                LogBuffer.log().write(f"  ❌ [演员数据库] 文件不存在: {db_path}")
                 signal.show_traceback_log(f"[演员数据库] 文件不存在，等待首次 TMDB 查询后创建: {db_path}")
             return
         old = self.actor_db
@@ -251,10 +254,12 @@ class Resources:
 
             self.actor_db = _read_actor_db_xlsx(db_path)
             self.actor_db_reverse_index = None
+            LogBuffer.log().write(f"  ✅ [演员数据库] 已加载 {len(self.actor_db)} 条记录")
             signal.show_traceback_log(f"[演员数据库] 初始化成功: 已加载 {len(self.actor_db)} 条记录 (路径: {db_path})")
         except ImportError as e:
             self.actor_db = old
             self.actor_db_reverse_index = None
+            LogBuffer.log().write(f"  ❌ [演员数据库] 模块缺失: {e}")
             signal.show_traceback_log(
                 f"[演员数据库] 初始化失败 (模块缺失): {e}\n"
                 f"  请确认打包时已包含: {e.name if hasattr(e, 'name') else 'unknown'}\n"
@@ -262,7 +267,9 @@ class Resources:
             )
         except Exception as e:
             self.actor_db = old
-            signal.show_traceback_log(f"[演员数据库] 重载失败，保留当前缓存: {e}")
+            tb = traceback.format_exc()
+            LogBuffer.log().write(f"  ❌ [演员数据库] 重载失败: {e}")
+            signal.show_traceback_log(f"[演员数据库] 重载失败，保留当前缓存: {e}\n{tb}")
 
     def reload_info_db(self):
         """加载信息映射数据库 xlsx"""
