@@ -13,7 +13,18 @@ from typing import Any
 import zhconv
 
 from ..config.manager import manager
-from ..config.resources import resources
+from ..config.resources import (
+    COL_HREF,
+    COL_KEYWORD,
+    COL_TMDB_URL,
+    COL_TMDBID,
+    COL_ZH_CN,
+    COL_ZH_TW,
+    DB_HEADERS,
+    _tmdb_person_url,
+    read_actor_db_xlsx,
+    resources,
+)
 from ..models.log_buffer import LogBuffer
 from ..utils import convert_half
 
@@ -193,20 +204,7 @@ def is_japan_place(place: str) -> bool:
 
 # ============= 演员数据库 xlsx 管理 =============
 
-COL_JP = 0
-COL_ZH_CN = 1
-COL_ZH_TW = 2
-COL_KEYWORD = 3
-COL_HREF = 4
-COL_TMDBID = 5
-COL_TMDB_URL = 6
-
-DB_HEADERS = ["日文原名", "中文名", "繁体名", "别名", "链接", "tmdbid", "tmdb url"]
-
-
-def _tmdb_person_url(tmdbid: int | str) -> str:
-    return f"https://www.themoviedb.org/person/{tmdbid}"
-
+# ============= 演员名称规范化和变体扩展 =============
 
 _ACTOR_NAME_VARIANT_MAP = str.maketrans(
     {
@@ -370,40 +368,6 @@ def _build_actor_db_reverse_index(actor_db: dict[str, dict]) -> dict[str, str]:
     return index
 
 
-def _read_actor_db_xlsx(db_path: Path) -> dict[str, dict]:
-    db: dict[str, dict] = {}
-
-    import openpyxl
-
-    wb = openpyxl.load_workbook(db_path, read_only=True, data_only=True)
-    ws = wb.active
-    for row_idx, row in enumerate(ws.iter_rows(values_only=True), start=1):
-        if row_idx == 1:
-            continue
-        if len(row) < 1:
-            continue
-        jp = str(row[COL_JP] or "").strip()
-        if not jp:
-            continue
-        tmdbid_val = None
-        tmdbid_raw = str(row[COL_TMDBID] or "").strip() if len(row) > COL_TMDBID else ""
-        if tmdbid_raw and tmdbid_raw.isdigit():
-            tmdbid_val = int(tmdbid_raw)
-        tmdb_url = str(row[COL_TMDB_URL] or "").strip() if len(row) > COL_TMDB_URL else ""
-        if tmdbid_val is not None:
-            tmdb_url = _tmdb_person_url(tmdbid_val)
-        db[jp] = {
-            "zh_cn": str(row[COL_ZH_CN] or "").strip() if len(row) > COL_ZH_CN else "",
-            "zh_tw": str(row[COL_ZH_TW] or "").strip() if len(row) > COL_ZH_TW else "",
-            "keyword": str(row[COL_KEYWORD] or "").strip() if len(row) > COL_KEYWORD else "",
-            "href": str(row[COL_HREF] or "").strip() if len(row) > COL_HREF else "",
-            "tmdbid": tmdbid_val,
-            "tmdb_url": tmdb_url,
-        }
-    wb.close()
-    return db
-
-
 async def load_actor_db() -> dict[str, dict]:
     """
     加载演员数据库 xlsx。
@@ -413,7 +377,7 @@ async def load_actor_db() -> dict[str, dict]:
     if not db_path.exists():
         return {}
     try:
-        return _read_actor_db_xlsx(db_path)
+        return read_actor_db_xlsx(db_path)
     except ImportError:
         LogBuffer.log().write("  ⚠️ [演员数据库] 缺少 openpyxl，无法读取 actor_database.xlsx")
     except Exception as e:

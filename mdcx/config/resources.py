@@ -21,6 +21,54 @@ try:
 except ImportError:
     openpyxl = None
 
+# 演员数据库 xlsx 列索引（与 tmdb_actor 共享）
+COL_JP = 0
+COL_ZH_CN = 1
+COL_ZH_TW = 2
+COL_KEYWORD = 3
+COL_HREF = 4
+COL_TMDBID = 5
+COL_TMDB_URL = 6
+
+DB_HEADERS = ["日文原名", "中文名", "繁体名", "别名", "链接", "tmdbid", "tmdb url"]
+
+
+def _tmdb_person_url(tmdbid: int | str) -> str:
+    return f"https://www.themoviedb.org/person/{tmdbid}"
+
+
+def read_actor_db_xlsx(db_path: Path) -> dict[str, dict]:
+    db: dict[str, dict] = {}
+    import openpyxl
+
+    wb = openpyxl.load_workbook(db_path, read_only=True, data_only=True)
+    ws = wb.active
+    for row_idx, row in enumerate(ws.iter_rows(values_only=True), start=1):
+        if row_idx == 1:
+            continue
+        if len(row) < 1:
+            continue
+        jp = str(row[COL_JP] or "").strip()
+        if not jp:
+            continue
+        tmdbid_val = None
+        tmdbid_raw = str(row[COL_TMDBID] or "").strip() if len(row) > COL_TMDBID else ""
+        if tmdbid_raw and tmdbid_raw.isdigit():
+            tmdbid_val = int(tmdbid_raw)
+        tmdb_url = str(row[COL_TMDB_URL] or "").strip() if len(row) > COL_TMDB_URL else ""
+        if tmdbid_val is not None:
+            tmdb_url = _tmdb_person_url(tmdbid_val)
+        db[jp] = {
+            "zh_cn": str(row[COL_ZH_CN] or "").strip() if len(row) > COL_ZH_CN else "",
+            "zh_tw": str(row[COL_ZH_TW] or "").strip() if len(row) > COL_ZH_TW else "",
+            "keyword": str(row[COL_KEYWORD] or "").strip() if len(row) > COL_KEYWORD else "",
+            "href": str(row[COL_HREF] or "").strip() if len(row) > COL_HREF else "",
+            "tmdbid": tmdbid_val,
+            "tmdb_url": tmdb_url,
+        }
+    wb.close()
+    return db
+
 
 @singleton
 class Resources:
@@ -250,9 +298,7 @@ class Resources:
             return
         old = self.actor_db
         try:
-            from ..core.tmdb_actor import _read_actor_db_xlsx
-
-            self.actor_db = _read_actor_db_xlsx(db_path)
+            self.actor_db = read_actor_db_xlsx(db_path)
             self.actor_db_reverse_index = None
             LogBuffer.log().write(f"  ✅ [演员数据库] 已加载 {len(self.actor_db)} 条记录")
             signal.show_traceback_log(f"[演员数据库] 初始化成功: 已加载 {len(self.actor_db)} 条记录 (路径: {db_path})")
