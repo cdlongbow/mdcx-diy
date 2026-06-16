@@ -234,16 +234,18 @@ class Resources:
     def reload_actor_db(self):
         """重新加载演员数据库 xlsx（在刮削更新后调用）"""
         if openpyxl is None:
+            old = self.actor_db
             self.actor_db = None
             self.actor_db_reverse_index = None
             signal.show_traceback_log("[演员数据库] 初始化失败: openpyxl 模块未加载，请确认打包时已包含 openpyxl")
             return
         db_path = self.u("actor_database.xlsx")
         if not db_path.exists():
-            self.actor_db = None
-            self.actor_db_reverse_index = None
-            signal.show_traceback_log(f"[演员数据库] 初始化失败: 文件不存在 {db_path}")
+            # 文件不存在时不重置 actor_db，保留旧值（如空备份尚未创建）
+            if self.actor_db is None:
+                signal.show_traceback_log(f"[演员数据库] 文件不存在，等待首次 TMDB 查询后创建: {db_path}")
             return
+        old = self.actor_db
         try:
             from ..core.tmdb_actor import _read_actor_db_xlsx
 
@@ -251,12 +253,15 @@ class Resources:
             self.actor_db_reverse_index = None
             signal.show_traceback_log(f"[演员数据库] 初始化成功: 已加载 {len(self.actor_db)} 条记录 (路径: {db_path})")
         except ImportError as e:
+            self.actor_db = old
+            self.actor_db_reverse_index = None
             signal.show_traceback_log(
                 f"[演员数据库] 初始化失败 (模块缺失): {e}\n"
                 f"  请确认打包时已包含: {e.name if hasattr(e, 'name') else 'unknown'}\n"
                 f"  常见缺失模块: openpyxl, defusedxml, lxml"
             )
         except Exception as e:
+            self.actor_db = old
             signal.show_traceback_log(f"[演员数据库] 重载失败，保留当前缓存: {e}")
 
     def reload_info_db(self):

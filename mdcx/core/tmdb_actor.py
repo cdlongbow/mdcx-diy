@@ -17,6 +17,9 @@ from ..config.resources import resources
 from ..models.log_buffer import LogBuffer
 from ..utils import convert_half
 
+# 演员数据库写锁：防止多个并发任务同时写 xlsx 导致文件损坏
+_actor_db_write_lock = asyncio.Lock()
+
 
 async def _read_text_file(path: Path, encoding: str = "utf-8") -> str:
     return await asyncio.to_thread(path.read_text, encoding=encoding)
@@ -436,96 +439,97 @@ async def update_actor_db_row(
     """
     db_path = _get_db_path()
     db_path.parent.mkdir(parents=True, exist_ok=True)
-    try:
-        import openpyxl
+    async with _actor_db_write_lock:
+        try:
+            import openpyxl
 
-        write_status = "unchanged"
+            write_status = "unchanged"
 
-        if db_path.exists():
-            wb = openpyxl.load_workbook(db_path)
-        else:
-            wb = openpyxl.Workbook()
-            ws = wb.active
-            ws.title = "演员数据库"
-            for col, header in enumerate(DB_HEADERS, 1):
-                cell = ws.cell(row=1, column=col, value=header)
-                cell.font = openpyxl.styles.Font(bold=True)
-                cell.fill = openpyxl.styles.PatternFill("solid", fgColor="C0C0C0")
-                cell.alignment = openpyxl.styles.Alignment(horizontal="center")
-
-        ws = wb.active
-        if ws.title != "演员数据库":
-            ws.title = "演员数据库"
-
-        existing_row = None
-        for row_idx, row in enumerate(ws.iter_rows(min_col=1, max_col=7, values_only=True), start=1):
-            if row_idx == 1:
-                continue
-            if str(row[0] or "").strip() == jp:
-                existing_row = row_idx
-                break
-
-        if existing_row:
-            existing_zh_cn = ws.cell(row=existing_row, column=COL_ZH_CN + 1).value
-            existing_zh_tw = ws.cell(row=existing_row, column=COL_ZH_TW + 1).value
-            if overwrite_names:
-                if zh_cn and str(existing_zh_cn or "").strip() != zh_cn:
-                    ws.cell(row=existing_row, column=COL_ZH_CN + 1, value=zh_cn)
-                    write_status = "updated_zh_cn"
-                if zh_tw and str(existing_zh_tw or "").strip() != zh_tw:
-                    ws.cell(row=existing_row, column=COL_ZH_TW + 1, value=zh_tw)
-                    write_status = "updated_zh_cn_zh_tw" if write_status == "updated_zh_cn" else "updated_zh_tw"
+            if db_path.exists():
+                wb = openpyxl.load_workbook(db_path)
             else:
-                if not existing_zh_cn and zh_cn:
-                    ws.cell(row=existing_row, column=COL_ZH_CN + 1, value=zh_cn)
-                if not existing_zh_tw and zh_tw:
-                    ws.cell(row=existing_row, column=COL_ZH_TW + 1, value=zh_tw)
+                wb = openpyxl.Workbook()
+                ws = wb.active
+                ws.title = "演员数据库"
+                for col, header in enumerate(DB_HEADERS, 1):
+                    cell = ws.cell(row=1, column=col, value=header)
+                    cell.font = openpyxl.styles.Font(bold=True)
+                    cell.fill = openpyxl.styles.PatternFill("solid", fgColor="C0C0C0")
+                    cell.alignment = openpyxl.styles.Alignment(horizontal="center")
 
-            if keyword:
-                existing_kw = str(ws.cell(row=existing_row, column=COL_KEYWORD + 1).value or "").strip()
-                if append_keyword:
-                    new_kws = {k.strip() for k in keyword.split(",") if k.strip()}
-                    existing_kws_set = set()
-                    if existing_kw:
-                        existing_kws_set = {k.strip() for k in existing_kw.split(",") if k.strip()}
-                    merged = existing_kws_set | new_kws
-                    ws.cell(row=existing_row, column=COL_KEYWORD + 1, value=",".join(sorted(merged)))
-                elif not existing_kw:
-                    ws.cell(row=existing_row, column=COL_KEYWORD + 1, value=keyword)
+            ws = wb.active
+            if ws.title != "演员数据库":
+                ws.title = "演员数据库"
 
-            if not ws.cell(row=existing_row, column=COL_HREF + 1).value and href:
-                ws.cell(row=existing_row, column=COL_HREF + 1, value=href)
-            if tmdbid is not None and not ws.cell(row=existing_row, column=COL_TMDBID + 1).value:
-                ws.cell(row=existing_row, column=COL_TMDBID + 1, value=tmdbid)
-                write_status = "inserted_tmdbid"
-                tmdb_url = _tmdb_person_url(tmdbid)
-                ws.cell(row=existing_row, column=COL_TMDB_URL + 1).value = None
-                ws.cell(row=existing_row, column=COL_TMDB_URL + 1, value=tmdb_url)
-                ws.cell(row=existing_row, column=COL_TMDB_URL + 1).hyperlink = tmdb_url
-            elif tmdbid is not None and write_status == "unchanged":
-                write_status = "kept_existing_tmdbid"
-        else:
-            ws.append([jp, zh_cn, zh_tw, keyword, href, tmdbid or "", ""])
-            write_status = "inserted_new_row"
-            last_row = ws.max_row
-            if tmdbid:
-                tmdb_url = _tmdb_person_url(tmdbid)
-                ws.cell(row=last_row, column=COL_TMDB_URL + 1).value = None
-                ws.cell(row=last_row, column=COL_TMDB_URL + 1, value=tmdb_url)
-                ws.cell(row=last_row, column=COL_TMDB_URL + 1).hyperlink = tmdb_url
+            existing_row = None
+            for row_idx, row in enumerate(ws.iter_rows(min_col=1, max_col=7, values_only=True), start=1):
+                if row_idx == 1:
+                    continue
+                if str(row[0] or "").strip() == jp:
+                    existing_row = row_idx
+                    break
 
-        _format_db_worksheet(ws)
+            if existing_row:
+                existing_zh_cn = ws.cell(row=existing_row, column=COL_ZH_CN + 1).value
+                existing_zh_tw = ws.cell(row=existing_row, column=COL_ZH_TW + 1).value
+                if overwrite_names:
+                    if zh_cn and str(existing_zh_cn or "").strip() != zh_cn:
+                        ws.cell(row=existing_row, column=COL_ZH_CN + 1, value=zh_cn)
+                        write_status = "updated_zh_cn"
+                    if zh_tw and str(existing_zh_tw or "").strip() != zh_tw:
+                        ws.cell(row=existing_row, column=COL_ZH_TW + 1, value=zh_tw)
+                        write_status = "updated_zh_cn_zh_tw" if write_status == "updated_zh_cn" else "updated_zh_tw"
+                else:
+                    if not existing_zh_cn and zh_cn:
+                        ws.cell(row=existing_row, column=COL_ZH_CN + 1, value=zh_cn)
+                    if not existing_zh_tw and zh_tw:
+                        ws.cell(row=existing_row, column=COL_ZH_TW + 1, value=zh_tw)
 
-        wb.save(db_path)
-        wb.close()
-        resources.reload_actor_db()
-        return write_status
-    except ImportError:
-        return "missing_openpyxl"
-    except PermissionError:
-        return "file_locked"
-    except Exception as e:
-        return f"write_failed:{e}"
+                if keyword:
+                    existing_kw = str(ws.cell(row=existing_row, column=COL_KEYWORD + 1).value or "").strip()
+                    if append_keyword:
+                        new_kws = {k.strip() for k in keyword.split(",") if k.strip()}
+                        existing_kws_set = set()
+                        if existing_kw:
+                            existing_kws_set = {k.strip() for k in existing_kw.split(",") if k.strip()}
+                        merged = existing_kws_set | new_kws
+                        ws.cell(row=existing_row, column=COL_KEYWORD + 1, value=",".join(sorted(merged)))
+                    elif not existing_kw:
+                        ws.cell(row=existing_row, column=COL_KEYWORD + 1, value=keyword)
+
+                if not ws.cell(row=existing_row, column=COL_HREF + 1).value and href:
+                    ws.cell(row=existing_row, column=COL_HREF + 1, value=href)
+                if tmdbid is not None and not ws.cell(row=existing_row, column=COL_TMDBID + 1).value:
+                    ws.cell(row=existing_row, column=COL_TMDBID + 1, value=tmdbid)
+                    write_status = "inserted_tmdbid"
+                    tmdb_url = _tmdb_person_url(tmdbid)
+                    ws.cell(row=existing_row, column=COL_TMDB_URL + 1).value = None
+                    ws.cell(row=existing_row, column=COL_TMDB_URL + 1, value=tmdb_url)
+                    ws.cell(row=existing_row, column=COL_TMDB_URL + 1).hyperlink = tmdb_url
+                elif tmdbid is not None and write_status == "unchanged":
+                    write_status = "kept_existing_tmdbid"
+            else:
+                ws.append([jp, zh_cn, zh_tw, keyword, href, tmdbid or "", ""])
+                write_status = "inserted_new_row"
+                last_row = ws.max_row
+                if tmdbid:
+                    tmdb_url = _tmdb_person_url(tmdbid)
+                    ws.cell(row=last_row, column=COL_TMDB_URL + 1).value = None
+                    ws.cell(row=last_row, column=COL_TMDB_URL + 1, value=tmdb_url)
+                    ws.cell(row=last_row, column=COL_TMDB_URL + 1).hyperlink = tmdb_url
+
+            _format_db_worksheet(ws)
+
+            wb.save(db_path)
+            wb.close()
+            resources.reload_actor_db()
+            return write_status
+        except ImportError:
+            return "missing_openpyxl"
+        except PermissionError:
+            return "file_locked"
+        except Exception as e:
+            return f"write_failed:{e}"
 
 
 def search_actor_db_reverse(query_name: str) -> dict | None:
