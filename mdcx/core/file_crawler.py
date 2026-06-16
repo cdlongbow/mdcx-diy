@@ -49,7 +49,10 @@ def _normalize_release_value(value: object) -> str:
     if not release:
         return ""
     release = release.replace("/", "-").replace(".", "-")
-    if not (match := re.search(r"(\d{4})-(\d{1,2})-(\d{1,2})", release)):
+    match = re.search(r"(\d{4})-(\d{1,2})-(\d{1,2})", release)
+    if not match:
+        match = re.search(r"(\d{4})(\d{2})(\d{2})", release)
+    if not match:
         return ""
     year, month, day = (int(part) for part in match.groups())
     try:

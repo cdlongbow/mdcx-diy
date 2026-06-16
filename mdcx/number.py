@@ -138,6 +138,8 @@ def get_number_letters(number: str) -> str:
 
 
 def get_number_first_letter(number: str) -> str:
+    if not number:
+        return "#"
     result = number.upper()[0]
     return result if result.encode("utf-8").isalnum() else "#"
 

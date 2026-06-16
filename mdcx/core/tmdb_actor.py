@@ -90,6 +90,7 @@ async def _tmdb_request(client: Any, method: str, url: str, **kwargs) -> _TmdbRe
     """
     await _tmdb_rate_limiter.acquire()
     params = kwargs.get("params")
+    follow_redirects = kwargs.get("follow_redirects", True)
     if hasattr(client, "request"):
         resp, err = await client.request(method, url, params=params)
         if resp is None:
@@ -97,7 +98,7 @@ async def _tmdb_request(client: Any, method: str, url: str, **kwargs) -> _TmdbRe
         return _TmdbResponse(resp.status_code, resp.text)
     elif hasattr(client, method.lower()):
         send = getattr(client, method.lower())
-        resp = await send(url, params=params, allow_redirects=kwargs.get("follow_redirects", True))
+        resp = await send(url, params=params, allow_redirects=follow_redirects)
         return _TmdbResponse(resp.status, await resp.text())
     return None
 

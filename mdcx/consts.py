@@ -1,3 +1,4 @@
+import os
 import platform
 import sys
 from pathlib import Path
@@ -13,7 +14,7 @@ os_name = platform.system()
 mac_ver = platform.mac_ver()[0]
 IS_WINDOWS = os_name == "Windows"
 IS_MAC = os_name == "Darwin"
-IS_DOCKER = os_name == "Linux" or os_name == "Java"
+IS_DOCKER = os.path.isfile("/.dockerenv")
 
 IS_NFC = True  # unicode NFC normalization
 if IS_MAC and mac_ver:

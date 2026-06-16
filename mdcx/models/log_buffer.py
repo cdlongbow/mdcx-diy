@@ -13,6 +13,7 @@ except ImportError:
 
 
 class LogBuffer:
+    _lock = threading.Lock()
     all_buffers = {}
     global_buffer = None
 
@@ -43,32 +44,31 @@ class LogBuffer:
         task_id = LogBuffer._get_task_id()
         if task_id is None:
             return LogBuffer._global_buffer()
-        if task_id not in LogBuffer.all_buffers:
-            LogBuffer.all_buffers[task_id] = {}
-        if category not in LogBuffer.all_buffers[task_id]:
-            LogBuffer.all_buffers[task_id][category] = LogBuffer()
-        return LogBuffer.all_buffers[task_id][category]
+        with LogBuffer._lock:
+            if task_id not in LogBuffer.all_buffers:
+                LogBuffer.all_buffers[task_id] = {}
+            if category not in LogBuffer.all_buffers[task_id]:
+                LogBuffer.all_buffers[task_id][category] = LogBuffer()
+            return LogBuffer.all_buffers[task_id][category]
 
     @staticmethod
     def clear_task():
-        """清除当前任务（线程或协程）的日志缓冲区"""
         task_id = LogBuffer._get_task_id()
         if task_id is not None:
-            LogBuffer.all_buffers.pop(task_id, None)
+            with LogBuffer._lock:
+                LogBuffer.all_buffers.pop(task_id, None)
 
     @staticmethod
     def clear_stale_buffers(max_size: int = 200) -> int:
-        """清理过期或过多的缓冲区条目, 防止内存泄漏.
-
-        当 all_buffers 中的条目数超过 max_size 时, 清除最早的一半条目.
-        返回被清除的条目数.
-        """
         if len(LogBuffer.all_buffers) <= max_size:
             return 0
-        keys = list(LogBuffer.all_buffers.keys())
-        remove_count = len(keys) // 2
-        for key in keys[:remove_count]:
-            LogBuffer.all_buffers.pop(key, None)
+        with LogBuffer._lock:
+            if len(LogBuffer.all_buffers) <= max_size:
+                return 0
+            keys = list(LogBuffer.all_buffers.keys())
+            remove_count = len(keys) // 2
+            for key in keys[:remove_count]:
+                LogBuffer.all_buffers.pop(key, None)
         return remove_count
 
     @staticmethod
@@ -112,14 +112,14 @@ class LogBuffer:
 
     def get(self):
         result = "".join(self.buffer)
-        # 也收集其他 task 的 buffer（跨协程日志收集）
         task_id = LogBuffer._get_task_id()
-        for tid, categories in LogBuffer.all_buffers.items():
-            if tid == task_id:
-                continue
-            for category, buf in categories.items():
-                if isinstance(buf, LogBuffer):
-                    result += "".join(buf.buffer)
+        with LogBuffer._lock:
+            for tid, categories in list(LogBuffer.all_buffers.items()):
+                if tid == task_id:
+                    continue
+                for category, buf in categories.items():
+                    if isinstance(buf, LogBuffer):
+                        result += "".join(buf.buffer)
         return result
 
     def last(self):
