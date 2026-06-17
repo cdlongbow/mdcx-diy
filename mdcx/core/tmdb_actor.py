@@ -255,7 +255,7 @@ def _format_db_worksheet(ws) -> None:
         from openpyxl.utils import get_column_letter
 
         # 固定表头
-        ws.freeze_panes = "A2"
+        ws.freeze_panes = "B2"
 
         # 自动筛选
         last_col = get_column_letter(len(DB_HEADERS))

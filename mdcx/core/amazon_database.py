@@ -121,7 +121,7 @@ def _format_asin_worksheet(ws) -> None:
         import openpyxl
         from openpyxl.utils import get_column_letter
 
-        ws.freeze_panes = "A2"
+        ws.freeze_panes = "B2"
 
         last_col = get_column_letter(6)
         ws.auto_filter.ref = f"A1:{last_col}{ws.max_row}"
