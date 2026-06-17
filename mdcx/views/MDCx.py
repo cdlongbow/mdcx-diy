@@ -12626,16 +12626,20 @@ class Ui_MDCx:
                 "                                素人和 FC2 番号演员可能是「素人」之类假名字，勾选「使用AV-wiki获取演员真实名字」，可以请求 AV-wiki\n"
                 "                                获取演员真实日文名，之后可使用映射表翻译为中文！<br>\n"
                 "                                演员名比较复杂，不能简单使用翻译引擎翻译。主要的问题：演员名翻译不准确、演员有多个名字、同一演员不同番号演员名不统一、各网站使用的演员名不统一等。<br>\n"
-                "                                不过，通过演员名映射翻译表可以解决这些问题，使刮削后的演员名整齐统一。<br>\n"
-                "                                实现逻辑：刮削网站获取演员名后，通过查询映射表中的匹配词来映射对应输出词。\n"
+                "                                不过，通过演员映射表可以解决这些问题，使刮削后的演员名整齐统一。<br>\n"
+                "                                实现逻辑：刮削网站获取演员名后，通过查询映射表中的匹配词来映射对应输出词。同时支持自动通过 TMDB API 获取演员 TMDB ID 和中英文翻译。<br>\n"
                 "                                <br>\n"
-                "                                演员名映射翻译表文件名为：mapping_actor.xml<br>\n"
+                "                                演员映射表文件名为：actor_database.xlsx<br>\n"
                 "                                ·\n"
-                "                                Windows位置：\\配置文件目录\\userdata\\mapping_actor.xml（配置文件目录在「设置」-「其他」中设置）<br>\n"
-                "                                · Mac位置：/配置文件目录/userdata/mapping_actor.xml<br>\n"
-                "                                你可使用文件编辑工具打开该文件自定义修改添加。映射表中的字段含义如下：<br>\n"
-                "                                1、keyword：匹配词（每个名字前后都要有逗号）。刮削网站获取演员名后，会在 keyword 的名字中进行匹配。<br>\n"
-                "                                2、zh_cn/zh_tw/jp：输出词。当 keyword 匹配到演员名时，可输出对应语言的名字。</p>",
+                "                                Windows位置：\\配置文件目录\\userdata\\actor_database.xlsx（配置文件目录在「设置」-「高级」中设置）<br>\n"
+                "                                · Mac位置：/配置文件目录/userdata/actor_database.xlsx<br>\n"
+                "                                你可使用 Excel 或文件编辑工具打开该文件自定义修改添加。映射表中各字段含义如下：<br>\n"
+                "                                1、日文原名：演员日文名（唯一标识，不可重复）。<br>\n"
+                "                                2、中文名/繁体名：输出词。匹配到演员时可输出中文简体名/繁体名对应的名字。<br>\n"
+                "                                3、别名：匹配词（多个时用逗号间隔）。刮削网站获取演员名后，会在别名中进行匹配。<br>\n"
+                "                                4、链接：演员页面链接如libredmm、Minnano-av、javdb等。<br>\n"
+                "                                5、tmdbid：TMDB ID。优先从本地数据库获取，不存在时自动通过 TMDB API 搜索并填充。<br>\n"
+                "                                6、tmdb url：TMDB 页面链接（自动根据 tmdbid 生成）。</p>",
             )
         )
         self.checkBox_actor_realname.setText(_translate("MDCx", "使用AV-wiki获取演员真实名字"))
@@ -12646,7 +12650,7 @@ class Ui_MDCx:
         self.radioButton_tag_zh_tw.setText(_translate("MDCx", "中文繁体"))
         self.radioButton_tag_jp.setText(_translate("MDCx", "日语"))
         self.label_165.setText(
-            _translate("MDCx", "映射表文件名：mapping_info.xml。作用和演员映射表类似，说明可参考演员映射表。")
+            _translate("MDCx", "映射表文件名：info_database.xlsx。作用和演员映射表类似，说明可参考演员映射表。")
         )
         self.checkBox_tag_translate.setText(_translate("MDCx", "使用信息映射表翻译标签"))
         self.label_251.setText(_translate("MDCx", "标签语言："))
@@ -12655,7 +12659,7 @@ class Ui_MDCx:
         self.label_255.setText(_translate("MDCx", "系列语言："))
         self.label_256.setText(_translate("MDCx", "翻译方式："))
         self.label_245.setText(
-            _translate("MDCx", "映射表文件名：mapping_info.xml。作用和演员映射表类似，说明可参考演员映射表。")
+            _translate("MDCx", "映射表文件名：info_database.xlsx。作用和演员映射表类似，说明可参考演员映射表。")
         )
         self.radioButton_series_zh_cn.setText(_translate("MDCx", "中文简体"))
         self.radioButton_series_zh_tw.setText(_translate("MDCx", "中文繁体"))
@@ -12665,7 +12669,7 @@ class Ui_MDCx:
         self.label_259.setText(_translate("MDCx", "片商语言："))
         self.label_260.setText(_translate("MDCx", "翻译方式："))
         self.label_247.setText(
-            _translate("MDCx", "映射表文件名：mapping_info.xml。作用和演员映射表类似，说明可参考演员映射表。")
+            _translate("MDCx", "映射表文件名：info_database.xlsx。作用和演员映射表类似，说明可参考演员映射表。")
         )
         self.radioButton_studio_zh_cn.setText(_translate("MDCx", "中文简体"))
         self.radioButton_studio_zh_tw.setText(_translate("MDCx", "中文繁体"))
@@ -12675,7 +12679,7 @@ class Ui_MDCx:
         self.label_264.setText(_translate("MDCx", "发行商语言："))
         self.label_265.setText(_translate("MDCx", "翻译方式："))
         self.label_266.setText(
-            _translate("MDCx", "映射表文件名：mapping_info.xml。作用和演员映射表类似，说明可参考演员映射表。")
+            _translate("MDCx", "映射表文件名：info_database.xlsx。作用和演员映射表类似，说明可参考演员映射表。")
         )
         self.radioButton_publisher_zh_cn.setText(_translate("MDCx", "中文简体"))
         self.radioButton_publisher_zh_tw.setText(_translate("MDCx", "中文繁体"))
@@ -12685,7 +12689,7 @@ class Ui_MDCx:
         self.label_267.setText(_translate("MDCx", "发行商语言："))
         self.label_268.setText(_translate("MDCx", "翻译方式："))
         self.label_269.setText(
-            _translate("MDCx", "映射表文件名：mapping_info.xml。作用和演员映射表类似，说明可参考演员映射表。")
+            _translate("MDCx", "映射表文件名：info_database.xlsx。作用和演员映射表类似，说明可参考演员映射表。")
         )
         self.checkBox_director_translate.setText(_translate("MDCx", "使用信息映射表翻译导演"))
         self.radioButton_director_zh_cn.setText(_translate("MDCx", "中文简体"))
