@@ -150,6 +150,11 @@ def _format_asin_worksheet(ws) -> None:
                         cell.style = "Hyperlink"
                         cell.hyperlink = val
 
+        # 超链接处理会覆盖边框，重新设置
+        for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=6):
+            for cell in row:
+                cell.border = border
+
         caps = {1: 20, 2: 15, 3: 50, 4: 80, 5: 50, 6: 40}
         col_max = [0] * 7
         for row in ws.iter_rows(min_row=2, values_only=True):

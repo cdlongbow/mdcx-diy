@@ -302,6 +302,11 @@ def _format_db_worksheet(ws) -> None:
                     tmdb_cell.style = "Hyperlink"
                     tmdb_cell.hyperlink = tmdb_val
 
+        # 超链接处理会覆盖边框，重新设置
+        for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=len(DB_HEADERS)):
+            for cell in row:
+                cell.border = border
+
         # 自动列宽
         caps = {1: 25, 2: 15, 3: 15, 4: 60, 5: 50, 6: 12, 7: 42}
         col_max = [0] * (len(DB_HEADERS) + 1)
