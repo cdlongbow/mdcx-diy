@@ -147,8 +147,8 @@ def _format_asin_worksheet(ws) -> None:
                 if val and val.startswith("http"):
                     existing_target = cell.hyperlink.target if cell.hyperlink else None
                     if existing_target != val:
-                        cell.hyperlink = val
                         cell.style = "Hyperlink"
+                        cell.hyperlink = val
 
         caps = {1: 20, 2: 15, 3: 50, 4: 80, 5: 50, 6: 40}
         col_max = [0] * 7

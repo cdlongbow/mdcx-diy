@@ -286,8 +286,8 @@ def _format_db_worksheet(ws) -> None:
             if href_val and href_val.startswith("http"):
                 existing_target = href_cell.hyperlink.target if href_cell.hyperlink else None
                 if existing_target != href_val:
-                    href_cell.hyperlink = href_val
                     href_cell.style = "Hyperlink"
+                    href_cell.hyperlink = href_val
             tmdbid_val = str(row[COL_TMDBID].value or "").strip()
             if tmdbid_val.isdigit():
                 expected_tmdb_val = _tmdb_person_url(tmdbid_val)
@@ -299,8 +299,8 @@ def _format_db_worksheet(ws) -> None:
             if tmdb_val and tmdb_val.startswith("http"):
                 existing_target = tmdb_cell.hyperlink.target if tmdb_cell.hyperlink else None
                 if existing_target != tmdb_val:
-                    tmdb_cell.hyperlink = tmdb_val
                     tmdb_cell.style = "Hyperlink"
+                    tmdb_cell.hyperlink = tmdb_val
 
         # 自动列宽
         caps = {1: 25, 2: 15, 3: 15, 4: 60, 5: 50, 6: 12, 7: 42}
