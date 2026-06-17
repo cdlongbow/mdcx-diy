@@ -659,7 +659,9 @@ class MyMAinWindow(QMainWindow):
         # activeAppName = AppKit.NSWorkspace.sharedWorkspace().activeApplication()['NSApplicationName'] # 活动窗口的标题
 
     def closeEvent(self, a0):
-        if self._user_initiated_close:
+        if Switch.HIDE_CLOSE in manager.config.switch_on:
+            self.hide()
+        else:
             self.ready_to_exit()
         if a0:
             a0.ignore()
