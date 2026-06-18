@@ -10,8 +10,6 @@
 - 调试信息进入 `CrawlerDebugInfo.logs`，错误进入 `CrawlerDebugInfo.error`
 - 迁移完成的站点应删除旧 `main()` 入口、旧调试样例和不再使用的 `actor_photo` 兼容代码
 
-简单说就是：所有刮削器都要变成统一的类结构，数据格式、调试信息和错误处理都走标准接口。
-
 ## 新版框架边界
 
 新版框架核心文件：
@@ -56,8 +54,6 @@ class XxxCrawler(GenericBaseCrawler[XxxContext]):
 ```
 
 当站点不是"搜索页 -> 详情页"模型，例如 API、POST 直接返回详情 HTML、多个接口聚合，可以重写 `_run()`，但仍需返回 `CrawlerResult`，并写入 `debug_info.search_urls/detail_urls`。
-
-简单说就是：普通页面站直接用标准模板，有特殊逻辑的可以重写 `_run()`，但返回格式不能变。
 
 ## 字段映射规则
 
@@ -114,8 +110,6 @@ uv run pytest tests/crawlers
 2. 有 POST、特殊编码、Cookie 或图片校验的站点：例如 `jav321`、`mgstage`、`getchu`
 3. 多语言站点：`airav_cc`、`iqqtv`、`javlibrary`。这类必须保留 `ctx.input.language` 行为
 4. API、组合或委托站点：例如 `official`、`theporndb`、`getchu_dmm`。这类通常需要单独设计 `_run()`
-
-简单说就是：从简单的 HTML 站点开始迁移，最后处理复杂的 API 站点。
 
 ## 当前已迁移站点
 

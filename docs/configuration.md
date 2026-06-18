@@ -8,11 +8,9 @@
 
 ### `Config`
 
-主配置类，基于 Pydantic。下面按区域介绍所有配置项。
+主配置类，基于 Pydantic。
 
 **1. 通用设置**
-
-最基本的路径和文件类型配置。
 
 - `media_path`：媒体文件存放路径
 - `softlink_path`：软链接存放路径
@@ -21,11 +19,7 @@
 - `media_type`：媒体文件类型列表（如 mp4、mkv）
 - `sub_type`：字幕文件类型列表（如 srt、ass）
 
-简单说：告诉程序"你的电影在哪、处理完放哪"。
-
 **2. 清理设置**
-
-处理前先清理文件名中的杂质。
 
 - `folders`：需要排除的目录列表
 - `string`：要从文件名中删除的字符串列表
@@ -34,9 +28,7 @@
 
 **3. 刮削设置**
 
-从网站抓取影片信息的参数。
-
-- `thread_number`：同时抓取的线程数（并发数）
+- `thread_number`：并发抓取线程数
 - `thread_time`：每次抓取之间的延时（秒）
 - `main_mode`：主模式
 - `read_mode`：读取模式
@@ -44,11 +36,7 @@
 - `download_files`：需要下载的文件类型列表
 - `scrape_like`：刮削模式
 
-简单说：控制刮削的速度和行为，线程越多越快，但也更容易被网站封。
-
 **4. 网站设置**
-
-不同类别的影片分别使用哪些数据源网站。
 
 - `website_youma`：有码影片的网站源列表
 - `website_wuma`：无码影片的网站源列表
@@ -56,19 +44,15 @@
 - `website_fc2`：FC2 影片的网站源列表
 - `website_oumei`：欧美影片的网站源列表
 - `website_guochan`：国产影片的网站源列表
-- `fixed_scraping_type`：锁定刮削类型（强制按某类处理）
+- `fixed_scraping_type`：锁定刮削类型
 
 **5. 字段配置**
-
-每个字段从哪个网站抓、用什么语言、是否翻译。
 
 - `field_configs`：各字段的网站优先级、语言、翻译开关
 - `type_field_configs`：按类型区分字段优先级
 - `site_configs`：网站配置
 
 **6. 翻译配置**
-
-抓取到的信息如果需要翻译，用这里配置的服务。
 
 - `translate_config`：`TranslateConfig` 对象
   - `translate_by`：翻译服务列表（按优先级）
@@ -80,8 +64,6 @@
 
 **7. 命名和格式化**
 
-输出文件叫什么名字、长什么样。
-
 - `nfo_include_new`：NFO 文件中包含哪些内容
 - `folder_name`：目录名称模板
 - `naming_file`：文件命名模板
@@ -91,8 +73,6 @@
 - `*_style`：各类样式配置
 
 **8. 服务器设置**
-
-连接 Emby 或 Jellyfin 的参数。
 
 - `server_type`：服务器类型（emby/jellyfin）
 - `emby_url`：Emby 服务器地址
@@ -104,16 +84,12 @@
 
 **9. 水印设置**
 
-给图片加水印的配置。
-
 - `poster_mark`、`thumb_mark`、`fanart_mark`：不同图片的水印
 - `mark_size`：水印大小
 - `mark_type`：水印类型列表
 - `mark_fixed`、`mark_pos*`：水印位置规则
 
 **10. 网络设置**
-
-代理和超时等网络相关配置。
 
 - `use_proxy`：代理类型（no/http/socks5）
 - `proxy`：代理地址
@@ -195,8 +171,6 @@
 4. 验证配置是否正确
 5. 应用配置
 
-简单说：程序启动时会自动找配置文件，发现旧版的就帮你转成新版。
-
 ---
 
 ## 网络配置详解
@@ -256,7 +230,7 @@
    libredmm
    ```
 
-简单说：你只需写网站简称（如 `javdb`），系统会自动匹配它的所有域名。
+**配置项**
 
 **支持的网站值**
 

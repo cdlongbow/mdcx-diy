@@ -1,7 +1,5 @@
 # 安装指南
 
-跟着下面的步骤，你就能在自己的电脑上装好 MDCX。
-
 ## 你需要准备什么
 
 ### 操作系统
@@ -11,7 +9,7 @@
 
 ### Python 环境
 - Python 3.13.4 或更新的版本
-- [uv](https://docs.astral.sh/uv/getting-started/installation/) 包管理器（用来安装和管理依赖）
+- [uv](https://docs.astral.sh/uv/getting-started/installation/) 包管理器
 
 ### 程序要用到的软件包
 - PyQt6（程序界面框架）
@@ -34,7 +32,6 @@
 
 2. **装 uv**
 ```powershell
-# 打开 PowerShell，运行这一行
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
@@ -61,11 +58,11 @@ uv run main.py
 
 1. **装系统需要的库**
 ```bash
-# 如果你用的是 Ubuntu 或 Debian
+# Ubuntu 或 Debian
 sudo apt update
 sudo apt install python3 python3-pip python3-venv libxcb-xinerama0
 
-# 如果你用的是 CentOS 或 RHEL
+# CentOS 或 RHEL
 sudo yum install python3 python3-pip libxcb-xinerama0
 ```
 
@@ -97,7 +94,6 @@ uv run main.py
 
 1. **装 Python**
 ```bash
-# 推荐用 Homebrew 安装
 brew install python@3.13
 ```
 
@@ -127,13 +123,13 @@ uv run main.py
 
 ## 配置
 
-第一次启动时，程序会自动生成配置文件。想了解详细的配置项，请看[配置说明文档](configuration.md)。
+第一次启动时，程序会自动生成配置文件。详情见[配置说明文档](configuration.md)。
 
 ## 常见问题
 
 ### 装 PyQt6 时出错
 
-如果提示 PyQt6 相关的错误，手动装一下：
+手动装一下：
 
 ```bash
 pip install PyQt6
@@ -142,15 +138,11 @@ uv pip install PyQt6
 
 ### 提示权限不够（Linux/macOS）
 
-给程序文件加个执行权限：
-
 ```bash
 chmod +x main.py
 ```
 
 ### 缺系统库（Linux）
-
-如果界面显示不正常，补装几个库：
 
 ```bash
 # Ubuntu/Debian
@@ -163,7 +155,7 @@ sudo yum install libxcb-xinerama0 libxcb-cursor0
 ## 卸载
 
 1. 删除项目文件夹
-2. 如果你用了虚拟环境，把虚拟环境文件夹也删掉
+2. 删除虚拟环境文件夹
 3. （可选）删除用户配置目录（一般在 `~/.mdcx`）
 
 ## 更新到最新版
@@ -175,13 +167,6 @@ uv sync --all-extras --dev
 
 ## 下一步
 
-- 阅读[用户使用手册](USER_GUIDE.md)，了解程序怎么用
-- 查看[配置说明](configuration.md)，了解各项设置
-- 遇到问题先看看[FAQ](FAQ.md)
-
-## 获取帮助
-
-如果还有问题：
-- 查看[FAQ](FAQ.md)
-- 在 GitHub 上提交 Issue
-- 访问项目 Wiki 获取更多信息
+- 阅读[用户使用手册](USER_GUIDE.md)
+- 查看[配置说明](configuration.md)
+- 遇到问题看看[FAQ](FAQ.md)

@@ -1,7 +1,5 @@
 # 测试覆盖率摘要
 
-本文档提供 MDCx 测试覆盖率的概述。
-
 ## 测试框架
 
 - **测试框架**：pytest
@@ -48,9 +46,9 @@ tests/
 
 ### 覆盖的核心功能
 
-| 模块 | 测了什么 |
+| 模块 | 测试内容 |
 |------|---------|
-| `tmdb_actor.py` | 查 TMDB ID、读写 Excel、中文繁简归一化、候选排序、反查缓存、LibreDMM 链接补全 |
+| `tmdb_actor.py` | TMDB ID 查询、Excel 读写、中文繁简归一化、候选排序、反查缓存、LibreDMM 链接补全 |
 | `mapping_resources.py` | 演员/制作商/标签映射表的加载和查询 |
 | `nfo.py` | NFO 读写、转义、标签优先级、演员 tmdbid 标签、外部 ID 标签 |
 
@@ -65,8 +63,8 @@ tests/
 ### 集成测试
 
 - 测试多个模块协作
-- 测试完整的刮削流程
-- 使用真实的网络请求（可配置）
+- 测试完整刮削流程
+- 使用真实网络请求（可配置）
 
 ### 测试覆盖率目标
 
@@ -76,17 +74,16 @@ tests/
 
 ## 测试最佳实践
 
-1. **独立性**：每个测试应该独立运行
-2. **可读性**：测试名称应该清晰表达测试意图
+1. **独立性**：每个测试独立运行
+2. **可读性**：测试名称清晰表达测试意图
 3. **可维护性**：使用测试辅助工具和 fixture
-4. **快速反馈**：单元测试应该快速执行（当前 43 个测试约 1-2 秒完成）
+4. **快速反馈**：单元测试快速执行（当前 43 个测试约 1-2 秒完成）
 
 ## 预提交自检
 
 每次 `git push` 前自动运行：
 
 ```bash
-# 运行于 pre-push 钩子
 ruff format --check
 ruff check
 python3 -m pytest tests/test_tmdb_actor.py tests/test_mapping_resources.py tests/test_nfo_*.py
@@ -96,7 +93,7 @@ python3 -m pytest tests/test_tmdb_actor.py tests/test_mapping_resources.py tests
 
 ## CI/CD 集成
 
-测试会在以下情况下自动运行：
+测试自动运行：
 
 - 提交 Pull Request
 - 合并到主分支
@@ -104,5 +101,5 @@ python3 -m pytest tests/test_tmdb_actor.py tests/test_mapping_resources.py tests
 
 ## 相关文档
 
-- [架构设计](architecture.md) - 系统架构
-- [核心模块](core-modules.md) - 核心模块说明
+- [架构设计](architecture.md)
+- [核心模块](core-modules.md)

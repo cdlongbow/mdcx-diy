@@ -10,13 +10,9 @@
 
 泛型爬虫基类。所有具体爬虫都要继承这个类，并实现它定义的抽象方法。
 
-简单说：这个类规定了"所有爬虫应该长什么样"——统一了爬虫的启动、运行、关闭流程，还内置了性能监控、健康检查和错误处理。
-
 **主要特性**：
 - 支持自定义上下文类型
 - 统一的爬虫生命周期管理
-- 性能监控集成
-- 爬虫健康监测集成
 - 完善的错误处理
 
 **主要方法**：
@@ -49,13 +45,13 @@
 ## 爬虫注册与获取
 
 **主要机制**：
-- 装饰器模式注册爬虫（写一个 `@register_crawler` 就能注册）
-- 工厂模式获取爬虫实例（通过工厂方法创建，不用自己 new）
-- 懒加载优化性能（用到时才创建，不占用内存）
+- 通过 `register_crawler()` 函数注册
+- 通过 `get_crawler()` 查询注册表获取爬虫类
+- 子类定义后通过 `__init_subclass__` 自动注册到 `crawler_registry`
 
 ## 爬虫实现目录（[mdcx/crawlers/](../mdcx/crawlers/)）
 
-每个网站一个爬虫文件，共 42+ 个站点。
+每个网站一个爬虫文件，共 40+ 个站点。
 
 **支持的网站**：
 - Airav.cc
@@ -105,15 +101,15 @@
 1. 在 `mdcx/crawlers/` 下创建新文件
 2. 继承 `BaseCrawler`（或 `GenericBaseCrawler`）
 3. 实现抽象方法
-4. 使用 `@register_crawler` 装饰器注册
+4. 在 `mdcx/crawlers/__init__.py` 中导入并通过 `register_crawler()` 注册
 5. 在 `Website` 枚举中添加对应网站
 
 ---
 
 ## 相关文档
 
-- [项目架构](architecture.md) - 项目整体架构
-- [核心模块](core-modules.md) - 核心功能模块详解
-- [数据模型](data-models.md) - 数据结构定义
-- [配置系统](configuration.md) - 配置管理详解
-- [工具模块](tools.md) - 工具模块详解
+- [项目架构](architecture.md)
+- [核心模块](core-modules.md)
+- [数据模型](data-models.md)
+- [配置系统](configuration.md)
+- [工具模块](tools.md)

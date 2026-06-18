@@ -373,21 +373,13 @@ for row in ws.iter_rows(min_row=2, values_only=True):
 
 #### 4. 更新 NFO
 
-1. **重新刮削**
-   - 返回主界面
-   - 选择已添加字幕的视频
-   - 点击"开始刮削"
-
-2. **验证结果**
-   - 检查 NFO 文件
-   - 确认字幕信息已添加
+重新刮削后可更新 NFO 中的字幕信息。
 
 ### 预期效果
 
 - 📄 字幕文件已自动匹配
 - 📝 字幕文件已正确命名
 - 📁 字幕已复制到视频目录
-- 📄 NFO 文件已更新字幕信息
 
 ### 高级技巧
 
@@ -395,11 +387,6 @@ for row in ws.iter_rows(min_row=2, values_only=True):
 - 支持从多个字幕源目录批量匹配
 - 支持字幕语言识别
 - 支持多字幕文件管理
-
-**字幕质量筛选**
-- 配置字幕质量阈值
-- 自动过滤低质量字幕
-- 优先选择高质量字幕
 
 ### 常见问题
 
@@ -410,7 +397,7 @@ for row in ws.iter_rows(min_row=2, values_only=True):
 - A: 确认字幕编码格式，尝试转换为 UTF-8，检查媒体服务器字幕设置。
 
 **Q: NFO 未更新字幕信息？**
-- A: 确认已勾选"仅更新 NFO"并重新刮削，或手动编辑 NFO 文件。
+- A: 重新刮削视频文件，字幕文件本身的复制和重命名不修改 NFO。
 
 ---
 
@@ -437,7 +424,9 @@ for row in ws.iter_rows(min_row=2, values_only=True):
 
 1. **自动识别 ASIN**
    - 选择需要更新封面的视频
-   - 程序会尝试从视频文件中提取 ASIN 条码
+   - 程序会从封面图片中检测 EAN/JAN 条码
+   - 条码命中后按 ASIN 精确匹配 Amazon 商品
+   - 未命中条码则回退到标题/关键词模糊搜索
 
 2. **查看识别结果**
    - 检查识别的 ASIN 是否正确
@@ -456,28 +445,7 @@ for row in ws.iter_rows(min_row=2, values_only=True):
 
 #### 4. 下载高清封面
 
-1. **配置下载选项**
-   - 进入"设置" → "下载"
-   - Amazon 高清封面通过 `download_hd_pics` 配置启用（Amazon SL1500 为默认尺寸）
-
-2. **批量下载**
-   - 选择所有需要更新封面的视频
-   - 使用 Amazon 封面下载功能
-   - 等待下载完成
-
-3. **验证结果**
-   - 检查下载的封面质量
-   - 确认封面已正确替换
-
-#### 5. 更新 NFO
-
-1. **重新刮削**
-   - 选择已更新封面的视频
-   - 点击"开始刮削"
-
-2. **验证 NFO**
-   - 检查 NFO 文件
-   - 确认封面 URL 已更新
+Amazon 高清封面通过刮削时启用 `download_hd_pics` 配置自动获取（默认尺寸 SL1500）。重新刮削即可触发下载。
 
 ### 预期效果
 
@@ -582,11 +550,8 @@ for row in ws.iter_rows(min_row=2, values_only=True):
    # 包含标题
    {{ number }}-{{ title }}.{{ ext }}
 
-   # 包含标签
-   {{ number }}[{{ tags }}].{{ ext }}
-
    # 复杂模板
-   [{% if number %}{{ number }}{% endif %}][{{ studio }}]{{ title }}[{{ resolution }}].{{ ext }}
+   [{% if number %}{{ number }}{% endif %}][{{ studio }}]{{ title }}.{{ ext }}
    ```
 
 3. **预览效果**
@@ -707,7 +672,7 @@ for row in ws.iter_rows(min_row=2, values_only=True):
    - 选择翻译引擎
    - 勾选需要翻译的字段（标题、简介、标签等）
 
-#### 3. 配置翻译引擎
+#### 2. 配置翻译引擎
 
 1. **打开翻译设置**
    - 进入"设置" → "翻译"
@@ -730,7 +695,7 @@ for row in ws.iter_rows(min_row=2, values_only=True):
 5. **配置映射表**
    - 编辑 `resources/info_database.xlsx` 演员/制作商/标签映射表
 
-#### 5. 测试翻译
+#### 3. 测试翻译
 
 1. **刮削测试**
    - 选择一个测试视频
@@ -812,65 +777,21 @@ for row in ws.iter_rows(min_row=2, values_only=True):
 
 #### 3. 创建定时任务
 
+MDCx 内置了定时刮削功能（UI 中的 TIMED_SCRAPE 配置），无需外部任务调度即可实现自动刮削。
+
 **Windows 任务计划程序**
 ```cmd
-# 创建任务
-schtasks /create /tn "MDCx 自动刮削" /tr "C:\MDCx\MDCx.exe --auto" /sc daily /st 02:00
-
-# 手动触发
-schtasks /run /tn "MDCx 自动刮削"
+schtasks /create /tn "MDCx 自动刮削" /tr "C:\MDCx\MDCx.exe" /sc daily /st 02:00
 ```
 
 **Linux Cron**
 ```bash
-# 编辑 crontab
-crontab -e
-
-# 添加定时任务（每天凌晨 2 点运行）
-0 2 * * * /path/to/mdcx/main.py --auto
+0 2 * * * /path/to/mdcx/main.py
 ```
 
-**macOS Launchd**
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>Label</key>
-    <string>com.mdcx.auto</string>
-    <key>ProgramArguments</key>
-    <array>
-        <string>/path/to/mdcx/main.py</string>
-        <string>--auto</string>
-    </array>
-    <key>StartCalendarInterval</key>
-    <dict>
-        <key>Hour</key>
-        <integer>2</integer>
-        <key>Minute</key>
-        <integer>0</integer>
-    </dict>
-</dict>
-</plist>
-```
+#### 4. 监控和调试
 
-#### 4. 配置日志
-
-1. **查看日志**
-   - 主界面右侧日志区域显示实时日志
-   - 查看刮削结果和错误信息
-
-#### 5. 监控和调试
-
-1. **查看日志**
-   - 定期检查日志文件
-   - 查看刮削结果
-   - 识别问题
-
-2. **调整配置**
-   - 根据日志调整配置
-   - 优化刮削策略
-   - 提高效率
+查看主界面右侧日志区域了解刮削状态和错误信息，根据日志调整并发数和刮削策略。
 
 ### 预期效果
 
@@ -889,11 +810,6 @@ crontab -e
 - 启用缓存机制
 - 限流避免触发反爬
 
-**条件触发**
-- 只在工作日运行
-- 只在特定时间段运行
-- 只处理特定类型文件
-
 ### 常见问题
 
 **Q: 自动刮削未触发？**
@@ -907,11 +823,7 @@ crontab -e
 
 ---
 
-## 总结
-
-通过以上场景和案例，您应该已经掌握了 MDCx 的主要功能和用法。MDCx 功能强大，配置灵活，可以根据您的具体需求进行定制。
-
-### 快速参考
+## 快速参考
 
 - **快速上手**：参见 [用户使用手册](USER_GUIDE.md)
 - **功能详解**：参见 [功能特色](FEATURES.md)
@@ -919,13 +831,7 @@ crontab -e
 - **常见问题**：参见 [FAQ](FAQ.md)
 - **技术文档**：参见 [Code Wiki](CODE_WIKI.md)
 
-### 获取帮助
+## 获取帮助
 
-- 📖 查看文档
 - 💬 加入 [Telegram 交流群](https://t.me/mdcx_chat)
 - 🐛 提交 [GitHub Issue](https://github.com/cdlongbow/mdcx/issues)
-- 📧 联系开发者
-
----
-
-祝您使用愉快！

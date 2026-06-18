@@ -13,8 +13,6 @@
 - 搜索演员信息
 - 更新演员数据
 
-简单说：这个工具让你用 Excel 表格管理演员信息，可以查、改、增。
-
 ## Emby 演员 ([mdcx/tools/emby_actor_info.py](../mdcx/tools/emby_actor_info.py))
 
 **功能**：更新 Emby/Jellyfin 演员信息
@@ -35,8 +33,6 @@
 ## 缺失文件检测 ([mdcx/tools/missing.py](../mdcx/tools/missing.py))
 
 **功能**：检测缺失的文件
-
-简单说：帮你找出媒体库里少了哪些文件。
 
 ## 字幕管理 ([mdcx/tools/subtitle.py](../mdcx/tools/subtitle.py))
 

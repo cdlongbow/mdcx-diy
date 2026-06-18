@@ -28,94 +28,35 @@
 
 **支持识别的番号类型**
 
-| 番号类型 | 格式示例 | 标记 | 识别规则 |
-|---------|---------|------|---------|
-| **有码** | ABP-123, SSIS-456 | 有码 | 标准字母数字格式 |
-| **国产** | MD-0123, MKY-0045 | 国产 | MD/MKY 开头 |
-| **素人** | SIRO-1234, 300MAAN-001 | 素人 | SIRO/300MAAN 等 |
-| **FC2** | FC2-PPV-1234567 | FC2 | 包含 FC2 |
-| **欧美** | 123.45.67.89 | 欧美 | 数字点号格式 |
-| **KIN8** | KIN8-123 | 无码 | KIN8 开头 |
-| **Getchu** | getchu-12345 | 其他 | 特定网站识别 |
-| **MyWife** | mywife-123 | 其他 | 特定网站识别 |
-| **无码** | HEYZO-123, Carib-123 | 无码 | 特定前缀 |
-
-**识别流程**
-```
-1. 提取文件名
-   ↓
-2. 正则匹配番号
-   ↓
-3. 类型判断
-   ↓
-4. 特殊规则应用
-   ↓
-5. 返回识别结果
-```
+| 番号类型 | 格式示例 | 标记 |
+|---------|---------|------|
+| **有码** | ABP-123, SSIS-456 | 有码 |
+| **国产** | MD-0123, MKY-0045 | 国产 |
+| **素人** | SIRO-1234, 300MAAN-001 | 素人 |
+| **FC2** | FC2-PPV-1234567 | FC2 |
+| **欧美** | 123.45.67.89 | 欧美 |
+| **KIN8** | KIN8-123 | 无码 |
+| **Getchu** | getchu-12345 | 其他 |
+| **MyWife** | mywife-123 | 其他 |
+| **无码** | HEYZO-123, Carib-123 | 无码 |
 
 #### 2. 马赛克类型判断
 
-**判断规则**
-
-| 番号特征 | 马赛克类型 |
-|---------|-----------|
-| MD/MKY 系列 | 国产 |
-| 素人番号 | 素人 |
-| FC2 系列 | FC2 |
-| KIN8/HEYZO/Carib 等 | 无码 |
-| 其他 | 有码 |
-
-**代码实现** (mosaic.py)
-```python
-def get_mosaic_type(number: str) -> str:
-    """判断马赛克类型"""
-    if number.startswith(('MD-', 'MKY-')):
-        return '国产'
-    if number.startswith(('SIRO-', '300MAAN-')):
-        return '素人'
-    if 'FC2' in number.upper():
-        return 'FC2'
-    if number.upper().startswith(('KIN8-', 'HEYZO-', 'CARIB-')):
-        return '无码'
-    return '有码'
-```
+使用 `mosaic.py` 中的 `normalize_mosaic()` 函数将马赛克标签归一化为稳定值：`有码`、`无码`、`无码破解`、`流出`、`无码流出`、`国产`。额外提供 `is_censored_mosaic()`、`is_plain_uncensored_mosaic()`、`is_guochan_mosaic()` 等谓词函数供调用方分类。
 
 #### 3. 标签优先级系统
 
-**功能说明**
-- 为标签设置优先级
-- 不同类型的标签使用不同优先级
-- 支持标签过滤和排序
-
-**优先级配置**
-```python
-TAG_PRIORITIES = {
-    'high': ['女优', '单体', '作品', '独家'],
-    'medium': ['中文字幕', '高清', '独家'],
-    'low': ['其他', '标签']
-}
-```
+从 `info_database.xlsx` 提取优先级标签名称，范围从 `M女`（优先级起始标记）到指定终止标记。`prioritize_nfo_tags()` 将标签重排为：优先级标签（随机打乱）→ 系列标签 → 其他标签。
 
 #### 4. 网络检查功能
 
-**功能说明**
-- 检查网络连接状态
-- 检查网站可达性
-- 检测网络速度
-- 代理连接测试
-
-**检查项**
-- ✅ 网络连接状态
-- ✅ DNS 解析
-- ✅ HTTP/HTTPS 连接
-- ✅ 代理连接
-- ✅ 网站可达性
+检查项包括网络连接、DNS 解析、HTTP/HTTPS 连接、代理连接、网站可达性。实现在 `mdcx/core/network_check.py`。
 
 ---
 
 ## 完整网站列表
 
-### 有码类 (20 个)
+### 有码类 (24 个)
 
 | 网站爬虫 | 网站名称 | 说明 |
 |---------|---------|------|
@@ -144,13 +85,12 @@ TAG_PRIORITIES = {
 | `xcity` | XCity | XCity 信息站 |
 | `libredmm` | LibreDMM | LibreDMM 开源项目 |
 
-### 无码类 (3 个)
+### 无码类 (2 个)
 
 | 网站爬虫 | 网站名称 | 说明 |
 |---------|---------|------|
 | `kin8` | KIN8 | KIN8 无码 |
 | `love6` | Love6 | Love6 无码 |
-| `avbase_new` | AVBase | AVBase 无码 |
 
 ### FC2 类 (4 个)
 
@@ -177,10 +117,11 @@ TAG_PRIORITIES = {
 |---------|---------|------|
 | `theporndb` | ThePornDB | 欧美数据库 |
 
-### 其他类 (6 个)
+### 其他类 (7 个)
 
 | 网站爬虫 | 网站名称 | 说明 |
 |---------|---------|------|
+| `airav_cc` | AIRAV | Airav 信息站 |
 | `cableav` | CableAV | CableAV 信息站 |
 | `freejavbt` | FreejavBT | FreejavBT 磁力站 |
 | `hscangku` | HS仓库 | HS仓库 |
@@ -188,7 +129,7 @@ TAG_PRIORITIES = {
 | `mdtv` | MDTV | MDTV |
 | `avbase_new` | AVBase | AVBase |
 
-**总计：42 个网站爬虫**
+**总计：43 个网站爬虫**
 
 ---
 
@@ -310,34 +251,20 @@ TAG_PRIORITIES = {
 
 **代码实现** (face_crop.py)
 ```python
-import cv2
+def detect_and_crop(image_path: str, output_path: str) -> str:
+    """使用 OpenCV YuNet 模型检测人脸并裁剪为 2:3 比例海报。"""
+    img = cv2.imread(image_path)
+    h, w = img.shape[:2]
+    scale = min(YUNET_DETECT_MAX_SIDE / max(h, w), 1.0)
+    if scale < 1:
+        img = cv2.resize(img, None, fx=scale, fy=scale)
 
-def detect_and_crop(image_path: str) -> str:
-    """检测人脸并裁剪图片"""
-    # 加载图片
-    image = cv2.imread(image_path)
-
-    # 加载人脸检测模型
-    face_cascade = cv2.CascadeClassifier(
-        cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
-    )
-
-    # 检测人脸
-    faces = face_cascade.detectMultiScale(
-        image,
-        scaleFactor=1.1,
-        minNeighbors=5,
-        minSize=(30, 30)
-    )
-
-    # 裁剪图片
-    if len(faces) > 0:
-        x, y, w, h = faces[0]
-        cropped = image[y:y+h, x:x+w]
-        # 调整到 2:3 比例
-        # ...
-
-    return cropped_image_path
+    model = cv2.FaceDetectorYN.create(YUNET_MODEL_PATH, "", (img.shape[1], img.shape[0]))
+    _, faces = model.detect(img)
+    if faces is not None:
+        face = faces[0]
+        # 放大包围盒、扩展到 2:3 比例、裁剪
+        ...
 ```
 
 ### 水印添加功能
@@ -365,7 +292,7 @@ def detect_and_crop(image_path: str) -> str:
 #### 1. Google 翻译
 
 **配置要求**
-- 无需 API Key（免费版）
+- 无需 API Key
 - 或配置 Google Cloud Translation API Key
 
 **支持语言**
@@ -504,74 +431,33 @@ def detect_and_crop(image_path: str) -> str:
 
 **支持的变量**
 
-#### 基本变量
-
-| 变量名 | 类型 | 说明 | 示例 |
-|--------|------|------|------|
-| `number` | str | 番号 | ABP-123 |
-| `title` | str | 标题 | 标题名称 |
-| `originaltitle` | str | 原始标题 | Original Title |
-| `ext` | str | 文件扩展名 | mp4 |
-| `filename` | str | 原文件名 | 原文件名.mp4 |
-
-#### 演员变量
-
-| 变量名 | 类型 | 说明 | 示例 |
-|--------|------|------|------|
-| `actor` | str | 演员（逗号分隔） | 演员1,演员2 |
-| `first_actor` | str | 首位演员 | 演员1 |
-| `all_actor` | str | 全部演员 | 演员1,演员2,演员3 |
-| `actors` | list | 演员列表 | ['演员1', '演员2'] |
-
-#### 制作信息变量
-
-| 变量名 | 类型 | 说明 | 示例 |
-|--------|------|------|------|
-| `studio` | str | 制作商 | 制作商名称 |
-| `label` | str | 厂牌 | 厂牌名称 |
-| `publisher` | str | 发行商 | 发行商名称 |
-| `director` | str | 导演 | 导演名称 |
-| `series` | str | 系列 | 系列名称 |
-
-#### 日期变量
-
-| 变量名 | 类型 | 说明 | 示例 |
-|--------|------|------|------|
-| `release` | str | 发行日期 | 2024-01-01 |
-| `year` | str | 年份 | 2024 |
-
-#### 质量变量
-
-| 变量名 | 类型 | 说明 | 示例 |
-|--------|------|------|------|
-| `runtime` | int | 时长（分钟） | 120 |
-| `definition` | str | 清晰度 | 1080p |
-| `mosaic` | str | 马赛克类型 | 有码 |
-| `cnword` | str | 字幕标识 | [中字] |
-| `moword` | str | 版本标识 | [版本] |
-| `four_k` | str | 4K 标识 | [4K] |
-
-#### 标签变量
-
-| 变量名 | 类型 | 说明 | 示例 |
-|--------|------|------|------|
-| `outline` | str | 简介 | 剧情简介 |
-| `tags` | str | 标签（逗号分隔） | 标签1,标签2 |
-| `genres` | str | 类型（逗号分隔） | 类型1,类型2 |
-
-#### 番号变量
-
-| 变量名 | 类型 | 说明 | 示例 |
-|--------|------|------|------|
-| `letters` | str | 番号前缀 | ABP |
-| `first_letter` | str | 番号首字符 | A |
-
-#### 评分变量
-
-| 变量名 | 类型 | 说明 | 示例 |
-|--------|------|------|------|
-| `score` | float | 评分 | 8.5 |
-| `wanted` | int | 想看人数 | 1000 |
+| 变量名 | 说明 | 示例 |
+|--------|------|------|
+| `number` | 番号 | ABP-123 |
+| `title` | 标题 | 标题名称 |
+| `originaltitle` | 原始标题 | Original Title |
+| `actor` | 演员（逗号分隔） | 演员1,演员2 |
+| `first_actor` | 首位演员 | 演员1 |
+| `all_actor` | 全部演员 | 演员1,演员2,演员3 |
+| `letters` | 番号前缀 | ABP |
+| `first_letter` | 番号首字符 | A |
+| `outline` | 简介 | 剧情简介 |
+| `director` | 导演 | 导演名称 |
+| `series` | 系列 | 系列名称 |
+| `studio` | 制作商 | 制作商名称 |
+| `publisher` | 发行商 | 发行商名称 |
+| `release` | 发行日期 | 2024-01-01 |
+| `year` | 年份 | 2024 |
+| `runtime` | 时长（分钟） | 120 |
+| `mosaic` | 马赛克类型 | 有码 |
+| `definition` | 清晰度 | 1080p |
+| `cnword` | 字幕标识 | [中字] |
+| `moword` | 版本标识 | [版本] |
+| `filename` | 原文件名（不含扩展名） | 原文件名 |
+| `ext` | 文件扩展名 | mp4 |
+| `wanted` | 想看人数 | 1000 |
+| `score` | 评分 | 8.5 |
+| `four_k` | 4K 标识 | [4K] |
 
 **模板示例**
 
@@ -588,11 +474,8 @@ def detect_and_crop(image_path: str) -> str:
 # 条件渲染
 [{% if number %}{{ number }}{% endif %}]{{ title }}.{{ ext }}
 
-# 循环遍历演员
-{{ number }}-{% for actor in actors %}{{ actor }}{% if not loop.last %},{% endif %}{% endfor %}.{{ ext }}
-
 # 复杂模板
-[{% if number %}{{ number }}{% endif %}][{{ studio }}]{{ title }}-{{ first_actor }}[{{ resolution }}].{{ ext }}
+[{% if number %}{{ number }}{% endif %}][{{ studio }}]{{ title }}-{{ first_actor }}.{{ ext }}
 ```
 
 ### 文件处理功能
@@ -721,30 +604,9 @@ def detect_and_crop(image_path: str) -> str:
 
 **API 调用**
 ```python
-async def update_actor_info(
-    actor_id: str,
-    tmdb_id: int,
-    emby_url: str,
-    api_key: str
-):
-    """更新 Emby 演员信息"""
-    # 从 Wikipedia 获取信息
-    wiki_info = await get_wikipedia_info(actor_name)
-
-    # 更新 Emby
-    url = f"{emby_url}/Users/{{user_id}}/Items/{{actor_id}}"
-    data = {
-        "Overview": wiki_info.get('biography'),
-        "PremiereDate": wiki_info.get('birthday'),
-        "ProductionLocations": [wiki_info.get('place_of_birth')]
-    }
-
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            url,
-            json=data,
-            headers={"X-Emby-Token": api_key}
-        )
+async def update_emby_actor_info():
+    """从 Wikipedia 获取信息，更新 Emby 演员。"""
+    ...
 ```
 
 ### 演员图片更新
@@ -808,10 +670,9 @@ async def upload_actor_image(
 ### ASIN 条码识别
 
 **识别方式**
-- 📸 从视频文件中提取条码
+- 📸 从封面图片中检测 EAN/JAN 条码
 - 🏷️ 从元数据中提取 ASIN
-- 🔍 从文件名中提取 ASIN
-- ✋ 手动输入 ASIN
+- 🔍 从标签详情中提取 ASIN
 
 **识别流程**
 ```
@@ -834,7 +695,6 @@ async def upload_actor_image(
 **搜索参数**
 - `asin`: ASIN 条码
 - `keywords`: 搜索关键词
-- `search_index`: 搜索类别（DVD, Movies 等）
 
 **返回信息**
 ```json
@@ -852,25 +712,26 @@ async def upload_actor_image(
 ### Amazon 数据库
 
 **数据库功能**
-- 💾 缓存 ASIN 数据
+- 💾 缓存 ASIN 数据到 Excel
 - 🔍 快速查询已缓存的 ASIN
-- 🔄 定期更新缓存
-- 📊 统计查询次数
+- 🔄 更新已有记录的 poster_url
 
 **数据库结构**
 ```python
-class AmazonDatabase:
-    def __init__(self, db_path: str):
-        self.db_path = db_path
-        self.cache = {}
+# 使用 amazon_database.py 中的函数
+from mdcx.core.amazon_database import (
+    save_asin_to_excel,
+    query_asin_database,
+    update_asin_record,
+)
 
-    def get_cached(self, asin: str) -> Optional[dict]:
-        """获取缓存的 ASIN 数据"""
-        return self.cache.get(asin)
-
-    def save_cache(self, asin: str, data: dict):
-        """保存 ASIN 数据到缓存"""
-        self.cache[asin] = data
+AsinRecord = {
+    "number": str,      # 影片番号
+    "asin": str,         # 亚马逊 ASIN
+    "product_url": str,  # 商品详情页链接
+    "title": str,        # 商品标题
+    "poster_url": str,   # 封面图片 URL
+}
 ```
 
 ### 高清封面获取
@@ -886,15 +747,17 @@ class AmazonDatabase:
 
 **获取流程**
 ```
-1. 识别 ASIN
+1. 获取封面候选图
    ↓
-2. 查询 Amazon 数据库
+2. 扫描封面条码（EAN/JAN）
    ↓
-3. 获取产品信息
+3. 按条码精确匹配 Amazon 商品
    ↓
-4. 下载 SL1500 封面
+4. 条码未命中时按标题/关键词搜索
    ↓
-5. 替换现有封面
+5. 结果排序：条码硬匹配 → 标题置信度 → 关键词
+   ↓
+6. 下载 SL1500 封面
 ```
 
 ---
@@ -1052,17 +915,11 @@ use_proxy = use_proxy and not self._is_no_proxy_host(host)
 
 **使用示例**
 ```python
-from mdcx.core.network_check import NetworkChecker
-
-checker = NetworkChecker()
+from mdcx.core.network_check import check_network_status
 
 # 检查网络连接
-result = await checker.check_network()
+result = await check_network_status()
 print(result)  # {'online': True, 'latency': 50}
-
-# 检查网站可达性
-result = await checker.check_website("https://javbus.com")
-print(result)  # {'reachable': True, 'status_code': 200}
 ```
 
 ### 反爬机制
@@ -1080,10 +937,9 @@ print(result)  # {'reachable': True, 'status_code': 200}
 - ⏰ 随机延时
 
 **代理支持**
-- 🔗 HTTP/HTTPS 代理
+- 🔗 HTTP 代理
 - 🔗 SOCKS5 代理
-- 🔄 代理轮换
-- ⚠️ 代理验证
+- ⚠️ 不走代理网站配置
 
 ---
 
@@ -1100,31 +956,30 @@ print(result)  # {'reachable': True, 'status_code': 200}
 
 **常用函数**
 ```python
-from mdcx.utils.file import get_files, clean_filename
+from mdcx.utils.file import move_file_sync, copy_file_sync, delete_file_sync
 
-# 获取目录下所有文件
-files = get_files("/path/to/dir")
-
-# 清理文件名
-clean_name = clean_filename("文件:名称?*")
+# 同步文件操作
+move_file_sync("/path/to/src", "/path/to/dst")
+copy_file_sync("/path/to/src", "/path/to/dst")
+delete_file_sync("/path/to/file")
 ```
 
 ### 语言工具 (language.py)
 
 **功能列表**
-- 🌐 语言检测
-- 🔄 简繁转换
-- 📝 语言代码转换
+- 🌐 日语检测
+- 🌐 英语检测
+- 🌐 翻译前英语判断
 
 **使用示例**
 ```python
-from mdcx.utils.language import detect_language, convert_s2t
+from mdcx.utils.language import is_japanese, is_english
 
-# 检测语言
-lang = detect_language("你好")  # 'zh'
+# 检测是否为日语
+lang = is_japanese("こんにちは")  # True
 
-# 简繁转换
-traditional = convert_s2t("简体中文")  # '簡體中文'
+# 检测是否为英语
+is_en = is_english("Hello")  # True
 ```
 
 ### 路径工具 (path.py)
@@ -1138,10 +993,7 @@ traditional = convert_s2t("简体中文")  # '簡體中文'
 ### 视频工具 (video.py)
 
 **功能列表**
-- 🎬 视频信息提取
-- ⏱️ 时长检测
-- 📐 分辨率检测
-- 🎞️ 编码检测
+- 🎬 视频高度/编码检测（pyav 或 ffprobe 后端）
 
 ---
 
@@ -1157,15 +1009,10 @@ traditional = convert_s2t("简体中文")  # '簡體中文'
 
 **使用示例**
 ```python
-from mdcx.tools.subtitle import SubtitleManager
+from mdcx.tools.subtitle import add_sub_for_all_video
 
-manager = SubtitleManager()
-
-# 自动匹配字幕
-matches = manager.auto_match("/path/to/videos")
-
-# 复制字幕到视频目录
-manager.copy_subtitles(matches)
+# 对所有视频执行字幕添加
+await add_sub_for_all_video()
 ```
 
 ### Wiki 工具 (wiki.py)
@@ -1226,17 +1073,9 @@ results = await asyncio.gather(*tasks)
 
 ---
 
-## 总结
-
-MDCx 是一个功能丰富、设计精良的视频元数据刮削和管理工具。本文档详细列出了所有功能，确保每个功能都有完整的说明。
-
 **功能统计**
-- 🌐 42 个网站爬虫
+- 🌐 43 个网站爬虫
 - 📝 30+ NFO 字段
 - 🌐 5 大翻译引擎
 - 🎭 8 大功能模块
-- 🛠️ 6 个实用工具
 - ⚡ 异步并发架构
-- 🔄 完整的集成能力
-
-所有功能均已详细文档化，可查阅相关文档了解更多详情。
