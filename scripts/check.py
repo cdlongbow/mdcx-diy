@@ -9,7 +9,18 @@ except ModuleNotFoundError:
 COMMANDS = [
     ["ruff", "format", "--check"],
     ["ruff", "check"],
-    [sys.executable, "-m", "pytest", "tests/test_tmdb_actor.py", "tests/test_mapping_resources.py"],
+    [
+        sys.executable,
+        "-m",
+        "pytest",
+        "tests/test_tmdb_actor.py",
+        "tests/test_mapping_resources.py",
+        "tests/test_nfo_read.py",
+        "tests/test_nfo_write_escape.py",
+        "tests/test_nfo_tag_priority.py",
+        "tests/test_nfo_actor_tmdbid.py",
+        "tests/test_nfo_external_id_tag.py",
+    ],
 ]
 
 
