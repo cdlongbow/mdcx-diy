@@ -811,9 +811,11 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
         async def _fetch_and_update(actor_name: str) -> None:
             async with link_semaphore:
                 try:
-                    href = await fetch_libredmm_link(actor_name)
+                    row = search_actor_db_reverse(actor_name)
+                    jp_key = row.get("jp", actor_name) if row else actor_name
+                    href = await fetch_libredmm_link(jp_key)
                     if href:
-                        await update_actor_db_row(jp=actor_name, href=href)
+                        await update_actor_db_row(jp=jp_key, href=href)
                         LogBuffer.log().write(f"  ✅ [LibreDMM] {actor_name} -> {href}")
                 except Exception as e:
                     LogBuffer.log().write(f"  ⚠️ [LibreDMM] {actor_name} 链接补全失败: {e}")
