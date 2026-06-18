@@ -23,34 +23,36 @@ uv run pytest tests/ --cov=mdcx --cov-report=term-missing
 
 ## 测试覆盖范围
 
-### 已测试的模块
+### 当前测试状态
 
-| 模块 | 文件 | 覆盖率 | 状态 |
-|------|------|--------|------|
-| 核心模块 | `tests/core/` | 待统计 | 待完成 |
-| 爬虫 | `tests/crawlers/` | 待统计 | 待完成 |
-| 工具 | `tests/utils/` | 待统计 | 待完成 |
-| 模型 | `tests/test_*.py` | 待统计 | 待完成 |
+| 类型 | 数量 |
+|------|------|
+| 测试文件 | 7 个 |
+| 测试用例 | 43 个 |
+| 执行方式 | `pytest`（CI 预提交钩子自动执行） |
+| 检查项 | `ruff format --check` + `ruff check` + `pytest` |
 
 ### 测试文件列表
 
 ```
 tests/
-├── conftest.py              # 测试配置
-├── random_generator.py      # 随机数据生成器
-├── core/                    # 核心模块测试
-│   ├── test_scraper.py      # 刮削器测试
-│   ├── test_file_crawler.py # 文件爬虫测试
-│   ├── test_nfo.py          # NFO 生成测试
-│   └── test_tmdb_actor.py   # TMDB 演员测试
-├── crawlers/                # 爬虫测试
-│   ├── test_base_crawler.py # 基础爬虫测试
-│   ├── test_javbus.py       # JavBus 爬虫测试
-│   └── ...
-└── utils/                   # 工具测试
-    ├── test_path.py         # 路径工具测试
-    └── test_language.py     # 语言工具测试
+├── conftest.py                     # 测试配置与 Mock 常量
+├── test_tmdb_actor.py              # TMDB 演员查询、xlsx 读写、LibreDMM 链接补全（25 个测试）
+├── test_mapping_resources.py       # 映射表资源查询（4 个测试）
+├── test_nfo_read.py                # NFO 读取解析（4 个测试）
+├── test_nfo_write_escape.py        # NFO 写入转义（2 个测试）
+├── test_nfo_tag_priority.py        # NFO 标签优先级（3 个测试）
+├── test_nfo_actor_tmdbid.py        # NFO 演员 TMDB ID 标签（3 个测试）
+└── test_nfo_external_id_tag.py     # NFO 外部 ID 标签（2 个测试）
 ```
+
+### 覆盖的核心模块逻辑
+
+| 模块 | 覆盖内容 |
+|------|---------|
+| `tmdb_actor.py` | 演员 TMDB ID 查询、xlsx 读写、中文繁简归一化、候选排序、反查缓存、LibreDMM 合并 |
+| `mapping_resources.py` | 演员/制作商/标签映射表加载与查询 |
+| `nfo.py` | NFO 读取、写入转义、标签优先级、演员 tmdbid 标签、外部 ID 标签 |
 
 ## 测试策略
 
@@ -77,7 +79,20 @@ tests/
 1. **独立性**：每个测试应该独立运行
 2. **可读性**：测试名称应该清晰表达测试意图
 3. **可维护性**：使用测试辅助工具和 fixture
-4. **快速反馈**：单元测试应该快速执行
+4. **快速反馈**：单元测试应该快速执行（当前 43 个测试约 1-2 秒完成）
+
+## 预提交自检
+
+每次 `git push` 前自动运行：
+
+```bash
+# 运行于 pre-push 钩子
+ruff format --check
+ruff check
+python3 -m pytest tests/test_tmdb_actor.py tests/test_mapping_resources.py tests/test_nfo_*.py
+```
+
+全部通过后方可推送。自检逻辑位于 `scripts/check.py`。
 
 ## CI/CD 集成
 

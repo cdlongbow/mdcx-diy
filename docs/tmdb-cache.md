@@ -214,8 +214,19 @@ def migrate_xml_to_xlsx():
 2. 系统发现某演员在 Excel 中缺少 tmdbid
 3. 先用 Excel 中已有名字和别名做反向缓存匹配
 4. 仍未命中时自动调用 TMDB API 查询（3 路并发，限流 3.5 req/s）
-5. 查询成功后自动填充 TMDB ID 到 Excel
-6. 自动刷新内存缓存
+5. TMDB 返回结果后，优先使用 `original_name` 字段作为日文原名写入 xlsx（而非搜索用的中文名）
+6. 查询成功后自动填充 TMDB ID 到 Excel
+7. 自动刷新内存缓存
+
+### 场景 4：LibreDMM 链接自动补全
+
+所有演员的 TMDB ID 查询/翻译完成后，系统会统一扫描仍有 tmdbid 但缺少 href 的演员：
+
+1. 遍历当前查询结果中 tmdbid 已命中但 href 为空的演员
+2. 通过 `search_actor_db_reverse()` 反查 xlsx 中日文原名
+3. 用日文原名搜索 LibreDMM 获取该演员的个人主页链接（提高搜索命中率）
+4. 将结果写回 xlsx 的"信息链接"列
+5. 整个过程在 `fetch_actor_tmdb_ids()` 末尾统一执行，不再分散在多处
 
 ## 名字匹配策略
 
@@ -232,6 +243,14 @@ TMDB 查询结合以下策略提升命中率：
 1. 用户手动编辑 `actor_database.xlsx`（添加新演员或修正数据）
 2. 下次刮削时系统自动重载 Excel 文件
 3. 内存缓存与 Excel 文件保持同步
+
+### original_name 字段
+
+TMDB 搜索结果中的 `original_name` 字段（通常是演员的日文原名）优先用于：
+
+- **xlsx 写入**：作为"日文原名"列的值写入，而非使用搜索时传入的中文名
+- **LibreDMM 搜索**：反查 xlsx 中日文原名后传入 LibreDMM，提高链接命中率
+- **回退策略**：若 `original_name` 为空，使用搜索名作为日文原名
 
 ## 配置选项
 

@@ -181,8 +181,10 @@
 
 2. **通过刮削自动补全**
    - 确认已配置 TMDB API Key
+   - 使用读取模式，勾选"更新 NFO"和"为演员写入 TMDB ID"
    - 重新刮削包含这些演员的影片
-   - 程序会自动查询缺失的 TMDB ID 并写回 Excel
+   - 程序会自动查询缺失的 TMDB ID 并写回 Excel 和 NFO
+   - TMDB 返回的 `original_name` 作为日文原名写入 xlsx
 
 3. **手动验证**
    - 检查自动写回的 TMDB ID

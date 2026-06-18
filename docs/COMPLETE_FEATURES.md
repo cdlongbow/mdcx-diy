@@ -638,6 +638,8 @@ def detect_and_crop(image_path: str) -> str:
 - 🔍 按名称搜索演员
 - 🎬 获取 TMDB ID 和候选基础信息
 - 🌐 获取多语言信息
+- 🏷️ **original_name 优先**：TMDB 返回的 `original_name`（通常是日文原名）优先作为 xlsx 日文原名列写入
+- 🔗 **LibreDMM 统一补链**：TMDB 查询结束后统一扫描缺链接的演员，用日文原名搜索 LibreDMM 补全信息链接
 - 🔄 将命中结果写回本地 Excel 缓存
 
 **匹配特性**
@@ -681,9 +683,11 @@ def detect_and_crop(image_path: str) -> str:
    ↓
 3. 并发查询 TMDB
    ↓
-4. 收集结果
+4. 收集结果（original_name 作为日文原名）
    ↓
 5. 更新数据库
+   ↓
+6. LibreDMM 统一扫描缺链接演员，补全信息链接
 ```
 
 ### 数据补全来源
@@ -691,6 +695,7 @@ def detect_and_crop(image_path: str) -> str:
 | 数据源 | 获取内容 | 优先级 |
 |--------|---------|--------|
 | TMDB API | TMDB ID、基本信息、图片 | 1 |
+| LibreDMM | 演员信息链接（统一扫描补全） | 1 |
 | Wikidata | 维基百科数据、简介 | 2 |
 | Av-wiki | 演员真实日文名 | 2 |
 | Gfriends | 演员头像和写真 | 3 |
