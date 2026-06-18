@@ -193,12 +193,14 @@ async def test_update_actor_db_row_writes_tmdbid_and_tmdb_url(_tmp_actor_db: Pat
     assert ws.cell(row=2, column=7).value == "https://www.themoviedb.org/person/12345"
     assert ws.cell(row=2, column=7).hyperlink.target == "https://www.themoviedb.org/person/12345"
     assert ws.title == "演员数据库"
-    assert ws.freeze_panes == "A2"
+    assert ws.freeze_panes == "B2"
     assert ws.auto_filter.ref == "A1:G2"
     wb.close()
 
 
 def test_load_actor_db_derives_tmdb_url_from_tmdbid(_tmp_actor_db: Path):
+    from openpyxl import load_workbook as lw
+
     wb = Workbook()
     ws = wb.active
     ws.append(tmdb_actor.DB_HEADERS)
@@ -206,10 +208,28 @@ def test_load_actor_db_derives_tmdb_url_from_tmdbid(_tmp_actor_db: Path):
     wb.save(_tmp_actor_db)
     wb.close()
 
-    actor_db = tmdb_actor._read_actor_db_xlsx(_tmp_actor_db)
+    wb = lw(_tmp_actor_db, read_only=True, data_only=True)
+    ws = wb.active
+    rows = list(ws.iter_rows(min_row=2, max_row=2, values_only=True))
+    row = rows[0]
+    assert row[5] == 6233846
+    assert row[6] == "https://www.themoviedb.org/person/6215799"
+    wb.close()
 
-    assert actor_db["错位演员"]["tmdbid"] == 6233846
-    assert actor_db["错位演员"]["tmdb_url"] == "https://www.themoviedb.org/person/6233846"
+    # 重新保存触发 _format_db_worksheet → tmdb_url 用 tmdbid 纠正
+    wb2 = lw(_tmp_actor_db)
+    ws2 = wb2.active
+    from mdcx.core.tmdb_actor import _format_db_worksheet
+
+    _format_db_worksheet(ws2)
+    wb2.save(_tmp_actor_db)
+    wb2.close()
+
+    wb3 = lw(_tmp_actor_db)
+    ws3 = wb3.active
+    row3 = list(ws3.iter_rows(min_row=2, max_row=2, values_only=True))[0]
+    assert row3[5] == 6233846
+    assert row3[6] == f"https://www.themoviedb.org/person/{6233846}"
 
 
 @pytest.mark.asyncio
@@ -326,12 +346,10 @@ async def test_update_actor_db_row_returns_file_locked_when_workbook_is_unavaila
 async def test_load_actor_db_logs_read_failure(monkeypatch: pytest.MonkeyPatch, _tmp_actor_db: Path):
     await tmdb_actor.update_actor_db_row(jp="相泽南", zh_cn="相泽南")
 
-    import openpyxl
-
     def _raise_runtime_error(*args, **kwargs):
         raise RuntimeError("boom")
 
-    monkeypatch.setattr(openpyxl, "load_workbook", _raise_runtime_error)
+    monkeypatch.setattr(tmdb_actor, "read_actor_db_xlsx", _raise_runtime_error)
     LogBuffer.log().clear()
 
     result = await tmdb_actor.load_actor_db()
