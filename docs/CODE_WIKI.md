@@ -1162,7 +1162,7 @@ class EmbyActorImage:
 
 ### 相关文档
 
-- [用户使用手册 - Emby 集成](USER_GUIDE.md#embyjellyfin-集成)
+- [用户使用手册 - 配合 Emby/Jellyfin 使用](USER_GUIDE.md#配合-embyjellyfin-使用)
 - [FAQ - Emby 问题](FAQ.md#embyjellyfin-集成)
 - [Emby 集成](#emby-集成)
 
