@@ -404,7 +404,6 @@ async def get_nfo_data(file_path: Path, movie_number: str) -> tuple[CrawlersResu
 
     async with aiofiles.open(local_nfo_path, encoding="utf-8") as f:
         content = await f.read()
-        content = content.replace("<![CDATA[", "").replace("]]>", "")
 
     parser = etree.XMLParser(encoding="utf-8", recover=True)
     try:
