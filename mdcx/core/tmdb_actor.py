@@ -666,7 +666,6 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
     result: dict[str, int] = {}
     need_query: list[tuple[str, str]] = []
     need_translate: list[tuple[str, str, int]] = []
-    need_link_only: list[tuple[str, str]] = []
 
     for actor in actors:
         if not actor or not actor.strip():
@@ -686,8 +685,6 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
             )
             if not row_data.get("zh_cn") or not row_data.get("zh_tw"):
                 need_translate.append((actor_stripped, actor_stripped, row_data["tmdbid"]))
-            elif not row_data.get("href"):
-                need_link_only.append((actor_stripped, actor_stripped))
             continue
 
         row = search_actor_db_reverse(actor_stripped)
@@ -697,8 +694,6 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
             LogBuffer.log().write(f" ℹ️ [TMDB] {actor_stripped} -> tmdbid={row['tmdbid']} (xlsx反查缓存)")
             if not row.get("zh_cn") or not row.get("zh_tw"):
                 need_translate.append((actor_stripped, row.get("jp", actor_stripped), row["tmdbid"]))
-            elif not row.get("href"):
-                need_link_only.append((actor_stripped, row.get("jp", actor_stripped)))
             continue
 
         LogBuffer.log().write(f"  ⚠️ [TMDB] '{actor_stripped}' 未匹配，将进入 TMDB API 搜索")
@@ -714,11 +709,8 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
             if not zh_tw and zh_cn:
                 zh_tw = zhconv.convert(zh_cn, "zh-hant")
             if zh_cn or zh_tw:
-                existing_href = (resources.actor_db or {}).get(jp_name, {}).get("href", "")
-                if not existing_href:
-                    existing_href = await fetch_libredmm_link(jp_name)
                 write_status = await update_actor_db_row(
-                    jp=jp_name, zh_cn=zh_cn, zh_tw=zh_tw, href=existing_href, tmdbid=tid, overwrite_names=True
+                    jp=jp_name, zh_cn=zh_cn, zh_tw=zh_tw, tmdbid=tid, overwrite_names=True
                 )
                 LogBuffer.log().write(
                     f" 🔄 [TMDB] {actor_name} 翻译补全: zh_cn={zh_cn or '-'} zh_tw={zh_tw or '-'} ({write_status})"
@@ -737,23 +729,6 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
         trans_tasks = [asyncio.create_task(_limited_translate(a, j, t)) for a, j, t in need_translate]
         await asyncio.gather(*trans_tasks)
 
-    if need_link_only:
-        LogBuffer.log().write(f"\n 🔗 [LibreDMM] 补全 {len(need_link_only)} 个演员的链接")
-        link_semaphore = asyncio.Semaphore(3)
-
-        async def _fetch_link(actor_name: str, jp_name: str) -> None:
-            async with link_semaphore:
-                try:
-                    href = await fetch_libredmm_link(jp_name)
-                    if href:
-                        await update_actor_db_row(jp=jp_name, href=href)
-                        LogBuffer.log().write(f"  ✅ [LibreDMM] {actor_name} -> {href}")
-                except Exception as e:
-                    LogBuffer.log().write(f"  ⚠️ [LibreDMM] {actor_name} 链接补全失败: {e}")
-
-        tasks = [asyncio.create_task(_fetch_link(a, j)) for a, j in need_link_only]
-        await asyncio.gather(*tasks)
-
     if not need_query:
         LogBuffer.log().write("  ℹ️ [TMDB] 所有演员已在 actor_db 中匹配，无需 API 查询")
         return result
@@ -762,9 +737,7 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
 
     async def _query_and_update(actor_name: str, query_name: str) -> None:
         try:
-            tmdb_task = asyncio.create_task(_query_single_actor(query_name, base_url, tmdb_api_key, client))
-            libredmm_task = asyncio.create_task(fetch_libredmm_link(query_name))
-            query_result, libredmm_link = await asyncio.gather(tmdb_task, libredmm_task)
+            query_result = await _query_single_actor(query_name, base_url, tmdb_api_key, client)
             if query_result:
                 tmdbid = query_result["pid"]
                 result[actor_name] = tmdbid
@@ -784,7 +757,6 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
                     zh_cn=zh_cn,
                     zh_tw=zh_tw,
                     keyword=keyword_str,
-                    href=libredmm_link,
                     tmdbid=tmdbid,
                     append_keyword=True,
                 )
@@ -827,6 +799,27 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
         f" 🎬 [TMDB] 查询完成: 缓存命中 {len(actors) - len(need_query)} 个, "
         f"本次匹配 {len(result) - cached_before} 个, 共 {len(result)} 个"
     )
+
+    # 统一补链接：有 tmdbid 但 xlsx 链接列为空的演员
+    actor_db = resources.actor_db or {}
+    missing_link = [name for name in result if not (actor_db.get(name, {}).get("href") or "")]
+    if missing_link:
+        LogBuffer.log().write(f"\n 🔗 [LibreDMM] 补全 {len(missing_link)} 个演员的链接")
+        link_semaphore = asyncio.Semaphore(3)
+
+        async def _fetch_and_update(actor_name: str) -> None:
+            async with link_semaphore:
+                try:
+                    href = await fetch_libredmm_link(actor_name)
+                    if href:
+                        await update_actor_db_row(jp=actor_name, href=href)
+                        LogBuffer.log().write(f"  ✅ [LibreDMM] {actor_name} -> {href}")
+                except Exception as e:
+                    LogBuffer.log().write(f"  ⚠️ [LibreDMM] {actor_name} 链接补全失败: {e}")
+
+        tasks = [asyncio.create_task(_fetch_and_update(name)) for name in missing_link]
+        await asyncio.gather(*tasks)
+
     return result
 
 
