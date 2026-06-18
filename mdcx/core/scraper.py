@@ -581,15 +581,18 @@ class Scraper:
                 res = nfo_data
                 movie_number = nfo_data.number
                 file_classification = classify_existing_scrape_result(file_info.crawl_task(), res, manager.config)
-                if "has_nfo_update" not in read_mode:  # 不更新并返回
+
+                has_nfo_update = ReadMode.HAS_NFO_UPDATE in read_mode
+                should_update_nfo = ReadMode.READ_UPDATE_NFO in read_mode
+                redownload = ReadMode.READ_DOWNLOAD_AGAIN in read_mode
+                if not has_nfo_update and not should_update_nfo and not redownload:  # 都不勾才跳过
                     show_result(res, start_time)
                     show_movie_info(file_info, nfo_data)
                     LogBuffer.log().write(f"\n 🙉 [Movie] {file_path}")
-                    await save_success_list(file_path, file_path)  # 保存成功列表
+                    await save_success_list(file_path, file_path)
                     return nfo_data, info
 
-                # 读取模式要不要下载图片等文件
-                if "read_download_again" not in read_mode:
+                if not redownload:
                     file_can_download = False
             else:
                 if "no_nfo_scrape" not in read_mode:  # 无 nfo 且未勾选 「无nfo时，刮削并执行更新模式」
@@ -613,12 +616,8 @@ class Scraper:
                 # [下载]处勾选保留nfo且nfo存在时
                 update_nfo = False
         elif manager.config.main_mode == 4:
-            # 4（读取）模式默认不写nfo
-            update_nfo = False
-            # 除非
-            if is_nfo_existed and ReadMode.HAS_NFO_UPDATE in read_mode and ReadMode.READ_UPDATE_NFO in read_mode:
-                # 启用"允许(使用本地 nfo)更新 nfo 文件"时
-                update_nfo = True
+            # 读模式下，由"允许更新 nfo 文件"独立控制
+            update_nfo = ReadMode.READ_UPDATE_NFO in read_mode
 
         # 读取模式下，补充缺失的演员 tmdbid（NFO已有→跳过，xlsx缓存→命中，API查询→补充）
         if update_nfo and is_nfo_existed and NfoInclude.ACTOR_TMDBID in manager.config.nfo_include_new:
@@ -836,48 +835,57 @@ class Scraper:
         # 显示json_data内容
         show_movie_info(file_info, res)
 
-        # 生成输出文件夹和输出文件的路径
-        (
-            folder_new_path,
-            file_new_path,
-            nfo_new_path,
-            poster_new_path_with_filename,
-            thumb_new_path_with_filename,
-            fanart_new_path_with_filename,
-            naming_rule,
-            poster_final_path,
-            thumb_final_path,
-            fanart_final_path,
-        ) = get_output_name(file_info, res, success_folder, file_ex)
+        # 读模式不勾"重新整理分类"时跳过文件整理相关步骤
+        skip_reorganize = manager.config.main_mode == 4 and is_nfo_existed and ReadMode.HAS_NFO_UPDATE not in read_mode
+
+        if skip_reorganize:
+            nfo_new_path = file_path.with_suffix(".nfo")
+            folder_new_path = file_path.parent
+        else:
+            # 生成输出文件夹和输出文件的路径
+            (
+                folder_new_path,
+                file_new_path,
+                nfo_new_path,
+                poster_new_path_with_filename,
+                thumb_new_path_with_filename,
+                fanart_new_path_with_filename,
+                naming_rule,
+                poster_final_path,
+                thumb_final_path,
+                fanart_final_path,
+            ) = get_output_name(file_info, res, success_folder, file_ex)
 
         # 判断输出文件的路径是否重复
-        if manager.config.soft_link == 0:
-            done_file_new_path_list = Flags.file_new_path_dic.get(file_new_path)
-            if not done_file_new_path_list:  # 如果字典中不存在同名的情况，存入列表，继续刮削
-                Flags.file_new_path_dic[file_new_path] = [file_path]
-            else:
-                done_file_new_path_list.append(file_path)  # 已存在时，添加到列表，停止刮削
-                done_file_new_path_list.sort(reverse=True)
-                LogBuffer.error().write(
-                    "存在重复文件（指刮削后的文件路径相同！），请检查:\n    🍁 "
-                    + "\n    🍁 ".join(str(path) for path in done_file_new_path_list)
-                )
-                res.outline = split_path(str(file_path))[1]
-                res.tag = str(file_path)
-                return None, None
+        if not skip_reorganize:
+            if manager.config.soft_link == 0:
+                done_file_new_path_list = Flags.file_new_path_dic.get(file_new_path)
+                if not done_file_new_path_list:  # 如果字典中不存在同名的情况，存入列表，继续刮削
+                    Flags.file_new_path_dic[file_new_path] = [file_path]
+                else:
+                    done_file_new_path_list.append(file_path)  # 已存在时，添加到列表，停止刮削
+                    done_file_new_path_list.sort(reverse=True)
+                    LogBuffer.error().write(
+                        "存在重复文件（指刮削后的文件路径相同！），请检查:\n    🍁 "
+                        + "\n    🍁 ".join(str(path) for path in done_file_new_path_list)
+                    )
+                    res.outline = split_path(str(file_path))[1]
+                    res.tag = str(file_path)
+                    return None, None
 
         # 判断输出文件夹和文件是否已存在，如无则创建输出文件夹
-        other = OtherInfo.empty()
-        if not await creat_folder(
-            other,
-            res,
-            folder_new_path,
-            file_path,
-            file_new_path,
-            thumb_new_path_with_filename,
-            poster_new_path_with_filename,
-        ):
-            return None, None
+        if not skip_reorganize:
+            other = OtherInfo.empty()
+            if not await creat_folder(
+                other,
+                res,
+                folder_new_path,
+                file_path,
+                file_new_path,
+                thumb_new_path_with_filename,
+                poster_new_path_with_filename,
+            ):
+                return None, None
 
         # 初始化图片已下载地址的字典
         if not Flags.file_done_dic.get(res.number):
@@ -919,20 +927,23 @@ class Scraper:
                 return None, None
 
         # 清理旧的thumb、poster、fanart、extrafanart、nfo
-        pic_final_catched, single_folder_catched = await deal_old_files(
-            res.number,
-            other,
-            folder_old_path,
-            folder_new_path,
-            file_path,
-            thumb_new_path_with_filename,
-            poster_new_path_with_filename,
-            fanart_new_path_with_filename,
-            nfo_new_path,
-            poster_final_path,
-            thumb_final_path,
-            fanart_final_path,
-        )
+        pic_final_catched = False
+        single_folder_catched = False
+        if not skip_reorganize:
+            pic_final_catched, single_folder_catched = await deal_old_files(
+                res.number,
+                other,
+                folder_old_path,
+                folder_new_path,
+                file_path,
+                thumb_new_path_with_filename,
+                poster_new_path_with_filename,
+                fanart_new_path_with_filename,
+                nfo_new_path,
+                poster_final_path,
+                thumb_final_path,
+                fanart_final_path,
+            )
 
         # 如果 final_pic_path 没处理过，这时才需要下载和加水印
         if pic_final_catched and file_can_download:
@@ -963,7 +974,7 @@ class Scraper:
                 await extrafanart_copy2(folder_new_path)
                 await extrafanart_extras_copy(folder_new_path)
 
-        if file_can_download:
+        if not skip_reorganize and file_can_download:
             # trailer 有带文件名、不带文件名两种命名方式，不能依赖图片处理权。
             await trailer_download(res, folder_new_path, folder_old_path, naming_rule)
             if single_folder_catched:
@@ -973,36 +984,38 @@ class Scraper:
         await write_nfo(file_info, res, nfo_new_path, folder_new_path, update_nfo)
 
         # 移动字幕、种子、bif、trailer、其他文件
-        if file_info.has_sub:
-            await move_sub(folder_old_path, folder_new_path, file_name, sub_list, naming_rule)
-        await move_torrent(folder_old_path, folder_new_path, file_name, movie_number, naming_rule)
-        await move_bif(folder_old_path, folder_new_path, file_name, naming_rule)
-        await move_other_file(res.number, folder_old_path, folder_new_path, file_name, naming_rule)
+        if not skip_reorganize:
+            if file_info.has_sub:
+                await move_sub(folder_old_path, folder_new_path, file_name, sub_list, naming_rule)
+            await move_torrent(folder_old_path, folder_new_path, file_name, movie_number, naming_rule)
+            await move_bif(folder_old_path, folder_new_path, file_name, naming_rule)
+            await move_other_file(res.number, folder_old_path, folder_new_path, file_name, naming_rule)
 
-        # 移动文件
-        if not await move_movie(other, file_info, file_path, file_new_path):
-            return None, None
-        await save_success_list(file_path, file_new_path)  # 保存成功列表
+            # 移动文件
+            if not await move_movie(other, file_info, file_path, file_new_path):
+                return None, None
+        await save_success_list(file_path, file_path)
 
-        # 创建软链接及复制文件
-        if manager.config.auto_link:
-            if manager.config.success_file_move:
-                # 此时 folder_new_path 在 success_folder 目录下
-                target_dir = Path(manager.config.localdisk_path) / folder_new_path.relative_to(
-                    success_folder, walk_up=True
-                )
-            else:
-                # 此时 folder_new_path == folder_old_path 且在 movie_path 目录下
-                target_dir = Path(manager.config.localdisk_path) / folder_old_path.relative_to(movie_path, walk_up=True)
-            copy = Switch.COPY_NETDISK_NFO in manager.config.switch_on
-            await newtdisk_creat_symlink(copy, folder_new_path, target_dir)
+        if not skip_reorganize:
+            # 创建软链接及复制文件
+            if manager.config.auto_link:
+                if manager.config.success_file_move:
+                    target_dir = Path(manager.config.localdisk_path) / folder_new_path.relative_to(
+                        success_folder, walk_up=True
+                    )
+                else:
+                    target_dir = Path(manager.config.localdisk_path) / folder_old_path.relative_to(
+                        movie_path, walk_up=True
+                    )
+                copy = Switch.COPY_NETDISK_NFO in manager.config.switch_on
+                await newtdisk_creat_symlink(copy, folder_new_path, target_dir)
 
-        # json添加封面缩略图路径
-        other.poster_path = poster_final_path
-        other.thumb_path = thumb_final_path
-        other.fanart_path = fanart_final_path
-        if not await aiofiles.os.path.exists(thumb_final_path) and await aiofiles.os.path.exists(fanart_final_path):
-            other.thumb_path = fanart_final_path
+            # json添加封面缩略图路径
+            other.poster_path = poster_final_path
+            other.thumb_path = thumb_final_path
+            other.fanart_path = fanart_final_path
+            if not await aiofiles.os.path.exists(thumb_final_path) and await aiofiles.os.path.exists(fanart_final_path):
+                other.thumb_path = fanart_final_path
 
         return res, other
 
