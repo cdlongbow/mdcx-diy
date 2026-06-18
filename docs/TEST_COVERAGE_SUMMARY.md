@@ -46,13 +46,13 @@ tests/
 └── test_nfo_external_id_tag.py     # NFO 外部 ID 标签（2 个测试）
 ```
 
-### 覆盖的核心模块逻辑
+### 覆盖的核心功能
 
-| 模块 | 覆盖内容 |
+| 模块 | 测了什么 |
 |------|---------|
-| `tmdb_actor.py` | 演员 TMDB ID 查询、xlsx 读写、中文繁简归一化、候选排序、反查缓存、LibreDMM 合并 |
-| `mapping_resources.py` | 演员/制作商/标签映射表加载与查询 |
-| `nfo.py` | NFO 读取、写入转义、标签优先级、演员 tmdbid 标签、外部 ID 标签 |
+| `tmdb_actor.py` | 查 TMDB ID、读写 Excel、中文繁简归一化、候选排序、反查缓存、LibreDMM 链接补全 |
+| `mapping_resources.py` | 演员/制作商/标签映射表的加载和查询 |
+| `nfo.py` | NFO 读写、转义、标签优先级、演员 tmdbid 标签、外部 ID 标签 |
 
 ## 测试策略
 

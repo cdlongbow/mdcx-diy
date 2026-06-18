@@ -2,30 +2,31 @@
 
 ## v1.4.0 (2026-06-18)
 
-### 架构改进
+### 新增功能
 
-- **#tmdb_actor.py** 演员 TMDB 查询改用 TMDB `original_name` 作为日文原名写入 xlsx，代替之前的搜索名
-- **#tmdb_actor.py** LibreDMM 链接补全解耦为统一扫描，合并 3 条独立路径，在 `fetch_actor_tmdb_ids()` 末尾统一执行
-- **#tmdb_actor.py** 补全链接时通过 `search_actor_db_reverse` 反查 xlsx 中日文原名后再更新，避免中文名导致的重复行
-- **#scraper.py** 读取模式选项逻辑解耦：进入处理（entry）由 `HAS_NFO_UPDATE` 控制独立于 `READ_UPDATE_NFO`，`update_nfo` 仅由 `READ_UPDATE_NFO` 控制，文件整理仅由 `HAS_NFO_UPDATE` 控制
+- **演员日文名更准了**：以前填演员表用的是搜索用的中文名，现在改用 TMDB 返回的日文原名（像"三上悠亜"这种）
+- **自动补演员网址**：刮削完会自动检查哪些演员有 TMDB ID 但没网址，用日文名去 LibreDMM 找到网址填上
+
+### 读取模式改进
+
+- **选项更灵活了**：4 个选项现在互不绑定。可以只勾"有 NFO 时更新"不勾"更新 NFO"，就只整理文件不改 NFO；也可以只勾"更新 NFO"不勾"有 NFO 时更新"，就只改 NFO 内容不挪文件
 
 ### 安全修复
 
-- **#v1.py** 移除硬编码的 Emby API Key `ee9a2f2419704257b1dd60b975f2d64e`
+- 移除了配置文件里写死的 Emby API Key（之前是示例用的 key，换掉了）
 
 ### Bug 修复
 
-- **#nfo.py** CDATA 解析改为 lxml 原生解析，移除暴力字符串替换（`replace("<![CDATA[", "").replace("]]>", "")`）
-- **#file_crawler.py** 修复 `re.compile` 正则注入（`re.escape(each)`）
-- **#file_crawler.py** 修复 `asyncio.gather` 未设置 `return_exceptions=True` 导致异常传播崩溃
-- **#tmdb_actor.py** 记录被 `except Exception: pass` 吞掉的异常日志
+- **NFO 里的 `<![CDATA[...]]>`** 改用正规解析，不会再因为内容里恰好有 `]]>` 而出错
+- **正则表达式安全**：文件名中的特殊字符会先转义再匹配，不会崩
+- **并发请求异常**：演员名查询时如果某个请求出错，不会让整个任务崩溃
+- **被悄悄吞掉的错误日志**：演员数据查询中隐蔽的异常现在会写入日志
 
-### 工程质量
+### 内部改进
 
-- 移除失效测试文件 `tests/test_path.py`、`tests/test_video.py`
-- `scripts/check.py` 新增 14 个 NFO 测试（共 7 个测试文件，43 个测试用例）覆盖 tag 优先级、actor tmdbid、external id 等场景
-- 修复 3 个预存测试失败：freeze_panes、`_read_actor_db_xlsx` mock、LogBuffer mock
-- `tests/conftest.py` 新增 `COL_HREF`、`COL_KEYWORD`、`COL_TMDB_URL`、`COL_TMDBID` 等列常量 mock
+- 删掉了两个已经没用的测试文件
+- 新增 NFO 标签优先级、演员 TMDB ID、外部 ID 等 14 个测试用例，自检总数达到 43 个
+- 修复了 3 个之前遗留的测试报错
 
 ## v1.3.0 (2026-06-18) 重磅更新
 

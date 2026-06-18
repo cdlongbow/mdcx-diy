@@ -179,12 +179,12 @@
    - 查看"TMDB ID"列
    - 找出没有 TMDB ID 的演员
 
-2. **通过刮削自动补全**
-   - 确认已配置 TMDB API Key
-   - 使用读取模式，勾选"更新 NFO"和"为演员写入 TMDB ID"
-   - 重新刮削包含这些演员的影片
-   - 程序会自动查询缺失的 TMDB ID 并写回 Excel 和 NFO
-   - TMDB 返回的 `original_name` 作为日文原名写入 xlsx
+2. **通过刮削自动补**
+   - 确认已经填好 TMDB API Key
+   - 用读取模式，勾上"更新 NFO"和"为演员写入 TMDB ID"
+   - 重新刮一下包含这些演员的片子
+   - 程序会自动查到缺失的 TMDB ID，写进 Excel 和 NFO
+   - 日文名会用 TMDB 返回的原名（比如"三上悠亜"）而不是中文名
 
 3. **手动验证**
    - 检查自动写回的 TMDB ID
