@@ -92,8 +92,8 @@ async def _get_emby_actor_list() -> list[dict]:
     if "emby" == manager.config.server_type:
         server_name = "Emby"
         url = base_url + "/emby/Persons?api_key=" + manager.config.api_key
-        # http://192.168.5.191:8096/emby/Persons?api_key=ee9a2f2419704257b1dd60b975f2d64e
-        # http://192.168.5.191:8096/emby/Persons/梦乃爱华?api_key=ee9a2f2419704257b1dd60b975f2d64e
+        # http://192.168.5.191:8096/emby/Persons?api_key=your_api_key
+        # http://192.168.5.191:8096/emby/Persons/梦乃爱华?api_key=your_api_key
         if manager.config.user_id:
             url += f"&userid={manager.config.user_id}"
     else:

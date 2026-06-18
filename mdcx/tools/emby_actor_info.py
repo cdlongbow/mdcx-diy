@@ -281,7 +281,7 @@ async def show_emby_actor_list(mode: int) -> None:
                     logs = ""
                 count += 1
             else:
-                # http://192.168.5.191:8096/emby/Persons/梦乃爱华?api_key=ee9a2f2419704257b1dd60b975f2d64e
+                # http://192.168.5.191:8096/emby/Persons/梦乃爱华?api_key=your_api_key
                 res, error = await _get_actor_detail(actor_js)
                 _raise_if_stop_requested()
                 if res is None:

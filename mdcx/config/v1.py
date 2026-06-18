@@ -250,7 +250,7 @@ class ConfigV1:
     # emby
     server_type: str = r"emby"
     emby_url: str = r"http://192.168.5.191:8096"
-    api_key: str = r"ee9a2f2419704257b1dd60b975f2d64e"
+    api_key: str = r""
     user_id: str = r""
     emby_on: str = r"actor_info_zh_cn,actor_info_miss,actor_photo_net,actor_photo_miss,"
     use_database: bool = False
