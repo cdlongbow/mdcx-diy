@@ -1,12 +1,12 @@
 # 开发
 
-## 环境准备
+## 开始之前
 
-### 依赖
+### 需要安装的工具
 
-* [uv](https://docs.astral.sh/uv/getting-started/installation/)
+* [uv](https://docs.astral.sh/uv/getting-started/installation/) 包管理器
 
-### clone
+### 把代码下载到本地并安装依赖
 
 ```bash
 git clone https://github.com/sqzw-x/mdcx.git
@@ -16,7 +16,7 @@ uv run pre-commit install
 uv pip install -e .
 ```
 
-## Run
+## 启动程序
 
 启动 qt 版本
 
@@ -24,9 +24,9 @@ uv pip install -e .
 uv run main.py
 ```
 
-## Test
+## 运行测试
 
-Python 侧使用 pytest
+Python 这边用 pytest
 
 ```bash
 uv run pytest
@@ -34,16 +34,16 @@ uv run pytest
 
 ## 如何添加新配置项
 
-1. 在 `mdcx/config/models.py` `Config` 类中添加配置字段及默认值
-2. 通过 `from mdcx.models.config.manager import manager` 导入配置, 并通过 `manager.config.<key>` 访问配置项
-3. 按下一节所述在设置界面中添加对应的控件, 修改 `mdcx/controllers/main_window/` 目录下 `load_config.py` 及 `save_config.py`, 以实现 UI 绑定
+1. 在 `mdcx/config/models.py` 的 `Config` 类里加上配置字段和默认值
+2. 通过 `from mdcx.models.config.manager import manager` 导入配置, 然后用 `manager.config.<key>` 读取配置项
+3. 按照下一节所述在设置界面中添加对应的控件, 修改 `mdcx/controllers/main_window/` 目录下的 `load_config.py` 和 `save_config.py`, 让界面和配置关联起来
 
 ## 如何修改图形界面
 
-* `mdcx/views/MDCx.ui` 定义了主窗口, `mdcx/views/posterCutTool.ui` 是图片裁剪窗口, 可使用 Qt Designer 或 Qt Creator 编辑
-* 修改后运行 `./scripts/pyuic.sh` 生成对应的 Python 代码
-* 如需设置控件事件等, 需修改 `mdcx.controllers.main_window.init.Init_Singal`
-* 所有事件处理函数均在 `mdcx/controllers/main_window/main_window.py` 及 `mdcx/controllers/main_window/handlers.py`
+* `mdcx/views/MDCx.ui` 是主窗口, `mdcx/views/posterCutTool.ui` 是图片裁剪窗口, 可以用 Qt Designer 或 Qt Creator 编辑
+* 改完后执行 `./scripts/pyuic.sh` 生成对应的 Python 代码
+* 如果要设置控件的事件处理, 需要改 `mdcx.controllers.main_window.init.Init_Singal`
+* 所有事件处理函数都在 `mdcx/controllers/main_window/main_window.py` 和 `mdcx/controllers/main_window/handlers.py` 里
 
 ## 代码结构说明
 

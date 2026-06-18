@@ -2,7 +2,7 @@
 
 ## 概述
 
-MDCx 的 Amazon 高清封面功能是一个复杂的系统，通过多层缓存和智能搜索策略，从 Amazon 获取影片的高清封面图片。该系统避免了重复搜索，提高了查询效率。
+MDCx 的 Amazon 高清封面功能是一个多层缓存系统。它从 Amazon 获取影片的高清封面图片，避免重复搜索，提高查询效率。
 
 ## 缓存架构
 
@@ -15,11 +15,15 @@ Amazon 缓存由两层组成：
 - **缓存内容**：番号与 ASIN 的映射关系及相关元数据
 - **生命周期**：持久化存储，程序重启后仍然有效
 
+简单说就是：用一个 Excel 文件长期保存查询结果，关掉程序再打开，数据还在。
+
 ### 2. 内存 LRU 缓存（辅助缓存）
 
 - **实现**：`@lru_cache(maxsize=1)`
 - **用途**：缓存条码数字模板
 - **生命周期**：进程级别，程序重启后失效
+
+简单说就是：只在程序运行期间临时缓存条码模板，重启后消失。
 
 ## 缓存数据模型
 
@@ -91,6 +95,8 @@ class AsinRecord(TypedDict, total=False):
   - 演员匹配比例 x 20
   - 介质优先级 x 2（Blu-ray > Software Download > DVD）
 
+简单说就是：用多种方式计算匹配程度，综合打分，选最像的那个。
+
 #### 第三层：演员兜底搜索
 
 ```
@@ -134,7 +140,9 @@ Amazon 请求使用自适应限流器 `_AdaptiveRequestThrottle`：
 
 - 检测 429、503、"too many requests"、"automated access" 等限流信号
 - 动态调整请求间隔（退避策略）
-- 失败时自动提取 Amazon cookie（session-id、ubid_acbjp）重试
+- 失败时自动提取 Amazon cookie（session-id、ubid-acbjp）重试
+
+简单说就是：被 Amazon 限制时就自动等一会儿再试，还会自动拿 cookie 重试。
 
 ## 使用场景
 

@@ -1,6 +1,6 @@
 # 配置系统
 
-> 本文档从 CODE_WIKI.md 提取,详见完整文档
+> 本文档从 CODE_WIKI.md 提取，详见完整文档
 
 ---
 
@@ -8,157 +8,194 @@
 
 ### `Config`
 
-主配置类,基于 Pydantic
+主配置类，基于 Pydantic。下面按区域介绍所有配置项。
 
-**主要配置区域**:
+**1. 通用设置**
 
-1. **通用设置**
-   - `media_path`:媒体路径
-   - `softlink_path`:软链接路径
-   - `success_output_folder`:成功输出目录
-   - `failed_output_folder`:失败输出目录
-   - `media_type`:媒体文件类型列表
-   - `sub_type`:字幕文件类型列表
+最基本的路径和文件类型配置。
 
-2. **清理设置**
-   - `folders`:排除目录列表
-   - `string`:要从文件名删除的字符串列表
-   - `file_size`:要处理的最小文件大小(MB)
-   - `clean_*`:各种清理规则
+- `media_path`：媒体文件存放路径
+- `softlink_path`：软链接存放路径
+- `success_output_folder`：处理成功后的输出目录
+- `failed_output_folder`：处理失败后的输出目录
+- `media_type`：媒体文件类型列表（如 mp4、mkv）
+- `sub_type`：字幕文件类型列表（如 srt、ass）
 
-3. **刮削设置**
-   - `thread_number`:并发数
-   - `thread_time`:线程延时
-   - `main_mode`:主模式
-   - `read_mode`:读取模式
-   - `update_mode`:更新模式
-   - `download_files`:下载文件类型列表
-   - `scrape_like`:刮削模式
+简单说：告诉程序"你的电影在哪、处理完放哪"。
 
-4. **网站设置**
-   - `website_youma`:有码网站源列表
-   - `website_wuma`:无码网站源列表
-   - `website_suren`:素人网站源列表
-   - `website_fc2`:FC2 网站源列表
-   - `website_oumei`:欧美网站源列表
-   - `website_guochan`:国产网站源列表
-   - `fixed_scraping_type`:锁定刮削类型
+**2. 清理设置**
 
-5. **字段配置**
-   - `field_configs`:各字段的网站优先级、语言、翻译开关
-   - `type_field_configs`:按类型字段优先级
-   - `site_configs`:网站配置
+处理前先清理文件名中的杂质。
 
-6. **翻译配置**
-   - `translate_config`:`TranslateConfig` 对象
-     - `translate_by`:翻译服务列表
-     - `baidu_appid`:百度 APP ID
-     - `baidu_key`:百度密钥
-     - `deepl_key`:DeepL 密钥
-     - `deeplx_url`:DeepLX URL
-     - `llm_*`:LLM 相关配置
+- `folders`：需要排除的目录列表
+- `string`：要从文件名中删除的字符串列表
+- `file_size`：只处理大于此值（MB）的文件
+- `clean_*`：各种清理规则
 
-7. **命名和格式化**
-   - `nfo_include_new`:NFO 包含内容列表
-   - `folder_name`:目录名称模板
-   - `naming_file`:文件命名模板
-   - `naming_media`:媒体命名模板
-   - `prevent_char`:禁止字符
-   - `fields_rule`:字段规则列表
-   - `*_style`:各类样式
+**3. 刮削设置**
 
-8. **服务器设置**
-   - `server_type`:服务器类型(emby/jellyfin)
-   - `emby_url`:Emby 地址
-   - `api_key`:API 密钥
-   - `user_id`:用户 ID
-   - `emby_on`:Emby 功能开关列表
-   - `use_database`:使用数据库
-   - `info_database_path`:信息数据库路径
+从网站抓取影片信息的参数。
 
-9. **水印设置**
-   - `poster_mark`、`thumb_mark`、`fanart_mark`:各图片水印
-   - `mark_size`:水印大小
-   - `mark_type`:水印类型列表
-   - `mark_fixed`、`mark_pos*`:水印位置规则
+- `thread_number`：同时抓取的线程数（并发数）
+- `thread_time`：每次抓取之间的延时（秒）
+- `main_mode`：主模式
+- `read_mode`：读取模式
+- `update_mode`：更新模式
+- `download_files`：需要下载的文件类型列表
+- `scrape_like`：刮削模式
 
-10. **网络设置**
-    - `use_proxy`:代理类型
-    - `proxy`:代理地址
-    - `no_proxy_sites`:不使用代理网站
-    - `cf_bypass_*`:Cloudflare Bypass 配置
-    - `timeout`、`retry`:超时和重试
-    - `theporndb_api_token`、`tmdb_api_key`:API 密钥
+简单说：控制刮削的速度和行为，线程越多越快，但也更容易被网站封。
 
-11. **日志设置**
-    - `show_web_log`:显示网页日志
-    - `show_from_log`:显示来源日志
-    - `show_data_log`:显示数据日志
-    - `save_log`:保存日志
+**4. 网站设置**
 
-**主要方法**:
-- `get_site_config(site)`:获取网站配置
-- `get_site_url(site, default)`:获取网站自定义 URL
-- `get_field_config(field)`:获取字段配置
-- `get_type_sites(scraping_type)`:获取类型网站
-- `get_type_field_config(scraping_type, field)`:获取类型字段配置
-- `set_field_sites(field, sites)`:设置字段网站
-- `set_field_language(field, language)`:设置字段语言
-- `set_field_translate(field, translate)`:设置字段翻译
+不同类别的影片分别使用哪些数据源网站。
+
+- `website_youma`：有码影片的网站源列表
+- `website_wuma`：无码影片的网站源列表
+- `website_suren`：素人影片的网站源列表
+- `website_fc2`：FC2 影片的网站源列表
+- `website_oumei`：欧美影片的网站源列表
+- `website_guochan`：国产影片的网站源列表
+- `fixed_scraping_type`：锁定刮削类型（强制按某类处理）
+
+**5. 字段配置**
+
+每个字段从哪个网站抓、用什么语言、是否翻译。
+
+- `field_configs`：各字段的网站优先级、语言、翻译开关
+- `type_field_configs`：按类型区分字段优先级
+- `site_configs`：网站配置
+
+**6. 翻译配置**
+
+抓取到的信息如果需要翻译，用这里配置的服务。
+
+- `translate_config`：`TranslateConfig` 对象
+  - `translate_by`：翻译服务列表（按优先级）
+  - `baidu_appid`：百度翻译 APP ID
+  - `baidu_key`：百度翻译密钥
+  - `deepl_key`：DeepL 密钥
+  - `deeplx_url`：DeepLX 服务地址
+  - `llm_*`：大语言模型相关配置
+
+**7. 命名和格式化**
+
+输出文件叫什么名字、长什么样。
+
+- `nfo_include_new`：NFO 文件中包含哪些内容
+- `folder_name`：目录名称模板
+- `naming_file`：文件命名模板
+- `naming_media`：媒体命名模板
+- `prevent_char`：禁止出现在文件名中的字符
+- `fields_rule`：字段规则列表
+- `*_style`：各类样式配置
+
+**8. 服务器设置**
+
+连接 Emby 或 Jellyfin 的参数。
+
+- `server_type`：服务器类型（emby/jellyfin）
+- `emby_url`：Emby 服务器地址
+- `api_key`：API 密钥
+- `user_id`：用户 ID
+- `emby_on`：Emby 功能开关列表
+- `use_database`：是否使用数据库
+- `info_database_path`：信息数据库路径
+
+**9. 水印设置**
+
+给图片加水印的配置。
+
+- `poster_mark`、`thumb_mark`、`fanart_mark`：不同图片的水印
+- `mark_size`：水印大小
+- `mark_type`：水印类型列表
+- `mark_fixed`、`mark_pos*`：水印位置规则
+
+**10. 网络设置**
+
+代理和超时等网络相关配置。
+
+- `use_proxy`：代理类型（no/http/socks5）
+- `proxy`：代理地址
+- `no_proxy_sites`：不走代理的网站列表
+- `cf_bypass_*`：Cloudflare Bypass 配置
+- `timeout`、`retry`：超时时间和重试次数
+- `theporndb_api_token`、`tmdb_api_key`：第三方 API 密钥
+
+**11. 日志设置**
+
+控制程序输出哪些日志。
+
+- `show_web_log`：是否显示网页日志
+- `show_from_log`：是否显示来源日志
+- `show_data_log`：是否显示数据日志
+- `save_log`：是否保存日志到文件
+
+**主要方法**：
+- `get_site_config(site)`：获取某个网站的配置
+- `get_site_url(site, default)`：获取网站的自定义 URL
+- `get_field_config(field)`：获取某个字段的配置
+- `get_type_sites(scraping_type)`：获取某类影片使用的网站
+- `get_type_field_config(scraping_type, field)`：获取某类型下某字段的配置
+- `set_field_sites(field, sites)`：设置字段对应的网站
+- `set_field_language(field, language)`：设置字段使用的语言
+- `set_field_translate(field, translate)`：开关字段翻译
 
 ## 配置枚举 ([mdcx/config/enums.py](../mdcx/config/enums.py))
 
 ### `Website`
 
-支持的网站枚举(34个站点)
+支持的网站枚举，共 34 个站点。
 
 ### `FixedScrapingType`
 
-刮削类型枚举
+固定刮削类型的枚举。用来告诉程序"这部片子属于哪一类"。
 
-**类型**:
-- `AUTO`:自动
-- `YOUMA`:有码
-- `WUMA`:无码
-- `SUREN`:素人
-- `FC2`:FC2
-- `OUMEI`:欧美
-- `GUOCHAN`:国产
+**类型**：
+- `AUTO`：自动识别
+- `YOUMA`：有码
+- `WUMA`：无码
+- `SUREN`：素人
+- `FC2`：FC2 系列
+- `OUMEI`：欧美
+- `GUOCHAN`：国产
 
 ### 其他枚举
 
-- `Language`:语言
-- `Translator`:翻译服务
-- `EmbyAction`:Emby 操作
-- `DownloadableFile`:可下载文件类型
-- `KeepableFile`:可保留文件类型
-- `ReadMode`:读取模式
-- `Switch`:功能开关
-- `NfoInclude`:NFO 包含内容
-- `MarkType`:水印类型
-- 等等...
+- `Language`：语言
+- `Translator`：翻译服务
+- `EmbyAction`：Emby 操作
+- `DownloadableFile`：可下载的文件类型
+- `KeepableFile`：可保留的文件类型
+- `ReadMode`：读取模式
+- `Switch`：功能开关
+- `NfoInclude`：NFO 包含的内容
+- `MarkType`：水印类型
+- 等等
 
 ## 配置管理器 ([mdcx/config/manager.py](../mdcx/config/manager.py))
 
 ### `ConfigManager`
 
-管理配置的加载、保存、迁移等
+配置管理器负责配置的加载、保存、迁移等。
 
-**主要方法**:
-- `__init__()`:初始化
-- `load()`:加载配置
-- `save()`:保存配置
-- `reset()`:重置为默认配置
-- `handle_v1()`:处理 V1 配置
-- `_replace_config()`:热切换配置
-- `acquire_computed()`:获取计算属性租约
+**主要方法**：
+- `__init__()`：初始化
+- `load()`：加载配置
+- `save()`：保存配置
+- `reset()`：重置为默认配置
+- `handle_v1()`：处理旧版 V1 配置
+- `_replace_config()`：热切换配置（不重启就生效）
+- `acquire_computed()`：获取计算属性租约
 
-**配置加载流程**:
-1. 检查标记文件确定配置路径
+**配置加载流程**：
+1. 检查标记文件，确定配置路径在哪
 2. 尝试加载配置文件
-3. 如果是旧版 .ini 配置,自动转换为新版
-4. 验证配置
+3. 如果是旧版 .ini 配置，自动转换为新版 JSON 格式
+4. 验证配置是否正确
 5. 应用配置
+
+简单说：程序启动时会自动找配置文件，发现旧版的就帮你转成新版。
 
 ---
 
@@ -175,9 +212,9 @@
 
 **代理类型**
 
-- `no`: 不使用代理
-- `http`: HTTP/HTTPS 代理
-- `socks5`: SOCKS5 代理
+- `no`：不使用代理
+- `http`：HTTP/HTTPS 代理
+- `socks5`：SOCKS5 代理
 
 **配置示例**
 
@@ -190,32 +227,36 @@
 
 ### 不走代理网站配置
 
+有些网站走代理反而打不开，可以单独设置不走代理。
+
 **配置项**
 
 | 配置项 | 类型 | 默认值 | 说明 |
 |--------|------|--------|------|
-| `no_proxy_sites` | str | `api.tmdb.org` | 不使用代理的网站列表 |
+| `no_proxy_sites` | str | `api.tmdb.org` | 不走代理的网站列表 |
 
 **配置格式**
 
-支持以下格式：
+支持以下三种写法：
 
-1. **单个网站**
+1. **写完整域名**
    ```
    api.tmdb.org
    ```
 
-2. **多个网站**（逗号分隔）
+2. **写多个域名**（逗号分隔）
    ```
    api.tmdb.org,javdb,javbus
    ```
 
-3. **网站值**（推荐，自动匹配域名）
+3. **写网站值**（推荐，系统自动匹配域名）
    ```
    javdb
    tmdb
    libredmm
    ```
+
+简单说：你只需写网站简称（如 `javdb`），系统会自动匹配它的所有域名。
 
 **支持的网站值**
 
@@ -260,9 +301,12 @@
 | `hdouban` | hdouban.com |
 | `theporndb` | theporndb.com |
 
-**使用场景**
+**实际使用场景**
 
 **场景 1：TMDB API 走代理速度慢**
+
+把 `api.tmdb.org` 加入不走代理列表，其他网站继续走代理。
+
 ```json
 {
   "use_proxy": "socks5",
@@ -270,9 +314,11 @@
   "no_proxy_sites": "api.tmdb.org"
 }
 ```
-说明：其他网站走代理，TMDB API 直连
 
-**场景 2：JavDB 使用代理无法访问**
+**场景 2：JavDB 用代理反而访问不了**
+
+把 `javdb` 加入不走代理列表。
+
 ```json
 {
   "use_proxy": "http",
@@ -280,9 +326,11 @@
   "no_proxy_sites": "javdb"
 }
 ```
-说明：JavDB 直连，其他网站走代理
 
-**场景 3：多个 API 服务不走代理**
+**场景 3：多个 API 服务都不走代理**
+
+用逗号分隔多个网站值。
+
 ```json
 {
   "use_proxy": "socks5",
@@ -290,31 +338,28 @@
   "no_proxy_sites": "api.tmdb.org,theporndb,cnmdb"
 }
 ```
-说明：指定多个网站不走代理
 
 **配置方式**
 
-在 MDCx 设置中配置"不使用代理网站"选项，输入网站列表（逗号分隔）。
+在 MDCx 设置的"不使用代理网站"选项里，直接输入网站列表，逗号分隔即可。
 
 **注意事项**
 
-⚠️ **域名匹配规则**：
 - 支持完整域名匹配（如 `api.tmdb.org`）
-- 支持子域名匹配（如 `api.tmdb.org` 会匹配 `sub.api.tmdb.org`）
-- 网站值不区分大小写（`JavDB` 和 `javdb` 等价）
-
-⚠️ **优先级**：
+- 支持子域名匹配（`api.tmdb.org` 也会匹配 `sub.api.tmdb.org`）
+- 网站值不区分大小写（`JavDB` 和 `javdb` 效果一样）
 - `no_proxy_sites` 的优先级高于全局代理设置
-- 如果主机在 `no_proxy_sites` 列表中，将直接连接
+- 如果域名在不走代理列表中，程序会直接连接
 
-⚠️ **常见问题**：
-- 如果配置后仍然走代理，请检查域名是否正确
-- 可以使用开发者工具查看实际请求的域名
-- 某些网站可能需要同时配置多个域名
+**常见问题**
 
-**实现细节**
+- 如果配了不走代理但还是走了代理，检查域名写没写对
+- 可以用浏览器开发者工具看实际请求的是哪个域名
+- 有些网站可能需要配多个域名才能完全不走代理
 
-系统在发起请求前会检查目标主机：
+**实现原理**
+
+程序在发起请求前会检查目标主机：
 
 ```python
 def _is_no_proxy_host(self, host: str) -> bool:
