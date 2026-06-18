@@ -11,6 +11,8 @@ from pathlib import Path
 from typing import Any
 
 import zhconv
+from curl_cffi.requests import AsyncSession
+from parsel import Selector
 
 from ..config.manager import manager
 from ..config.resources import (
@@ -708,8 +710,11 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
             if not zh_tw and zh_cn:
                 zh_tw = zhconv.convert(zh_cn, "zh-hant")
             if zh_cn or zh_tw:
+                existing_href = (resources.actor_db or {}).get(jp_name, {}).get("href", "")
+                if not existing_href:
+                    existing_href = await fetch_libredmm_link(jp_name)
                 write_status = await update_actor_db_row(
-                    jp=jp_name, zh_cn=zh_cn, zh_tw=zh_tw, tmdbid=tid, overwrite_names=True
+                    jp=jp_name, zh_cn=zh_cn, zh_tw=zh_tw, href=existing_href, tmdbid=tid, overwrite_names=True
                 )
                 LogBuffer.log().write(
                     f" 🔄 [TMDB] {actor_name} 翻译补全: zh_cn={zh_cn or '-'} zh_tw={zh_tw or '-'} ({write_status})"
@@ -736,7 +741,9 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
 
     async def _query_and_update(actor_name: str, query_name: str) -> None:
         try:
-            query_result = await _query_single_actor(query_name, base_url, tmdb_api_key, client)
+            tmdb_task = asyncio.create_task(_query_single_actor(query_name, base_url, tmdb_api_key, client))
+            libredmm_task = asyncio.create_task(fetch_libredmm_link(query_name))
+            query_result, libredmm_link = await asyncio.gather(tmdb_task, libredmm_task)
             if query_result:
                 tmdbid = query_result["pid"]
                 result[actor_name] = tmdbid
@@ -756,6 +763,7 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
                     zh_cn=zh_cn,
                     zh_tw=zh_tw,
                     keyword=keyword_str,
+                    href=libredmm_link,
                     tmdbid=tmdbid,
                     append_keyword=True,
                 )
@@ -963,6 +971,36 @@ async def _fetch_person_translations(pid: int, base_url: str, api_key: str, clie
         pass
 
     return result
+
+
+# ============= LibreDMM 链接查询 =============
+
+
+async def fetch_libredmm_link(actor_name: str) -> str:
+    """搜索 LibreDMM 获取演员页面链接，未找到返回空字符串。"""
+    search_url = "https://www.libredmm.com/actresses"
+    params = {"order": "New", "fuzzy": actor_name, "commit": "Filter by name"}
+    headers = {
+        "Accept-Language": "zh-CN,zh;q=0.9",
+        "Referer": "https://www.libredmm.com/actresses",
+    }
+    try:
+        async with AsyncSession(impersonate="safari15_5") as s:
+            resp = await s.get(search_url, params=params, headers=headers, timeout=15)
+            if resp.status_code != 200:
+                return ""
+
+            final_url = str(resp.url)
+            if "/actresses/" in final_url and final_url != search_url:
+                return final_url
+
+            sel = Selector(resp.text)
+            href = sel.css('a[href^="/actresses/"]::attr(href)').get()
+            if href and href != "/actresses":
+                return f"https://www.libredmm.com{href}"
+    except Exception:
+        pass
+    return ""
 
 
 # ============= TMDB 翻译过滤 =============

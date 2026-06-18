@@ -200,6 +200,16 @@ manager_module.get_new_str = lambda a, wanted=False: a
 sys.modules.setdefault("mdcx.config.manager", manager_module)
 
 resources_module = types.ModuleType("mdcx.config.resources")
+resources_module.COL_JP = 0
+resources_module.COL_ZH_CN = 1
+resources_module.COL_ZH_TW = 2
+resources_module.COL_KEYWORD = 3
+resources_module.COL_HREF = 4
+resources_module.COL_TMDBID = 5
+resources_module.COL_TMDB_URL = 6
+resources_module.DB_HEADERS = ["日文原名", "中文名", "繁体名", "别名", "链接", "tmdbid", "tmdb url"]
+resources_module._tmdb_person_url = lambda tid: f"https://www.themoviedb.org/person/{tid}"
+resources_module.read_actor_db_xlsx = lambda db_path: {}
 resources_module.resources = _DummyResources()
 sys.modules.setdefault("mdcx.config.resources", resources_module)
 
