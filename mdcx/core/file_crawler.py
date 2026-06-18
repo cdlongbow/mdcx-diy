@@ -328,7 +328,7 @@ class FileScraper:
 
         pending_keys = [k for k in all_needed_keys if k not in all_res and k not in failed]
         if pending_keys:
-            await asyncio.gather(*[_fetch_site(k) for k in pending_keys])
+            await asyncio.gather(*[_fetch_site(k) for k in pending_keys], return_exceptions=True)
 
         # 按字段分别处理，每个字段按优先级尝试获取
         for field in ManualConfig.REDUCED_FIELDS:
@@ -666,7 +666,7 @@ class FileScraper:
         if res.actor_amazon:
             for each in res.actor_amazon:  # 去除演员名，避免搜索不到
                 try:
-                    end_actor = re.compile(rf" {each}$")
+                    end_actor = re.compile(rf" {re.escape(each)}$")
                     res.originaltitle_amazon = re.sub(end_actor, "", res.originaltitle_amazon)
                 except Exception:
                     pass

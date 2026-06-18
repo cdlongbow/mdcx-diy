@@ -574,7 +574,7 @@ async def migrate_xml_to_xlsx() -> bool:
                                     old_tmdb_cache[name] = int(tid)
                         wb.close()
                     except Exception:
-                        pass
+                        LogBuffer.log().write("  ⚠️ [演员数据库] 旧版 tmdbid xlsx 读取失败，跳过迁移")
 
                 import openpyxl
 
