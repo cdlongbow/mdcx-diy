@@ -752,8 +752,9 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
                 aka = query_result.get("also_known_as", [])
                 keyword_str = ",".join(aka) if aka else ""
 
+                jp_name = query_result.get("original_name", "") or query_name
                 write_status = await update_actor_db_row(
-                    jp=query_name,
+                    jp=jp_name,
                     zh_cn=zh_cn,
                     zh_tw=zh_tw,
                     keyword=keyword_str,
@@ -913,6 +914,7 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
                 "known_for_count": known_for_count,
                 "place_has_japan": place_has_japan,
                 "name": detail.get("name", ""),
+                "original_name": item.get("original_name", ""),
                 "raw_names": sorted(all_names),
                 "all_norm": sorted(all_norm),
                 "translations": translations,

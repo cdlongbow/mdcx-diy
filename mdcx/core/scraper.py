@@ -674,8 +674,9 @@ class Scraper:
                                             # 更新 xlsx
                                             translations = query_result.get("translations", {})
                                             aka = query_result.get("also_known_as", [])
+                                            jp_original = query_result.get("original_name", "") or jp_name
                                             write_status = await update_actor_db_row(
-                                                jp=jp_name,
+                                                jp=jp_original,
                                                 zh_cn=_normalize_translation(translations.get("zh_cn", "")),
                                                 zh_tw=_normalize_translation(translations.get("zh_tw", "")),
                                                 keyword=",".join(aka) if aka else "",
