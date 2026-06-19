@@ -818,5 +818,110 @@
   "rest_count": 500,
   "rest_time": "PT20M",
   "no_proxy_sites": "api.tmdb.org,libredmm,javdbapi,dmmsee.cyou",
-  "fixed_scraping_type": "auto"
+  "fixed_scraping_type": "auto",
+  "type_field_configs": {
+    "youma": {
+      "title": {
+        "site_prority": [
+          "libredmm",
+          "javdbapi"
+        ]
+      },
+      "originaltitle": {
+        "site_prority": [
+          "libredmm",
+          "javdbapi"
+        ]
+      },
+      "outline": {
+        "site_prority": [
+          "iqqtv",
+          "airav_cc",
+          "libredmm",
+          "javdbapi"
+        ]
+      },
+      "originalplot": {
+        "site_prority": [
+          "libredmm",
+          "javdbapi"
+        ]
+      },
+      "actors": {
+        "site_prority": [
+          "libredmm",
+          "javdbapi"
+        ]
+      },
+      "all_actors": {
+        "site_prority": [
+          "libredmm",
+          "javdbapi"
+        ]
+      },
+      "thumb": {
+        "site_prority": [
+          "libredmm",
+          "javdbapi"
+        ]
+      },
+      "poster": {
+        "site_prority": [
+          "libredmm",
+          "javdbapi"
+        ]
+      },
+      "extrafanart": {
+        "site_prority": []
+      },
+      "tags": {
+        "site_prority": [
+          "libredmm",
+          "javdbapi"
+        ]
+      },
+      "release": {
+        "site_prority": [
+          "libredmm",
+          "javdbapi"
+        ]
+      },
+      "runtime": {
+        "site_prority": [
+          "libredmm",
+          "javdbapi"
+        ]
+      },
+      "score": {
+        "site_prority": []
+      },
+      "directors": {
+        "site_prority": []
+      },
+      "series": {
+        "site_prority": [
+          "libredmm",
+          "javdbapi"
+        ]
+      },
+      "studio": {
+        "site_prority": [
+          "libredmm",
+          "javdbapi"
+        ]
+      },
+      "publisher": {
+        "site_prority": [
+          "libredmm",
+          "javdbapi"
+        ]
+      },
+      "trailer": {
+        "site_prority": []
+      },
+      "wanted": {
+        "site_prority": []
+      }
+    }
+  }
 }
