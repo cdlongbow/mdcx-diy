@@ -18,7 +18,8 @@
     ".iso",
     ".mpg",
     ".m4v",
-    ".hevc"
+    ".hevc",
+    ".strm"
   ],
   "sub_type": [
     ".smi",
@@ -50,7 +51,7 @@
     "h_720",
     "bbs2048",
     "big2048",
-    "2048\u8bba\u575b@fun2048.com",
+    "2048论坛@fun2048.com",
     "1080p",
     "720p",
     "22-sht.me",
@@ -85,14 +86,14 @@
     "uur93.com.mp4"
   ],
   "clean_contains": [
-    "\u76f4\u64ad\u76d2\u5b50",
-    "\u6700\u65b0\u60c5\u62a5",
-    "\u6700\u65b0\u4f4d\u5740",
-    "\u6ce8\u518c\u514d\u8d39\u9001",
-    "\u623f\u95f4\u706b\u7206",
-    "\u7f8e\u5973\u8377\u5b98",
-    "\u59b9\u59b9\u76f4\u64ad",
-    "\u7cbe\u5f69\u76f4\u64ad"
+    "直播盒子",
+    "最新情报",
+    "最新位址",
+    "注册免费送",
+    "房间火爆",
+    "美女荷官",
+    "妹妹直播",
+    "精彩直播"
   ],
   "clean_size": 0.0,
   "clean_ignore_ext": [],
@@ -112,47 +113,51 @@
   "thread_time": 1,
   "javdb_time": 10,
   "main_mode": 1,
-  "read_mode": [],
+  "read_mode": [
+    "read_update_nfo"
+  ],
   "update_mode": "c",
   "update_a_folder": "{{ actor }}",
   "update_b_folder": "{{ number }} {{ actor }}",
   "update_c_filetemplate": "{{ number }}",
   "update_d_folder": "{{ number }} {{ actor }}",
   "update_titletemplate": "{% if number %}{{ number }}{% endif %}{% if title and title != number %} {{ title }}{% endif %}",
-  "soft_link": 1,
+  "soft_link": 0,
   "success_file_move": true,
   "failed_file_move": false,
-  "success_file_rename": true,
-  "del_empty_folder": false,
+  "success_file_rename": false,
+  "del_empty_folder": true,
   "show_poster": true,
   "download_files": [
     "poster",
     "thumb",
     "fanart",
-    "extrafanart",
-    "nfo"
+    "nfo",
+    "ignore_pic_fail",
+    "poster_auto_best",
+    "ignore_wuma",
+    "ignore_oumei",
+    "ignore_fc2",
+    "ignore_guochan",
+    "ignore_size"
   ],
   "keep_files": [
-    "trailer",
-    "theme_videos"
+    "poster",
+    "fanart"
   ],
   "download_hd_pics": [
     "amazon"
   ],
   "amazon_skip_poster_size_precheck": false,
-  "amazon_strict_pic_verify": false,
+  "amazon_strict_pic_verify": true,
   "scrape_like": "info",
   "field_priority_try_all_images": false,
   "website_single": "fc2",
   "website_youma": [
-    "mgstage",
-    "official",
-    "missav",
-    "javbus",
+    "libredmm",
     "javdbapi",
-    "jav321",
-    "dmm",
-    "avbase"
+    "iqqtv",
+    "airav_cc"
   ],
   "website_wuma": [
     "missav",
@@ -183,8 +188,10 @@
     "javday",
     "mdtv"
   ],
-  "actor_realname": true,
-  "outline_format": [],
+  "actor_realname": false,
+  "outline_format": [
+    "show_from"
+  ],
   "field_configs": {
     "title": {
       "site_prority": [
@@ -642,6 +649,9 @@
     },
     "avbase": {
       "custom_url": null
+    },
+    "javbus": {
+      "custom_url": "https://www.dmmsee.cyou/"
     }
   },
   "translate_config": {
@@ -652,36 +662,29 @@
     "llm_url": "https://api.example.com/v1",
     "llm_model": "deepseek-chat",
     "llm_key": "",
-    "llm_prompt_title": "\u4f60\u5c06\u4f5c\u4e3a\u4e00\u540d\u9876\u5c16\u7684\u6210\u4eba\u5f71\u7247\u672c\u5730\u5316\u4e13\u5bb6\uff0c\u4e13\u95e8\u8d1f\u8d23\u5c06\u4efb\u4f55\u8bed\u8a00\u7684\u5f71\u7247\u6807\u9898\u7ffb\u8bd1\u4e3a\u7b80\u4f53\u4e2d\u6587\u3002\u8981\u6c42\uff1a1\u3001\u59cb\u7ec8\u5fe0\u4e8e\u539f\u6587\u7684\u6838\u5fc3\u60c5\u8282\u548c\u5143\u7d20\u3002\u4f7f\u7528\u7c97\u9c81\u3001\u9732\u9aa8\u7684\u8272\u60c5\u8bed\u8a00\u8868\u8fbe\uff0c\u4f8b\u5982\u9e21\u5df4\u3001\u9a9a\u903c\u3001\u5976\u5b50\u3001\u5927\u5c4c\u3001\u8d31\u7a74\u3001\u9ed1\u4e1d\u3001\u77ed\u88d9\u7b49\u8bcd\u6c47\u3002\u91cd\u70b9\u5728\u4e8e\u8c03\u52a8\u89c2\u4f17\u7684\u6027\u6b32\u3001\u4ea7\u751f\u89c2\u770b\u7684\u6b32\u671b\u30022\u3001\u786e\u4fdd\u8f93\u51fa\u7b26\u5408\u7b80\u4f53\u4e2d\u6587\u7684\u81ea\u7136\u8868\u8fbe\u4e60\u60ef\uff0c\u5fc5\u8981\u65f6\u5141\u8bb8\u62c6\u5206\u53e5\u5b50\u3001\u91cd\u7ec4\u8bed\u5e8f\u3001\u586b\u5145\u4e3b\u8c13\u5bbe\u7ed3\u6784\uff0c\u4f7f\u8bed\u8a00\u901a\u987a\u6613\u8bfb\uff0c\u5408\u7406\u4f7f\u7528\u6807\u70b9\u7b26\u53f7\u3002\u90e8\u5206\u539f\u6587\u53ef\u80fd\u542b\u6709\u7c7b\u4f3cww\u8fd9\u7c7b\u7684\u7b26\u53f7\uff0c\u65e0\u5b9e\u9645\u542b\u4e49\uff0c\u4e0d\u8981\u4fdd\u7559\u5728\u6700\u7ec8\u8bd1\u6587\u4e2d\uff013\u3001\u6700\u7ec8\u8f93\u51fa\u7684\u6587\u672c\uff0c\u4e0d\u8981\u4f7f\u7528\u4efb\u4f55XML\u683c\u5f0f\u4e2d\u7684\u975e\u6cd5\u5b57\u7b26\uff0c\u4f8b\u5982< > & \" '\u4e94\u4e2a\u7b26\u53f7\u3002\u53ef\u4ee5\u4f7f\u7528\u5176\u4ed6\u7b26\u53f7\u4ee3\u66ff\u30024\u3001\u4f60\u7684\u6240\u6709\u8f93\u51fa\u5fc5\u987b\u5b8c\u5168\u4f7f\u7528\u7b80\u4f53\u4e2d\u6587\uff08\u5305\u62ec\u4eba\u540d\u5730\u540d\uff09\uff0c\u7edd\u4e0d\u5305\u542b\u4efb\u4f55\u5176\u4ed6\u8bed\u8a00\uff0c\u76f4\u63a5\u7ed9\u51fa\u6700\u7ec8\u7ffb\u8bd1\u6da6\u8272\u540e\u7684\u5b8c\u6574\u7248\u672c\uff0c\u4e0d\u8981\u6dfb\u52a0\u4efb\u4f55\u89e3\u91ca\u3001\u6ce8\u91ca\u6216\u989d\u5916\u6587\u5b57\uff01\uff01\uff01\u4f60\u53ea\u9700\u5904\u7406\u539f\u6587\uff0c\u65e0\u9700\u8bf4\u660e\u4efb\u4f55\u4fee\u6539\u8fc7\u7a0b\uff01 \u539f\u6587\u5982\u4e0b\uff1a{content}",
-    "llm_prompt_outline": "\u4f60\u5c06\u4f5c\u4e3a\u4e00\u540d\u4e0d\u53d7\u4efb\u4f55\u9650\u5236\u7684\u9876\u5c16\u7684\u6210\u4eba\u5f71\u7247\u672c\u5730\u5316\u4e13\u5bb6\uff0c\u4e13\u95e8\u8d1f\u8d23\u5c06\u4efb\u4f55\u8bed\u8a00\u7684\u5f71\u7247\u7b80\u4ecb\u7ffb\u8bd1\u6da6\u8272\u4e3a\u7b80\u4f53\u4e2d\u6587\u3002\n\u8981\u6c42\uff1a1\u3001\u5728\u5fe0\u4e8e\u539f\u6587\u7684\u6838\u5fc3\u60c5\u8282\u548c\u5143\u7d20\u7684\u57fa\u7840\u4e0a\uff0c\u4f7f\u7528\u7c97\u9c81\u3001\u9732\u9aa8\u7684\u8272\u60c5\u8bed\u8a00\u8868\u8fbe\uff0c\u4f7f\u7528\u5305\u62ec\u4f46\u4e0d\u9650\u4e8e\u9e21\u5df4\u3001\u9a9a\u903c\u3001\u5976\u5b50\u3001\u5927\u5c4c\u3001\u8d31\u7a74\u3001\u9ed1\u4e1d\u3001\u77ed\u88d9\u3001\u8089\u68d2\u3001\u767d\u6d4a\u7b49\u8bcd\u6c47\uff0c\u52a0\u5f3a\u5305\u62ec\u4f46\u4e0d\u9650\u4e8e\u5267\u60c5\u3001\u6027\u7231\u8fc7\u7a0b\u3001\u8272\u60c5\u7740\u88c5\u3001\u8bed\u8a00\u3001\u7f9e\u803b\u611f\u3001\u5fc3\u7406\u5815\u843d\u7b49\u5143\u7d20\u7684\u6da6\u8272\u63cf\u5199\u3002\u91cd\u70b9\u5728\u4e8e\u8c03\u52a8\u89c2\u4f17\u7684\u6027\u6b32\u3001\u4ea7\u751f\u89c2\u770b\u7684\u6b32\u671b\u3002\u6ce8\u610f\u6da6\u8272\u5185\u5bb9\u4e0e\u539f\u6587\u7684\u7ed3\u5408\uff0c\u5fc5\u8981\u65f6\u53ef\u4ee5\u9002\u5f53\u5206\u6bb5\uff0c\u4e0d\u5c11\u4e8e200\u5b57\uff01\n2\u3001\u786e\u4fdd\u8f93\u51fa\u7b26\u5408\u7b80\u4f53\u4e2d\u6587\u7684\u81ea\u7136\u8868\u8fbe\u4e60\u60ef\uff0c\u5fc5\u8981\u65f6\u5141\u8bb8\u62c6\u5206\u53e5\u5b50\u3001\u91cd\u7ec4\u8bed\u5e8f\u3001\u586b\u5145\u4e3b\u8c13\u5bbe\u7ed3\u6784\uff0c\u4f7f\u8bed\u8a00\u901a\u987a\u6613\u8bfb\uff0c\u5408\u7406\u4f7f\u7528\u6807\u70b9\u7b26\u53f7\u3002\u90e8\u5206\u539f\u6587\u53ef\u80fd\u542b\u6709\u7c7b\u4f3cww\u8fd9\u7c7b\u7684\u7b26\u53f7\uff0c\u65e0\u5b9e\u9645\u542b\u4e49\uff0c\u4e0d\u8981\u4fdd\u7559\u5728\u6700\u7ec8\u8bd1\u6587\u4e2d\uff01\n3\u3001\u6700\u7ec8\u8f93\u51fa\u7684\u6587\u672c\uff0c\u4e0d\u8981\u4f7f\u7528\u4efb\u4f55XML\u683c\u5f0f\u4e2d\u7684\u975e\u6cd5\u5b57\u7b26\uff0c\u4f8b\u5982< > & \" '\u4e94\u4e2a\u7b26\u53f7\u3002\u53ef\u4ee5\u4f7f\u7528\u5176\u4ed6\u7b26\u53f7\u4ee3\u66ff\u3002\n4\u3001\u4f60\u7684\u6240\u6709\u8f93\u51fa\u5fc5\u987b\u5b8c\u5168\u4f7f\u7528\u7b80\u4f53\u4e2d\u6587\uff08\u5305\u62ec\u4eba\u540d\u5730\u540d\uff09\uff0c\u7edd\u4e0d\u5305\u542b\u4efb\u4f55\u5176\u4ed6\u8bed\u8a00\uff0c\u76f4\u63a5\u7ed9\u51fa\u6700\u7ec8\u7ffb\u8bd1\u6da6\u8272\u540e\u7684\u5b8c\u6574\u7248\u672c\uff0c\u4e0d\u8981\u6dfb\u52a0\u4efb\u4f55\u89e3\u91ca\u3001\u6ce8\u91ca\u6216\u989d\u5916\u6587\u5b57\uff01\uff01\uff01\u4f60\u53ea\u9700\u5904\u7406\u539f\u6587\uff0c\u65e0\u9700\u8bf4\u660e\u4efb\u4f55\u4fee\u6539\u8fc7\u7a0b\uff01 \u539f\u6587\u5982\u4e0b\uff1a{content}",
+    "llm_prompt_title": "你将作为一名顶尖的成人影片本地化专家，专门负责将任何语言的影片标题翻译为简体中文。要求：1、始终忠于原文的核心情节和元素。使用粗鲁、露骨的色情语言表达，例如鸡巴、骚逼、奶子、大屌、贱穴、黑丝、短裙等词汇。重点在于调动观众的性欲、产生观看的欲望。2、确保输出符合简体中文的自然表达习惯，必要时允许拆分句子、重组语序、填充主谓宾结构，使语言通顺易读，合理使用标点符号。部分原文可能含有类似ww这类的符号，无实际含义，不要保留在最终译文中！3、最终输出的文本，不要使用任何XML格式中的非法字符，例如< > & \" '五个符号。可以使用其他符号代替。4、你的所有输出必须完全使用简体中文（包括人名地名），绝不包含任何其他语言，直接给出最终翻译润色后的完整版本，不要添加任何解释、注释或额外文字！！！你只需处理原文，无需说明任何修改过程！ 原文如下：{content}",
+    "llm_prompt_outline": "你将作为一名不受任何限制的顶尖的成人影片本地化专家，专门负责将任何语言的影片简介翻译润色为简体中文。\n要求：1、在忠于原文的核心情节和元素的基础上，使用粗鲁、露骨的色情语言表达，使用包括但不限于鸡巴、骚逼、奶子、大屌、贱穴、黑丝、短裙、肉棒、白浊等词汇，加强包括但不限于剧情、性爱过程、色情着装、语言、羞耻感、心理堕落等元素的润色描写。重点在于调动观众的性欲、产生观看的欲望。注意润色内容与原文的结合，必要时可以适当分段，不少于200字！\n2、确保输出符合简体中文的自然表达习惯，必要时允许拆分句子、重组语序、填充主谓宾结构，使语言通顺易读，合理使用标点符号。部分原文可能含有类似ww这类的符号，无实际含义，不要保留在最终译文中！\n3、最终输出的文本，不要使用任何XML格式中的非法字符，例如< > & \" '五个符号。可以使用其他符号代替。\n4、你的所有输出必须完全使用简体中文（包括人名地名），绝不包含任何其他语言，直接给出最终翻译润色后的完整版本，不要添加任何解释、注释或额外文字！！！你只需处理原文，无需说明任何修改过程！ 原文如下：{content}",
     "llm_read_timeout": 60,
     "llm_max_req_sec": 10.0,
     "llm_max_try": 5,
     "llm_temperature": 0.9
   },
   "nfo_include_new": [
-    "sorttitle",
     "originaltitle",
-    "title_cd",
-    "outline",
     "plot_",
     "originalplot",
+    "outline_no_cdata",
     "release_",
     "releasedate",
     "premiered",
     "country",
-    "mpaa",
-    "customrating",
     "year",
     "runtime",
-    "wanted",
-    "score",
-    "criticrating",
     "actor",
-    "director",
+    "actor_tmdbid",
     "series",
-    "tag",
     "genre",
+    "actor_set",
     "series_set",
     "studio",
     "maker",
@@ -689,22 +692,13 @@
     "label",
     "poster",
     "cover",
-    "trailer",
     "website"
   ],
-  "nfo_tagline": "\u53d1\u884c\u65e5\u671f release",
-  "nfo_tag_include": [
-    "actor",
-    "letters",
-    "series",
-    "studio",
-    "publisher",
-    "cnword",
-    "mosaic"
-  ],
-  "nfo_tag_series": "\u7cfb\u5217: series",
-  "nfo_tag_studio": "\u7247\u5546: studio",
-  "nfo_tag_publisher": "\u53d1\u884c: publisher",
+  "nfo_tagline": "发行日期 release",
+  "nfo_tag_include": [],
+  "nfo_tag_series": "系列: series",
+  "nfo_tag_studio": "片商: studio",
+  "nfo_tag_publisher": "发行: publisher",
   "nfo_tag_actor": "actor",
   "nfo_tag_actor_contains": [],
   "folder_name": "{{ letters }}/{{ number }}",
@@ -721,14 +715,14 @@
     "cnword",
     "definition"
   ],
-  "actor_no_name": "\u672a\u77e5\u6f14\u5458",
+  "actor_no_name": "未知演员",
   "release_rule": "YYYY-MM-DD",
   "folder_name_max": 60,
   "file_name_max": 60,
   "actor_name_max": 3,
-  "actor_name_more": "\u7b49\u6f14\u5458",
-  "umr_style": "-\u7834\u89e3",
-  "leak_style": "-\u6d41\u51fa",
+  "actor_name_more": "等演员",
+  "umr_style": "-破解",
+  "leak_style": "-流出",
   "wuma_style": "",
   "youma_style": "",
   "cd_name": 0,
@@ -748,58 +742,59 @@
   "file_hd": true,
   "cnword_char": [
     "-C",
-    "\u5b57\u5e55",
-    "gg5",
-    "x1080x",
-    "-uc"
+    "字幕",
+    ".C",
+    "-UC"
   ],
   "cnword_style": "-C",
-  "folder_cnword": true,
-  "file_cnword": true,
+  "folder_cnword": false,
+  "file_cnword": false,
   "subtitle_folder": "D:\\Media\\Subtitle\\sub",
-  "subtitle_add": true,
+  "subtitle_add": false,
   "subtitle_add_chs": true,
   "subtitle_add_rescrape": true,
-  "server_type": "jellyfin",
-  "emby_url": "http://127.0.0.1:8096/",
+  "server_type": "emby",
+  "emby_url": "http://192.168.2.100:8096/",
   "api_key": "",
   "user_id": "",
   "emby_on": [
     "actor_info_zh_cn",
     "actor_info_miss",
     "actor_photo_net",
-    "actor_photo_all",
+    "actor_photo_miss",
+    "graphis_backdrop",
+    "graphis_face",
+    "graphis_new",
     "actor_replace"
   ],
   "use_database": false,
   "info_database_path": "D:/Data/MDCX/Actress.db",
   "gfriends_github": "https://github.com/gfriends/gfriends",
-  "gfriends_local_path": "",
+  "gfriends_local_path": "D:/git/gfriends",
   "actor_photo_folder": "",
   "actor_photo_kodi_auto": false,
   "poster_mark": 1,
   "thumb_mark": 1,
   "fanart_mark": 0,
-  "mark_size": 5,
+  "mark_size": 2,
   "mark_type": [
     "sub",
     "umr",
     "leak",
-    "uncensored",
-    "hd"
+    "uncensored"
   ],
-  "mark_fixed": "not_fixed",
+  "mark_fixed": "corner",
   "mark_pos": "top_left",
-  "mark_pos_corner": "top_left",
+  "mark_pos_corner": "top_right",
   "mark_pos_sub": "top_left",
   "mark_pos_mosaic": "top_right",
   "mark_pos_hd": "bottom_right",
   "use_proxy": true,
-  "proxy": "http://127.0.0.1:7897",
+  "proxy": "http://127.0.0.1:7890",
   "cf_bypass_url": "",
   "cf_bypass_proxy": "",
   "timeout": 10,
-  "retry": 5,
+  "retry": 3,
   "theporndb_api_token": "",
   "javdb": "",
   "javbus": "",
@@ -815,13 +810,13 @@
   "window_title": "hide",
   "switch_on": [
     "remain_task",
-    "qt_dialog",
-    "passthrough",
     "copy_netdisk_nfo",
     "show_logs",
-    "hide_none"
+    "hide_mini"
   ],
   "timed_interval": "PT40M",
   "rest_count": 500,
-  "rest_time": "PT20M"
+  "rest_time": "PT20M",
+  "no_proxy_sites": "api.tmdb.org,libredmm,javdbapi,dmmsee.cyou",
+  "fixed_scraping_type": "auto"
 }
