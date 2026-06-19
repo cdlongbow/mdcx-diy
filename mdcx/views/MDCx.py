@@ -12119,7 +12119,7 @@ class Ui_MDCx:
         self.label_link_off.setText(
             _translate(
                 "MDCx",
-                "<span>适合 NAS 和硬盘用户。本地党可随心所欲整理文件。<br>注意：选择此项，下面的「成功后移动文件」「失败后移动文件」才会生效</span>",
+                "<span>适合 NAS 和硬盘用户。本地党可随心所欲整理文件。<br>「成功后移动文件」「失败后移动文件」「成功重命名文件」与此选项独立，不受其影响</span>",
             )
         )
         self.radioButton_hard_on.setText(_translate("MDCx", "创建硬链接"))
