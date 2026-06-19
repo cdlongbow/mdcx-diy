@@ -95,7 +95,7 @@ async def write_nfo(file_info: FileInfo, data: CrawlersResult, nfo_file: Path, o
         LogBuffer.log().write(f"\n 🍀 Nfo done! (old)({get_used_time(start_time)}s)")
         return True
 
-    if manager.config.main_mode == 3 or manager.config.main_mode == 4:
+    if manager.config.main_mode == 3:
         nfo_title_template = manager.config.update_titletemplate
     else:
         nfo_title_template = manager.config.naming_media
