@@ -883,6 +883,17 @@ class Scraper:
                     res.tag = str(file_path)
                     return None, None
 
+        # 不移动文件时，NFO、图片等写入原目录
+        if not manager.config.success_file_move:
+            nfo_new_path = file_path.with_suffix(".nfo")
+            folder_new_path = folder_old_path
+            poster_new_path_with_filename = folder_old_path / (file_name + "-poster.jpg")
+            thumb_new_path_with_filename = folder_old_path / (file_name + "-thumb.jpg")
+            fanart_new_path_with_filename = folder_old_path / (file_name + "-fanart.jpg")
+            poster_final_path = poster_new_path_with_filename
+            thumb_final_path = thumb_new_path_with_filename
+            fanart_final_path = fanart_new_path_with_filename
+
         # 判断输出文件夹和文件是否已存在，如无则创建输出文件夹
         other = OtherInfo.empty()
         if not skip_reorganize:
