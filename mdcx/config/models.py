@@ -296,7 +296,7 @@ class Config(BaseModel):
     update_c_filetemplate: str = Field(default="{{ number }}", title="更新C文件模板")
     update_d_folder: str = Field(default="{{ number }} {{ actor }}", title="更新D目录")
     update_titletemplate: str = Field(
-        default="[{% if number %}{{ number }}{% endif %}]{% if title and title != number %}{{ title }}{% endif %}",
+        default="{% if number %}{{ number }}{% endif %}{% if title and title != number %} {{ title }}{% endif %}",
         title="更新标题模板",
     )
     soft_link: int = Field(default=0, title="软链接")
@@ -513,7 +513,7 @@ class Config(BaseModel):
     folder_name: str = Field(default="{{ actor }}/{{ number }} {{ actor }}", title="目录名称")
     naming_file: str = Field(default="{{ number }}", title="文件命名")
     naming_media: str = Field(
-        default="[{% if number %}{{ number }}{% endif %}]{% if title and title != number %}{{ title }}{% endif %}",
+        default="{% if number %}{{ number }}{% endif %}{% if title and title != number %} {{ title }}{% endif %}",
         title="媒体命名",
     )
     prevent_char: str = Field(default="", title="禁止字符")
