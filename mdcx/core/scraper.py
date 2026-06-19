@@ -841,7 +841,9 @@ class Scraper:
 
         if skip_reorganize:
             nfo_new_path = file_path.with_suffix(".nfo")
-            folder_new_path = file_path.parent
+            file_new_path = success_folder / file_name
+            folder_new_path = success_folder
+            naming_rule = file_path.stem
         else:
             # 生成输出文件夹和输出文件的路径
             (
@@ -984,9 +986,9 @@ class Scraper:
         # 生成nfo文件
         await write_nfo(file_info, res, nfo_new_path, folder_new_path, update_nfo)
 
-        # 移动字幕、种子、bif、trailer、其他文件（路径变化 + 配置允许时才执行）
+        # 移动字幕、种子、bif、trailer、其他文件（配置允许时才执行）
         reorganizing = not skip_reorganize
-        if reorganizing and manager.config.success_file_move:
+        if manager.config.success_file_move:
             if file_info.has_sub:
                 await move_sub(folder_old_path, folder_new_path, file_name, sub_list, naming_rule)
             await move_torrent(folder_old_path, folder_new_path, file_name, movie_number, naming_rule)
