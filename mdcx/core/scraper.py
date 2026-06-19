@@ -38,7 +38,7 @@ from ..utils import executor, get_current_time, get_real_time, get_used_time, sp
 from ..utils.dataclass import update
 from ..utils.file import copy_file_async, move_file_async
 from ..utils.path import is_any_descendant
-from .file import creat_folder, deal_old_files, get_file_info_v2, get_output_name, move_movie
+from .file import _generate_file_name, creat_folder, deal_old_files, get_file_info_v2, get_output_name, move_movie
 from .file_crawler import FileScraper, classify_existing_scrape_result, classify_scrape_task
 from .image import add_mark
 from .media_resource import MediaResourceContext
@@ -840,10 +840,14 @@ class Scraper:
         skip_reorganize = manager.config.main_mode == 4 and is_nfo_existed and ReadMode.HAS_NFO_UPDATE not in read_mode
 
         if skip_reorganize:
-            nfo_new_path = file_path.with_suffix(".nfo")
-            file_new_path = success_folder / file_name
+            naming_rule = _generate_file_name(file_info.cd_part, file_info, res)
+            file_new_name = naming_rule + file_ex.lower()
+            file_new_path = success_folder / file_new_name
             folder_new_path = success_folder
-            naming_rule = file_path.stem
+            nfo_new_path = success_folder / (naming_rule + ".nfo")
+            poster_final_path = None
+            thumb_final_path = None
+            fanart_final_path = None
         else:
             # 生成输出文件夹和输出文件的路径
             (
@@ -987,7 +991,6 @@ class Scraper:
         await write_nfo(file_info, res, nfo_new_path, folder_new_path, update_nfo)
 
         # 移动字幕、种子、bif、trailer、其他文件（配置允许时才执行）
-        reorganizing = not skip_reorganize
         if manager.config.success_file_move:
             if file_info.has_sub:
                 await move_sub(folder_old_path, folder_new_path, file_name, sub_list, naming_rule)
@@ -1000,21 +1003,19 @@ class Scraper:
                 return None, None
         await save_success_list(file_path, file_path)
 
-        if reorganizing:
-            # 创建软链接及复制文件
-            if manager.config.auto_link:
-                if manager.config.success_file_move:
-                    target_dir = Path(manager.config.localdisk_path) / folder_new_path.relative_to(
-                        success_folder, walk_up=True
-                    )
-                else:
-                    target_dir = Path(manager.config.localdisk_path) / folder_old_path.relative_to(
-                        movie_path, walk_up=True
-                    )
-                copy = Switch.COPY_NETDISK_NFO in manager.config.switch_on
-                await newtdisk_creat_symlink(copy, folder_new_path, target_dir)
+        # 创建软链接及复制文件（由 auto_link 独立控制）
+        if manager.config.auto_link:
+            if manager.config.success_file_move:
+                target_dir = Path(manager.config.localdisk_path) / folder_new_path.relative_to(
+                    success_folder, walk_up=True
+                )
+            else:
+                target_dir = Path(manager.config.localdisk_path) / folder_old_path.relative_to(movie_path, walk_up=True)
+            copy = Switch.COPY_NETDISK_NFO in manager.config.switch_on
+            await newtdisk_creat_symlink(copy, folder_new_path, target_dir)
 
-            # json添加封面缩略图路径
+        # json添加封面缩略图路径（仅在路径重算后有值）
+        if poster_final_path is not None:
             other.poster_path = poster_final_path
             other.thumb_path = thumb_final_path
             other.fanart_path = fanart_final_path
