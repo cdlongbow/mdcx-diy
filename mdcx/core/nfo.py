@@ -120,6 +120,13 @@ async def write_nfo(file_info: FileInfo, data: CrawlersResult, nfo_file: Path, o
     title = normalize_xml_text(data.title)
     release = normalize_xml_text(data.release)
 
+    # 读取模式：剥离 data.title 中已累积的 [番号] 前缀，防止每次刮削叠套
+    if manager.config.main_mode == 4 and data.number:
+        number_prefix = f"[{data.number}]"
+        while data.title.startswith(number_prefix):
+            data.title = data.title[len(number_prefix) :]
+        title = normalize_xml_text(data.title)
+
     def write_text_element(code: StringIO, tag_name: str, value: str, indent: str = "  ") -> None:
         print(f"{indent}<{tag_name}>{escape_xml_text(value)}</{tag_name}>", file=code)
 
