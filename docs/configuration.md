@@ -66,8 +66,9 @@
 
 - `nfo_include_new`：NFO 文件中包含哪些内容
 - `folder_name`：目录名称模板
-- `naming_file`：文件命名模板
-- `naming_media`：媒体命名模板
+- `naming_file`：文件命名模板，默认 `{{ number }}`
+- `naming_media`：媒体命名模板（NFO 标题），默认 `{% if number %}{{ number }}{% endif %}{% if title and title != number %} {{ title }}{% endif %}`
+- `update_titletemplate`：更新模式 Emby 标题模板，默认同上（无括号格式）
 - `prevent_char`：禁止出现在文件名中的字符
 - `fields_rule`：字段规则列表
 - `*_style`：各类样式配置

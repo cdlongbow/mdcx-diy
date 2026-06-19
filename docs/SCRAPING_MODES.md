@@ -213,12 +213,14 @@ elif main_mode == 3:
 
 | 选项 | 枚举值 | 说明 |
 |------|--------|------|
-| **有 NFO 时更新** | `HAS_NFO_UPDATE` | 勾上才进读取模式干活；控制要不要按规则整理文件和文件夹 |
+| **有 NFO 时更新** | `HAS_NFO_UPDATE` | 控制是否按更新模式目录结构（A/B/C/D 模板）整理文件。不勾时文件直放到输出目录根，不创建子目录，不下载图片 |
 | **无 NFO 时刮削** | `NO_NFO_SCRAPE` | 之前刮失败的，或者没 NFO 的文件，重新刮（走更新模式的命名规则） |
-| **重新下载** | `READ_DOWNLOAD_AGAIN` | 重新下载图片和封面 |
+| **重新下载** | `READ_DOWNLOAD_AGAIN` | 重新下载图片和封面（**不受 HAS_NFO_UPDATE 影响**，不勾时不下图片） |
 | **更新 NFO** | `READ_UPDATE_NFO` | 更新 NFO 里的内容（比如重映射演员名、补 tmdbid 之类的都在这个选项下干活） |
 
-> **4 个选项互相独立**：可以组合出多种玩法。比如只勾"有 NFO 时更新"+"更新 NFO"，就会只改 NFO 内容不挪文件；只勾"有 NFO 时更新"不勾"更新 NFO"，那就只整理文件位置不碰 NFO 内容。
+> **4 个选项独立**：可以组合出多种玩法。
+> - 文件移动/重命名/链接由「设置-刮削」的独立开关控制，不依赖读取模式选项
+> - 图片下载由「重新下载」独立控制，不依赖 HAS_NFO_UPDATE
 
 ### 配置方式
 
@@ -241,7 +243,8 @@ elif main_mode == 3:
 3. 根据读取模式选项处理
    ↓
 4. 有 NFO：
-   - 选择性更新
+   - HAS_NFO_UPDATE 勾选 → 按更新模式目录结构整理，下载图片
+   - HAS_NFO_UPDATE 未勾 → 直放输出目录根，不建子目录，图片下载由「重新下载」独立控制
    - 重新下载（可选）
    - 更新 NFO（可选）
    ↓
@@ -250,7 +253,9 @@ elif main_mode == 3:
    - 下载图片
    - 生成 NFO
    ↓
-6. 按更新模式规则组织文件
+6. 文件移动/重命名/链接由独立开关控制（不受 HAS_NFO_UPDATE 影响）
+   ↓
+7. 关闭「成功后移动文件」时，NFO 和图片写入原目录（不搬走）
 ```
 
 ### 特点
@@ -258,7 +263,7 @@ elif main_mode == 3:
 - ✅ **智能处理**：根据 NFO 存在情况分别处理
 - ✅ **选择性更新**：可控制更新哪些内容
 - ✅ **保留已有信息**：默认保留已有 NFO 内容
-- ✅ **标题读取更稳定**：读取已有 NFO 时，只移除标题开头一次 `番号 + 空格` 前缀，正文里的同番号文本会保留
+- ✅ **标题读取更稳定**：读取已有 NFO 时，自动循环剥离标题开头累积的 `[番号]` 前缀，防止多次刮削叠套
 - ✅ **简介往返更稳定**：`plot` / `outline` / `originalplot` 会尽量保持一致；翻译来源尾注会在读取时拆回 `outline_from`，再次写出时保持一致
 - ✅ **标签清理更精确**：更新 NFO 时会移除后续可自动重建的标签，例如字幕、演员模板标签、系列模板标签、片商模板标签、发行模板标签、番号前缀和马赛克标签；普通结构化标签会保留，例如 `演员: 上原亚衣`、`系列: 测试系列`
 - ⚠️ **流程同正常模式**：但命名按照更新模式规则执行
@@ -361,7 +366,7 @@ elif main_mode == 3:
   "update_b_folder": "{{ number }} {{ actor }}",
   "update_c_filetemplate": "{{ number }}",
   "update_d_folder": "{{ number }} {{ actor }}",
-  "update_titletemplate": "[{% if number %}{{ number }}{% endif %}]{% if title and title != number %}{{ title }}{% endif %}"
+  "update_titletemplate": "{% if number %}{{ number }}{% endif %}{% if title and title != number %} {{ title }}{% endif %}"
 }
 ```
 
@@ -380,7 +385,7 @@ elif main_mode == 3:
 
 | 字段 | 类型 | 说明 | 默认值 |
 |------|------|------|--------|
-| `success_file_move` | bool | 成功后移动文件 | `true` |
+| `success_file_move` | bool | 成功后移动文件。关闭时视频、NFO、图片均留在原目录 | `true` |
 | `failed_file_move` | bool | 失败后移动文件 | `true` |
 | `success_file_rename` | bool | 成功后重命名文件 | `true` |
 | `soft_link` | int | 使用软链接 | `0` |

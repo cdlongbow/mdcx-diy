@@ -79,9 +79,9 @@ mdcx/core/naming/
 
 **媒体模板**：
 ```jinja2
-[{% if number %}{{ number }}{% endif %}]{% if title and title != number %}{{ title }}{% endif %}
+{% if number %}{{ number }}{% endif %}{% if title and title != number %} {{ title }}{% endif %}
 ```
-效果：有番号就加 `[番号]`，标题和番号不同时，再拼接标题。
+效果：有番号时输出番号，标题和番号不同且标题存在时，空格拼接标题。
 
 ## 智能截断
 
