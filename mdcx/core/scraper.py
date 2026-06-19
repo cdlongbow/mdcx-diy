@@ -845,9 +845,12 @@ class Scraper:
             file_new_path = success_folder / file_new_name
             folder_new_path = success_folder
             nfo_new_path = success_folder / (naming_rule + ".nfo")
-            poster_final_path = None
-            thumb_final_path = None
-            fanart_final_path = None
+            poster_new_path_with_filename = success_folder / (naming_rule + "-poster.jpg")
+            thumb_new_path_with_filename = success_folder / (naming_rule + "-thumb.jpg")
+            fanart_new_path_with_filename = success_folder / (naming_rule + "-fanart.jpg")
+            poster_final_path = poster_new_path_with_filename
+            thumb_final_path = thumb_new_path_with_filename
+            fanart_final_path = fanart_new_path_with_filename
         else:
             # 生成输出文件夹和输出文件的路径
             (
@@ -936,21 +939,20 @@ class Scraper:
         # 清理旧的thumb、poster、fanart、extrafanart、nfo
         pic_final_catched = False
         single_folder_catched = False
-        if not skip_reorganize:
-            pic_final_catched, single_folder_catched = await deal_old_files(
-                res.number,
-                other,
-                folder_old_path,
-                folder_new_path,
-                file_path,
-                thumb_new_path_with_filename,
-                poster_new_path_with_filename,
-                fanart_new_path_with_filename,
-                nfo_new_path,
-                poster_final_path,
-                thumb_final_path,
-                fanart_final_path,
-            )
+        pic_final_catched, single_folder_catched = await deal_old_files(
+            res.number,
+            other,
+            folder_old_path,
+            folder_new_path,
+            file_path,
+            thumb_new_path_with_filename,
+            poster_new_path_with_filename,
+            fanart_new_path_with_filename,
+            nfo_new_path,
+            poster_final_path,
+            thumb_final_path,
+            fanart_final_path,
+        )
 
         # 如果 final_pic_path 没处理过，这时才需要下载和加水印
         if pic_final_catched and file_can_download:
@@ -981,7 +983,7 @@ class Scraper:
                 await extrafanart_copy2(folder_new_path)
                 await extrafanart_extras_copy(folder_new_path)
 
-        if not skip_reorganize and file_can_download:
+        if file_can_download:
             # trailer 有带文件名、不带文件名两种命名方式，不能依赖图片处理权。
             await trailer_download(res, folder_new_path, folder_old_path, naming_rule)
             if single_folder_catched:
