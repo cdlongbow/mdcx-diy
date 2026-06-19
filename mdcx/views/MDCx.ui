@@ -6347,7 +6347,7 @@
                               <string notr="true">color: rgb(8, 128, 128);</string>
                             </property>
                             <property name="text">
-                              <string>&lt;span&gt;适合 NAS 和硬盘用户。本地党可随心所欲整理文件。&lt;br&gt;「成功后移动文件」「失败后移动文件」「成功重命名文件」与此选项独立，不受其影响&lt;/span&gt;</string>
+                              <string>&lt;span&gt;适合 NAS 和硬盘用户。本地党可随心所欲整理文件。&lt;br&gt;注意：选择此项，下面的「成功后移动文件」「失败后移动文件」才会生效&lt;/span&gt;</string>
                             </property>
                           </widget>
                         </item>
