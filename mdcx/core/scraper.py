@@ -875,8 +875,8 @@ class Scraper:
                     return None, None
 
         # 判断输出文件夹和文件是否已存在，如无则创建输出文件夹
+        other = OtherInfo.empty()
         if not skip_reorganize:
-            other = OtherInfo.empty()
             if not await creat_folder(
                 other,
                 res,
