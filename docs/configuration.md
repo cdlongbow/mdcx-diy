@@ -182,14 +182,8 @@
 
 | 配置项 | 类型 | 默认值 | 说明 |
 |--------|------|--------|------|
-| `use_proxy` | str | `no` | 代理类型（no/http/socks5） |
-| `proxy` | str | `""` | 代理地址（如 `http://proxy.com:8080`） |
-
-**代理类型**
-
-- `no`：不使用代理
-- `http`：HTTP/HTTPS 代理
-- `socks5`：SOCKS5 代理
+| `use_proxy` | bool | `true` | 是否使用代理 |
+| `proxy` | str | `"http://127.0.0.1:7890"` | 代理地址 |
 
 **配置示例**
 
@@ -208,7 +202,7 @@
 
 | 配置项 | 类型 | 默认值 | 说明 |
 |--------|------|--------|------|
-| `no_proxy_sites` | str | `api.tmdb.org` | 不走代理的网站列表 |
+| `no_proxy_sites` | str | `api.tmdb.org,libredmm,javdbapi,dmmsee.cyou` | 不走代理的网站列表 |
 
 **配置格式**
 
