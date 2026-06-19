@@ -836,7 +836,7 @@ class Scraper:
         # 显示json_data内容
         show_movie_info(file_info, res)
 
-        # 读模式不勾"重新整理分类"时跳过文件整理相关步骤
+        # 读模式不勾"重新整理分类"时跳过路径计算
         skip_reorganize = manager.config.main_mode == 4 and is_nfo_existed and ReadMode.HAS_NFO_UPDATE not in read_mode
 
         if skip_reorganize:
@@ -984,8 +984,9 @@ class Scraper:
         # 生成nfo文件
         await write_nfo(file_info, res, nfo_new_path, folder_new_path, update_nfo)
 
-        # 移动字幕、种子、bif、trailer、其他文件
-        if not skip_reorganize:
+        # 移动字幕、种子、bif、trailer、其他文件（路径变化 + 配置允许时才执行）
+        reorganizing = not skip_reorganize
+        if reorganizing and manager.config.success_file_move:
             if file_info.has_sub:
                 await move_sub(folder_old_path, folder_new_path, file_name, sub_list, naming_rule)
             await move_torrent(folder_old_path, folder_new_path, file_name, movie_number, naming_rule)
@@ -997,7 +998,7 @@ class Scraper:
                 return None, None
         await save_success_list(file_path, file_path)
 
-        if not skip_reorganize:
+        if reorganizing:
             # 创建软链接及复制文件
             if manager.config.auto_link:
                 if manager.config.success_file_move:
