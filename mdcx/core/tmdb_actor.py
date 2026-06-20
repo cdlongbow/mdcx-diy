@@ -359,6 +359,22 @@ def _actor_index_keys(name: str) -> set[str]:
     return {key for key in result if key}
 
 
+def _merge_keyword_values(*groups: list[str] | tuple[str, ...] | set[str] | str) -> str:
+    merged: list[str] = []
+    seen: set[str] = set()
+
+    for group in groups:
+        values = [group] if isinstance(group, str) else list(group)
+        for value in values:
+            normalized = str(value or "").strip()
+            if not normalized or normalized in seen:
+                continue
+            seen.add(normalized)
+            merged.append(normalized)
+
+    return ",".join(merged)
+
+
 def _build_actor_db_reverse_index(actor_db: dict[str, dict]) -> dict[str, str]:
     index: dict[str, str] = {}
     for jp, data in actor_db.items():
@@ -750,9 +766,14 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
                 if not zh_tw and zh_cn:
                     zh_tw = zhconv.convert(zh_cn, "zh-hant")
                 aka = query_result.get("also_known_as", [])
-                keyword_str = ",".join(aka) if aka else ""
+                keyword_str = _merge_keyword_values(
+                    query_result.get("name", ""),
+                    query_result.get("original_name", ""),
+                    aka,
+                )
 
-                jp_name = query_result.get("original_name", "") or query_name
+                # 优先保留站点原始演员名作为 jp 主名，TMDB 主名/别名只作为反查关键字。
+                jp_name = query_name
                 write_status = await update_actor_db_row(
                     jp=jp_name,
                     zh_cn=zh_cn,

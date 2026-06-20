@@ -24,6 +24,8 @@ _ENCRYPTED_PART2 = "WzE5OCwxNjksMTIzLDEwNiwxNzcsMTY2LDE0MCwxNjIsMTQ3LDE4OSwxNjIs
 
 _API_BASE = "https://apidd.czssdgz.com"
 _API_FALLBACKS = ["https://apidd.spthgb.com", "https://jdforrepam.com"]
+_IMAGE_PREFIX_OLD = "https://tp.cmastd.com/rhe951l4q/"
+_IMAGE_PREFIX_NEW = "https://c0.jdbstatic.com/"
 
 _PLATFORM = "android"
 _APP_CHANNEL = "official"
@@ -136,6 +138,13 @@ class JavdbAPICrawler(BaseCrawler):
             return "https:" + url
         return url or ""
 
+    @classmethod
+    def _normalize_image_url(cls, url: str) -> str:
+        normalized = cls._ensure_https(url)
+        if normalized.startswith(_IMAGE_PREFIX_OLD):
+            return normalized.replace(_IMAGE_PREFIX_OLD, _IMAGE_PREFIX_NEW, 1)
+        return normalized
+
     @staticmethod
     def _clean_str(value: str | None) -> str:
         if not value:
@@ -238,8 +247,8 @@ class JavdbAPICrawler(BaseCrawler):
             title=self._clean_str(movie.title),
             originaltitle=self._clean_str(movie.origin_title),
             outline=self._clean_str(movie.summary),
-            thumb=self._ensure_https(self._clean_str(movie.thumb_url)),
-            poster=self._ensure_https(self._clean_str(movie.cover_url)),
+            thumb=self._normalize_image_url(self._clean_str(movie.thumb_url)),
+            poster=self._normalize_image_url(self._clean_str(movie.cover_url)),
             release=self._clean_str(movie.release_date),
             runtime=self._clean_int(movie.duration),
             score=self._clean_str(movie.score),
@@ -275,7 +284,7 @@ class JavdbAPICrawler(BaseCrawler):
                 else []
             ),
             extrafanart=[
-                self._ensure_https(img.get("thumb_url") or img.get("large_url", ""))
+                self._normalize_image_url(img.get("thumb_url") or img.get("large_url", ""))
                 for img in (movie.preview_images or [])
                 if img
             ],

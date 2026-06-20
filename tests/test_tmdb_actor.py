@@ -514,6 +514,52 @@ async def test_fetch_actor_tmdb_ids_zhconv_fallback_for_new_actor(monkeypatch: p
 
 
 @pytest.mark.asyncio
+async def test_fetch_actor_tmdb_ids_keeps_site_name_as_jp_and_merges_tmdb_aliases(
+    monkeypatch: pytest.MonkeyPatch, _tmp_actor_db: Path
+):
+    monkeypatch.setattr(tmdb_actor.manager.config, "tmdb_api_key", "fake-key")
+    monkeypatch.setattr(tmdb_actor.manager.config, "tmdb_api_base", "api.tmdb.org")
+
+    async def _stub_tmdb_request(client, method, url, **kwargs):
+        if "/search/person" in url:
+            return tmdb_actor._TmdbResponse(
+                200,
+                '{"results":[{"id":3714704,"name":"北条麻妃","original_name":"ほうじょう まき","gender":1,"adult":true,"popularity":1.0}]}',
+            )
+        if "/person/3714704" in url and "/translations" not in url:
+            return tmdb_actor._TmdbResponse(
+                200,
+                '{"id":3714704,"name":"北条麻妃","original_name":"ほうじょう まき","gender":1,"place_of_birth":"Ishikawa, Japan","also_known_as":["Maki Houjou","ほうじょう まき","北条麻妃"]}',
+            )
+        if "/person/3714704/translations" in url:
+            return tmdb_actor._TmdbResponse(
+                200,
+                '{"translations":[{"iso_639_1":"zh","iso_3166_1":"CN","english_name":"","data":{"name":"北条麻妃"}}]}',
+            )
+        return None
+
+    monkeypatch.setattr(tmdb_actor, "_tmdb_request", _stub_tmdb_request)
+    monkeypatch.setattr(tmdb_actor.manager.config, "show_data_log", False)
+
+    result = await tmdb_actor.fetch_actor_tmdb_ids(["北條麻妃"], object())
+
+    assert result == {"北條麻妃": 3714704}
+
+    wb = load_workbook(_tmp_actor_db)
+    ws = wb.active
+    found = False
+    for row in ws.iter_rows(min_row=2, values_only=True):
+        if str(row[0] or "").strip() == "北條麻妃":
+            assert row[1] == "北条麻妃"
+            keywords = {part.strip() for part in str(row[3] or "").split(",") if part.strip()}
+            assert keywords == {"北条麻妃", "ほうじょう まき", "Maki Houjou"}
+            found = True
+            break
+    assert found, "北條麻妃 row not found in xlsx"
+    wb.close()
+
+
+@pytest.mark.asyncio
 async def test_fetch_actor_tmdb_ids_skips_translate_when_both_names_present(
     monkeypatch: pytest.MonkeyPatch, _tmp_actor_db: Path
 ):
