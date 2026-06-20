@@ -1,6 +1,8 @@
+import asyncio
 import base64
 import hashlib
 import json
+import random
 import time
 from typing import override
 
@@ -107,6 +109,11 @@ class MovieDetail(BaseModel):
 
 
 class JavdbAPICrawler(BaseCrawler):
+    def __init__(self, client, base_url="", browser=None):
+        super().__init__(client, base_url, browser)
+        self._request_lock = asyncio.Lock()
+        self._last_request_at = 0.0
+
     @staticmethod
     def _log(message: str) -> None:
         from ..signals import signal
@@ -142,7 +149,6 @@ class JavdbAPICrawler(BaseCrawler):
         return str(value)
 
     async def _request_api(self, path: str, params: dict | None = None) -> dict | None:
-        """尝试通过所有 API 主机发起请求，返回 JSON 数据。"""
         hosts = [_API_BASE] + _API_FALLBACKS
         signature = make_signature()
         headers = {
@@ -150,6 +156,14 @@ class JavdbAPICrawler(BaseCrawler):
             "accept-language": "zh",
             "User-Agent": "Dart/3.5 (dart:io)",
         }
+
+        async with self._request_lock:
+            if self._last_request_at > 0:
+                elapsed = time.monotonic() - self._last_request_at
+                delay = random.uniform(3.0, 8.0)
+                if elapsed < delay:
+                    await asyncio.sleep(delay - elapsed)
+            self._last_request_at = time.monotonic()
 
         last_error = None
         for host in hosts:
