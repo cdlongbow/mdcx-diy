@@ -141,7 +141,11 @@ def is_jdbstatic_image_url(url: str) -> bool:
 def build_jdbstatic_headers(url: str) -> dict[str, str]:
     fingerprint = select_fingerprint("javdb.com", purpose="asset")
     headers = build_fingerprint_headers(url, fingerprint=fingerprint, purpose="asset")
+    headers["Accept"] = "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
     headers["Referer"] = "https://javdb.com/"
+    headers["Sec-Fetch-Dest"] = "image"
+    headers["Sec-Fetch-Mode"] = "no-cors"
+    headers["Sec-Fetch-Site"] = "cross-site"
     return headers
 
 
