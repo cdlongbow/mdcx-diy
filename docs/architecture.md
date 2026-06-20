@@ -105,6 +105,7 @@
 │   │   ├── jav321.py                # Jav321 爬虫
 │   │   ├── javbus.py                # JavBus 爬虫
 │   │   ├── javday.py                # JavDay 爬虫
+│   │   ├── javdb_app.py              # JavDB 移动端 API 爬虫
 │   │   ├── javdb_new.py             # JavDB 爬虫
 │   │   ├── javdbapi.py              # JavDB API 爬虫
 │   │   ├── javlibrary.py            # JavLibrary 爬虫

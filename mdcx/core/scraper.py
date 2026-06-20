@@ -369,7 +369,7 @@ class Scraper:
         signal.label_result.emit(
             f" 刮削中：{Flags.scrape_started - Flags.succ_count - Flags.fail_count} 成功：{Flags.succ_count} 失败：{Flags.fail_count}"
         )
-        LogBuffer.log().write("\n" + "👆" * 50)
+        LogBuffer.log().write("\n" + "=" * 40)
         LogBuffer.log().write("\n 🙈 [file] " + str(file_info.file_path))
         LogBuffer.log().write("\n 🚘 [number] " + number)
 
@@ -460,7 +460,7 @@ class Scraper:
             progress_percentage = f"{progress_value:.2f}%"
             used_time = get_used_time(start_time)
             scrape_info_begin = f"{count:d}/{count_all:d} ({progress_percentage}) round({Flags.count_claw}) {split_path(file_path)[1]}    新的刮削线程"
-            scrape_info_begin = "\n\n\n" + "👇" * 50 + "\n" + scrape_info_begin
+            scrape_info_begin = "\n\n\n" + "=" * 40 + "\n" + scrape_info_begin
             scrape_info_after = f"\n 🕷 {get_current_time()} {count}/{count_all} {split_path(file_path)[1]} 刮削完成！用时 {used_time} 秒！"
             if manager.config.show_web_log:
                 signal.show_log_text(scrape_info_begin + LogBuffer.log().get() + scrape_info_after)
@@ -729,24 +729,24 @@ class Scraper:
                 Flags.json_get_set.add(movie_number)
                 Flags.json_get_status[movie_number] = None
                 LogBuffer.log().write(f"\n 🟡 [Same Number] 首次刮削，开始共享番号数据：{movie_number}")
-        else:
-            # 同番号任务等待首个任务完成；若首个任务失败，直接结束等待，避免线程卡死
-            LogBuffer.log().write(f"\n 🟡 [Same Number] 等待同番号任务完成：{movie_number}")
-            wait_timeout = 300
-            waited = 0
-            while Flags.json_get_status.get(movie_number) is None:
-                if Flags.stop_requested or signal.stop:
-                    LogBuffer.log().write(f"\n 🟡 [Same Number] 检测到停止请求，取消等待：{movie_number}")
+            else:
+                # 同番号任务等待首个任务完成；若首个任务失败，直接结束等待，避免线程卡死
+                LogBuffer.log().write(f"\n 🟡 [Same Number] 等待同番号任务完成：{movie_number}")
+                wait_timeout = 300
+                waited = 0
+                while Flags.json_get_status.get(movie_number) is None:
+                    if Flags.stop_requested or signal.stop:
+                        LogBuffer.log().write(f"\n 🟡 [Same Number] 检测到停止请求，取消等待：{movie_number}")
+                        return None, None
+                    if waited >= wait_timeout:
+                        LogBuffer.error().write(f"同番号等待超时（{wait_timeout}秒），取消等待：{movie_number}")
+                        Flags.json_get_status[movie_number] = False
+                        return None, None
+                    await asyncio.sleep(1)
+                    waited += 1
+                if Flags.json_get_status.get(movie_number) is False:
+                    LogBuffer.error().write(f"同番号任务失败，取消等待：{movie_number}")
                     return None, None
-                if waited >= wait_timeout:
-                    LogBuffer.error().write(f"同番号等待超时（{wait_timeout}秒），取消等待：{movie_number}")
-                    Flags.json_get_status[movie_number] = False
-                    return None, None
-                await asyncio.sleep(1)
-                waited += 1
-            if Flags.json_get_status.get(movie_number) is False:
-                LogBuffer.error().write(f"同番号任务失败，取消等待：{movie_number}")
-                return None, None
 
         pre_data = Flags.json_data_dic.get(movie_number)
         # 已存在该番号数据时直接使用该数据

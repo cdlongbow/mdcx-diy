@@ -56,7 +56,7 @@
 
 ## 完整网站列表
 
-### 有码类 (24 个)
+### 有码类 (21 个)
 
 | 网站爬虫 | 网站名称 | 说明 |
 |---------|---------|------|
@@ -70,13 +70,10 @@
 | `javdbapi` | JavDB API | JavDB API 接口 |
 | `javlibrary` | JavLibrary | JavLibrary 番号搜索 |
 | `javday` | JavDay | JavDay 信息站 |
-| `avsox` | AVSoX | AVSoX 信息站 |
-| `avsex` | AVSex | AVSex 信息站 |
 | `missav` | MissAV | MissAV 番号搜索 |
 | `mmtv` | MMTV | MMTV 媒体 |
 | `mywife` | MyWife | MyWife 官方网站 |
 | `getchu` | Getchu | Getchu 官方网站 |
-| `getchu_dl` | Getchu DL | Getchu 下载站 |
 | `getchu_dmm` | Getchu DMM | Getchu DMM 分站 |
 | `giga` | Giga | Giga 官方网站 |
 | `faleno` | Faleno | Faleno 官方网站 |
@@ -85,14 +82,15 @@
 | `xcity` | XCity | XCity 信息站 |
 | `libredmm` | LibreDMM | LibreDMM 开源项目 |
 
-### 无码类 (2 个)
+### 无码类 (3 个)
 
 | 网站爬虫 | 网站名称 | 说明 |
 |---------|---------|------|
+| `avsox` | AVSoX | AVSoX 信息站 |
 | `kin8` | KIN8 | KIN8 无码 |
-| `love6` | Love6 | Love6 无码 |
+| `javdb_app` | JavDB APP | JavDB 移动端 API |
 
-### FC2 类 (4 个)
+### FC2 类 (5 个)
 
 | 网站爬虫 | 网站名称 | 说明 |
 |---------|---------|------|
@@ -100,22 +98,23 @@
 | `fc2club` | FC2Club | FC2Club 信息站 |
 | `fc2hub` | FC2Hub | FC2Hub 信息站 |
 | `fc2ppvdb` | FC2PPVDB | FC2 PPV 数据库 |
+| `javdb_app` | JavDB APP | JavDB 移动端 API |
 
-### 国产类 (5 个)
+### 国产类 (4 个)
 
 | 网站爬虫 | 网站名称 | 说明 |
 |---------|---------|------|
 | `hdouban` | HDOUBAN | 豆瓣 HD |
 | `cnmdb` | CNMDB | 中国番号库 |
-| `guochan` | 国产番号 | 国产番号站 |
 | `madouqu` | 码豆区 | 码豆区 |
 | `lulubar` | 咕噜吧 | 咕噜吧 |
 
-### 欧美类 (1 个)
+### 欧美类 (2 个)
 
 | 网站爬虫 | 网站名称 | 说明 |
 |---------|---------|------|
 | `theporndb` | ThePornDB | 欧美数据库 |
+| `javdb_app` | JavDB APP | JavDB 移动端 API |
 
 ### 其他类 (7 个)
 
@@ -129,7 +128,7 @@
 | `mdtv` | MDTV | MDTV |
 | `avbase_new` | AVBase | AVBase |
 
-**总计：43 个网站爬虫**
+**总计：40 个网站爬虫**
 
 ---
 
