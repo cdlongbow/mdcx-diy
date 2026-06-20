@@ -1876,10 +1876,10 @@ class MyMAinWindow(QMainWindow):
             text, ok = QInputDialog.getText(
                 self,
                 "输入网址重新刮削",
-                f"文件名: {main_file_name}\n支持网站:airav_cc、avsex、avsox、dmm、getchu、fc2"
+                f"文件名: {main_file_name}\n支持网站:airav_cc、avsox、dmm、getchu、fc2"
                 f"、fc2club、fc2hub、iqqtv、jav321、javbus、javdb、freejavbt、javlibrary、mdtv"
                 f"、madouqu、mgstage、7mmtv、xcity、mywife、giga、faleno、dahlia、fantastica、avbase"
-                f"、prestige、hdouban、lulubar、love6、cnmdb、theporndb、kin8\n请输入番号对应的网址（不是网站首页地址！！！是番号页面地址！！！）:",
+                f"、prestige、hdouban、lulubar、cnmdb、theporndb、kin8\n请输入番号对应的网址（不是网站首页地址！！！是番号页面地址！！！）:",
             )
             if ok and text:
                 website, url = deal_url(text)
@@ -2678,10 +2678,10 @@ class MyMAinWindow(QMainWindow):
   <p><span style=" font-weight:700;">所有可用网站:</span></p>
   <li>airav_cc</li>
   <li>avbase</li>
-  <li>avsex</li>
   <li>avsox</li>
   <li>cableav</li>
   <li>cnmdb</li>
+  <li>dahlia</li>
   <li>dmm</li>
   <li>faleno</li>
   <li>fantastica</li>
@@ -2691,6 +2691,7 @@ class MyMAinWindow(QMainWindow):
   <li>fc2ppvdb</li>
   <li>freejavbt</li>
   <li>getchu</li>
+  <li>getchu_dmm</li>
   <li>giga</li>
   <li>hdouban</li>
   <li>hscangku</li>
@@ -2699,29 +2700,32 @@ class MyMAinWindow(QMainWindow):
   <li>javbus</li>
   <li>javday</li>
   <li>javdb</li>
+  <li>javdb_app</li>
+  <li>javdbapi</li>
   <li>javlibrary</li>
   <li>kin8</li>
-  <li>love6</li>
+  <li>libredmm</li>
   <li>lulubar</li>
   <li>madouqu</li>
   <li>mdtv</li>
-  <li>missav</li>
   <li>mgstage</li>
-  <li>7mmtv</li>
+  <li>missav</li>
   <li>mywife</li>
+  <li>official</li>
   <li>prestige</li>
   <li>theporndb</li>
   <li>xcity</li>
-  <li>dahlia</li>
-  <li>getchu_dmm</li>
-  <li>official</li>
+  <li>7mmtv</li>
   <p><span style=" font-weight:700;">指定类型影片可指定刮削网站:<span></p>
-  <p>· 欧美：theporndb </p>
-  <p>· 国产：mdtv、madouqu、hdouban、cnmdb、love6</p>
+  <p>· 欧美：theporndb 、javdb_app </p>
+  <p>· 国产：mdtv、madouqu、hdouban、cnmdb、javdb_app </p>
   <p>· 里番：getchu_dmm </p>
   <p>· Mywife：mywife </p>
   <p>· GIGA：giga </p>
-  <p>· Kin8：Kin8 </p>
+  <p>· Kin8：kin8 </p>
+  <p>· 无码：javdb_app </p>
+  <p>· 素人：javdb_app </p>
+  <p>· FC2：javdb_app </p>
 </body>
 </html>""")
 

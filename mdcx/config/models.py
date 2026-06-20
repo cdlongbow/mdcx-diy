@@ -369,6 +369,7 @@ class Config(BaseModel):
             Website.JAV321,
             Website.DMM,
             Website.AVBASE,
+            Website.JAVDB_APP,
         ],
         title="有码网站源",
     )
@@ -377,6 +378,7 @@ class Config(BaseModel):
             Website.MISSAV,
             Website.MMTV,
             Website.AVSOX,
+            Website.JAVDB_APP,
         ],
         title="无码网站源",
     )
@@ -388,6 +390,7 @@ class Config(BaseModel):
             Website.DMM,
             Website.AVBASE,
             Website.MMTV,
+            Website.JAVDB_APP,
         ],
         title="素人网站源",
     )
@@ -397,11 +400,12 @@ class Config(BaseModel):
             Website.MMTV,
             Website.FC2HUB,
             Website.FC2CLUB,
+            Website.JAVDB_APP,
         ],
         title="FC2网站源",
     )
     website_oumei: list[Website] = Field(
-        default_factory=lambda: [Website.THEPORNDB],
+        default_factory=lambda: [Website.THEPORNDB, Website.JAVDB_APP],
         title="欧美网站源",
     )
     website_guochan: list[Website] = Field(

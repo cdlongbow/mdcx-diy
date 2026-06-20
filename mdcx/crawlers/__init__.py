@@ -45,6 +45,7 @@ from .iqqtv import IqqtvCrawler
 from .jav321 import Jav321Crawler
 from .javbus import JavbusCrawler
 from .javday import JavdayCrawler
+from .javdb_app import JavdbAPICrawler
 from .javdb_new import JavdbCrawler
 from .javlibrary import JavlibraryCrawler
 from .kin8 import Kin8Crawler
@@ -62,6 +63,7 @@ from .xcity import XcityCrawler
 
 register_crawler(DmmCrawler)
 register_crawler(JavdbCrawler)
+register_crawler(JavdbAPICrawler)
 register_crawler(javdbapi.JavdbApiCrawler)
 register_crawler(AvbaseCrawler)
 register_crawler(missav.MissavCrawler)
