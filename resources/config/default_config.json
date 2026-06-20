@@ -156,9 +156,9 @@
   "website_youma": [
     "libredmm",
     "javdbapi",
+    "javbus",
     "iqqtv",
-    "airav_cc",
-    "javdb_app"
+    "airav_cc"
   ],
   "website_wuma": [
     "missav",
@@ -905,8 +905,8 @@
       },
       "series": {
         "site_prority": [
-          "libredmm",
-          "javdbapi"
+          "javdbapi",
+          "javbus"
         ]
       },
       "studio": {
