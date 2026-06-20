@@ -20,6 +20,7 @@ from ..base.web import (
     build_jdbstatic_headers,
     is_dmm_image_url,
     is_jdbstatic_image_url,
+    log_jdbstatic_request_headers,
     normalize_media_url,
 )
 from ..config.manager import manager
@@ -83,6 +84,7 @@ class MediaResourceContext:
         # 完整下载不能使用 DMM 探测参数，否则会把 120x90 探测图写入封面缓存。
         request_url, added_probe = normalized_url, False
         headers = build_jdbstatic_headers(request_url) if is_jdbstatic_image_url(request_url) else None
+        log_jdbstatic_request_headers(request_url, headers)
         async with manager.acquire_computed() as computed:
             response, error = await computed.async_client.request("GET", request_url, headers=headers)
         if response is None:
@@ -154,6 +156,7 @@ class MediaResourceContext:
 
         request_url, added_probe = self._build_request_url(normalized_url) if use_dmm_probe else (normalized_url, False)
         headers = build_jdbstatic_headers(request_url) if is_jdbstatic_image_url(request_url) else None
+        log_jdbstatic_request_headers(request_url, headers)
         async with manager.acquire_computed() as computed:
             client = computed.async_client
             response, error = await client.request("GET", request_url, stream=True, headers=headers)
@@ -208,6 +211,7 @@ class MediaResourceContext:
 
             for attempt, delay in enumerate(retry_delays, start=1):
                 headers = build_jdbstatic_headers(url) if is_jdbstatic_image_url(url) else None
+                log_jdbstatic_request_headers(url, headers)
                 response, error = await client.request("HEAD", url, retry_count=1, headers=headers)
                 if response is not None:
                     if content_length := _parse_content_length(response.headers.get("Content-Length")):
@@ -222,6 +226,7 @@ class MediaResourceContext:
 
             for attempt, delay in enumerate(retry_delays, start=1):
                 headers = build_jdbstatic_headers(url) if is_jdbstatic_image_url(url) else None
+                log_jdbstatic_request_headers(url, headers)
                 response, error = await client.request("GET", url, retry_count=1, headers=headers)
                 if response is None:
                     if not _should_retry_link_error(error) or attempt == len(retry_delays):

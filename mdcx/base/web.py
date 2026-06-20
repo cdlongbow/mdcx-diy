@@ -149,6 +149,21 @@ def build_jdbstatic_headers(url: str) -> dict[str, str]:
     return headers
 
 
+def log_jdbstatic_request_headers(url: str, headers: dict[str, str] | None) -> None:
+    if not is_jdbstatic_image_url(url):
+        return
+    safe_headers = headers or {}
+    LogBuffer.log().write(
+        "\n 🔎 JDBStatic请求头: "
+        f"url={url} "
+        f"accept={safe_headers.get('Accept', '')} "
+        f"referer={safe_headers.get('Referer', '')} "
+        f"sec-fetch-dest={safe_headers.get('Sec-Fetch-Dest', '')} "
+        f"sec-fetch-mode={safe_headers.get('Sec-Fetch-Mode', '')} "
+        f"sec-fetch-site={safe_headers.get('Sec-Fetch-Site', '')}"
+    )
+
+
 def _should_retry_link_error(error: str) -> bool:
     normalized = str(error or "").lower()
     if not normalized:
@@ -818,6 +833,7 @@ async def download_content_with_filepath(url: str, file_path: Path, folder_new_p
 
     try:
         headers = build_jdbstatic_headers(url) if is_jdbstatic_image_url(url) else None
+        log_jdbstatic_request_headers(url, headers)
         async with manager.acquire_computed() as computed:
             content, error = await computed.async_client.get_content(url, headers=headers)
         if not content:
