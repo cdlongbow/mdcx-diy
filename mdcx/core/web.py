@@ -854,6 +854,12 @@ def _can_direct_download_poster_candidate(
     candidate: PosterCandidate,
     poster_auto_best: bool,
 ) -> bool:
+    if (
+        result.source == "javdb_app"
+        and result.scraping_type == FixedScrapingType.YOUMA
+        and "/small_covers/" in candidate.url
+    ):
+        return False
     if poster_auto_best:
         return True
     if result.scraping_type in POSTER_DIRECT_DOWNLOAD_TYPES:

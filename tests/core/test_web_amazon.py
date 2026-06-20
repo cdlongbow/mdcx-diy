@@ -291,6 +291,40 @@ async def test_youma_without_auto_best_crops_when_direct_poster_loses_to_crop(
 
 
 @pytest.mark.asyncio
+async def test_javdb_app_small_cover_skips_direct_download_and_crops(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
+    async def fake_get_big_poster(*args, **kwargs):
+        return None
+
+    async def fake_download_file_with_filepath(*args, **kwargs):
+        raise AssertionError("javdb_app 的 small_covers 不应再尝试直下 poster")
+
+    monkeypatch.setattr(manager.config, "download_files", [DownloadableFile.POSTER, DownloadableFile.THUMB])
+    monkeypatch.setattr(manager.config, "keep_files", [])
+    monkeypatch.setattr(manager.config, "download_hd_pics", [])
+    monkeypatch.setattr("mdcx.core.web._get_big_poster", fake_get_big_poster)
+    monkeypatch.setattr("mdcx.core.web.download_file_with_filepath", fake_download_file_with_filepath)
+
+    thumb_path = tmp_path / "thumb.jpg"
+    _save_test_image(thumb_path, (800, 500))
+
+    result = CrawlersResult.empty()
+    result.number = "URE-018"
+    result.source = "javdb_app"
+    result.scraping_type = FixedScrapingType.YOUMA
+    result.poster = "https://c0.jdbstatic.com/small_covers/xw/XWPga.jpg"
+    result.poster_from = "javdb_app"
+    result.image_download = True
+    other = OtherInfo.empty()
+    other.thumb_path = thumb_path
+
+    poster_path = tmp_path / "poster.jpg"
+    assert await poster_download(result, other, "", tmp_path, poster_path) is True
+    assert result.poster_from == "thumb right"
+    assert result.image_download is False
+    assert other.poster_path == poster_path
+
+
+@pytest.mark.asyncio
 async def test_select_poster_auto_best_falls_back_to_thumb_right_crop(tmp_path: Path):
     thumb_path = tmp_path / "thumb.jpg"
     _save_test_image(thumb_path, (800, 500))
