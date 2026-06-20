@@ -26,6 +26,8 @@ _API_BASE = "https://apidd.czssdgz.com"
 _API_FALLBACKS = ["https://apidd.spthgb.com", "https://jdforrepam.com"]
 _IMAGE_PREFIX_OLD = "https://tp.cmastd.com/rhe951l4q/"
 _IMAGE_PREFIX_NEW = "https://c0.jdbstatic.com/"
+_SMALL_COVERS_SEGMENT = "/small_covers/"
+_THUMBS_SEGMENT = "/thumbs/"
 
 _PLATFORM = "android"
 _APP_CHANNEL = "official"
@@ -141,6 +143,8 @@ class JavdbAPICrawler(BaseCrawler):
     @classmethod
     def _normalize_image_url(cls, url: str) -> str:
         normalized = cls._ensure_https(url)
+        if _SMALL_COVERS_SEGMENT in normalized:
+            normalized = normalized.replace(_SMALL_COVERS_SEGMENT, _THUMBS_SEGMENT, 1)
         if normalized.startswith(_IMAGE_PREFIX_OLD):
             return normalized.replace(_IMAGE_PREFIX_OLD, _IMAGE_PREFIX_NEW, 1)
         return normalized
@@ -240,6 +244,12 @@ class JavdbAPICrawler(BaseCrawler):
         except Exception as e:
             ctx.debug(f"详情响应解析失败: {e} {movie_raw=}")
             raise CrawlerException("详情响应解析失败") from e
+
+        self._log(
+            "图片字段: "
+            f"cover_url={self._normalize_image_url(self._clean_str(movie.cover_url))} "
+            f"thumb_url={self._normalize_image_url(self._clean_str(movie.thumb_url))}"
+        )
 
         # Step 3: Build CrawlerData
         data = CrawlerData(

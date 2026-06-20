@@ -12,6 +12,10 @@ def test_normalize_image_url_rewrites_legacy_host():
         crawler._normalize_image_url("https://tp.cmastd.com/rhe951l4q/covers/demo.jpg")
         == "https://c0.jdbstatic.com/covers/demo.jpg"
     )
+    assert (
+        crawler._normalize_image_url("https://tp.cmastd.com/rhe951l4q/small_covers/demo.jpg")
+        == "https://c0.jdbstatic.com/thumbs/demo.jpg"
+    )
 
 
 @pytest.mark.asyncio
@@ -46,7 +50,7 @@ async def test_run_maps_cover_to_thumb_and_thumb_to_poster():
                                 "origin_title": "Origin Title",
                                 "summary": "Outline",
                                 "cover_url": "https://tp.cmastd.com/rhe951l4q/covers/cover-wide.jpg",
-                                "thumb_url": "https://tp.cmastd.com/rhe951l4q/thumbs/poster-tall.jpg",
+                                "thumb_url": "https://tp.cmastd.com/rhe951l4q/small_covers/poster-tall.jpg",
                                 "duration": 120,
                                 "release_date": "2024-01-02",
                                 "maker_name": "Maker",
