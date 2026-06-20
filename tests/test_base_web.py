@@ -210,6 +210,36 @@ async def test_download_extrafanart_task_uses_single_get_for_dmm_image(monkeypat
 
 
 @pytest.mark.asyncio
+async def test_download_extrafanart_task_uses_jdbstatic_headers(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
+    headers_seen: list[dict[str, str] | None] = []
+
+    async def fake_get_content(url: str, **kwargs):
+        headers_seen.append(kwargs.get("headers"))
+        return b"fake-image", ""
+
+    async def fake_check_pic_async(path: Path):
+        return (800, 1200)
+
+    monkeypatch.setattr(manager.computed.async_client, "get_content", fake_get_content)
+    monkeypatch.setattr(base_web, "check_pic_async", fake_check_pic_async)
+
+    result = await base_web.download_extrafanart_task(
+        (
+            "https://c0.jdbstatic.com/covers/xw/XWPga.jpg",
+            tmp_path / "fanart1.jpg",
+            tmp_path,
+            "fanart1.jpg",
+        )
+    )
+
+    assert result is True
+    assert headers_seen
+    assert headers_seen[0] is not None
+    assert headers_seen[0]["Referer"] == "https://javdb.com/"
+    assert "User-Agent" in headers_seen[0]
+
+
+@pytest.mark.asyncio
 async def test_download_extrafanart_task_skips_invalid_dmm_placeholder(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     calls: list[tuple[str, str]] = []
 

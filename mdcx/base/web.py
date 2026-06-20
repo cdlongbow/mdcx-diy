@@ -19,7 +19,7 @@ from ping3 import ping
 from ..config.manager import manager
 from ..consts import GITHUB_RELEASES_API_LATEST
 from ..models.log_buffer import LogBuffer
-from ..network_fingerprint import build_amazon_headers
+from ..network_fingerprint import build_amazon_headers, build_fingerprint_headers, select_fingerprint
 from ..signals import signal
 from ..utils import executor
 from ..utils.file import check_pic_async
@@ -36,6 +36,7 @@ _amazon_request_throttle = _AdaptiveRequestThrottle(
 
 _DMM_IMAGE_BAD_URL_KEYS = ("now_printing", "nowprinting", "noimage", "nopic", "media_violation")
 _DMM_IMAGE_PROBE_PARAMS = (("w", "120"), ("h", "90"))
+_JDBSTATIC_HOST_SUFFIXES = ("jdbstatic.com",)
 
 
 def normalize_media_url(url: str, *, strip_dmm_probe_params: bool = False) -> str:
@@ -119,6 +120,29 @@ def _build_dmm_probe_url(url: str) -> tuple[str, bool]:
 def _is_invalid_image_redirect_url(url: str) -> bool:
     normalized = normalize_media_url(url).lower()
     return any(each_key in normalized for each_key in _DMM_IMAGE_BAD_URL_KEYS)
+
+
+def is_jdbstatic_image_url(url: str) -> bool:
+    normalized = normalize_media_url(url)
+    if normalized.startswith("//"):
+        normalized = "https:" + normalized
+    try:
+        split_result = urlsplit(normalized)
+    except Exception:
+        return False
+
+    host = split_result.netloc.lower()
+    path = split_result.path.lower()
+    if not host or not host.endswith(_JDBSTATIC_HOST_SUFFIXES):
+        return False
+    return path.endswith((".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp", ".avif"))
+
+
+def build_jdbstatic_headers(url: str) -> dict[str, str]:
+    fingerprint = select_fingerprint("javdb.com", purpose="asset")
+    headers = build_fingerprint_headers(url, fingerprint=fingerprint, purpose="asset")
+    headers["Referer"] = "https://javdb.com/"
+    return headers
 
 
 def _should_retry_link_error(error: str) -> bool:
@@ -789,8 +813,9 @@ async def download_content_with_filepath(url: str, file_path: Path, folder_new_p
         await aiofiles.os.makedirs(folder_new_path)
 
     try:
+        headers = build_jdbstatic_headers(url) if is_jdbstatic_image_url(url) else None
         async with manager.acquire_computed() as computed:
-            content, error = await computed.async_client.get_content(url)
+            content, error = await computed.async_client.get_content(url, headers=headers)
         if not content:
             LogBuffer.log().write(f"\n 🥺 Download failed! {url} {error}")
             return False

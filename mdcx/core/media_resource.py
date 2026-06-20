@@ -17,7 +17,9 @@ from ..base.web import (
     _is_invalid_image_redirect_url,
     _parse_content_length,
     _should_retry_link_error,
+    build_jdbstatic_headers,
     is_dmm_image_url,
+    is_jdbstatic_image_url,
     normalize_media_url,
 )
 from ..config.manager import manager
@@ -80,8 +82,9 @@ class MediaResourceContext:
 
         # 完整下载不能使用 DMM 探测参数，否则会把 120x90 探测图写入封面缓存。
         request_url, added_probe = normalized_url, False
+        headers = build_jdbstatic_headers(request_url) if is_jdbstatic_image_url(request_url) else None
         async with manager.acquire_computed() as computed:
-            response, error = await computed.async_client.request("GET", request_url)
+            response, error = await computed.async_client.request("GET", request_url, headers=headers)
         if response is None:
             if error:
                 LogBuffer.log().write(f"\n 🟡 图片读取失败: {error}")
@@ -150,9 +153,10 @@ class MediaResourceContext:
             return cached.size
 
         request_url, added_probe = self._build_request_url(normalized_url) if use_dmm_probe else (normalized_url, False)
+        headers = build_jdbstatic_headers(request_url) if is_jdbstatic_image_url(request_url) else None
         async with manager.acquire_computed() as computed:
             client = computed.async_client
-            response, error = await client.request("GET", request_url, stream=True)
+            response, error = await client.request("GET", request_url, stream=True, headers=headers)
             if response is None:
                 if error:
                     LogBuffer.log().write(f"\n 🟡 图片尺寸探测失败: {error}")
@@ -203,7 +207,8 @@ class MediaResourceContext:
                 return await self._fetch_dmm_content_length(client, url, retry_delays)
 
             for attempt, delay in enumerate(retry_delays, start=1):
-                response, error = await client.request("HEAD", url, retry_count=1)
+                headers = build_jdbstatic_headers(url) if is_jdbstatic_image_url(url) else None
+                response, error = await client.request("HEAD", url, retry_count=1, headers=headers)
                 if response is not None:
                     if content_length := _parse_content_length(response.headers.get("Content-Length")):
                         return content_length
@@ -216,7 +221,8 @@ class MediaResourceContext:
                     await asyncio.sleep(delay)
 
             for attempt, delay in enumerate(retry_delays, start=1):
-                response, error = await client.request("GET", url, retry_count=1)
+                headers = build_jdbstatic_headers(url) if is_jdbstatic_image_url(url) else None
+                response, error = await client.request("GET", url, retry_count=1, headers=headers)
                 if response is None:
                     if not _should_retry_link_error(error) or attempt == len(retry_delays):
                         return None

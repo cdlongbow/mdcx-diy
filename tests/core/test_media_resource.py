@@ -210,6 +210,30 @@ async def test_media_resource_context_can_probe_original_dmm_aws_image_size(monk
 
 
 @pytest.mark.asyncio
+async def test_media_resource_context_uses_jdbstatic_headers(monkeypatch: pytest.MonkeyPatch):
+    seen_headers: list[dict[str, str] | None] = []
+
+    async def fake_request(method: str, url: str, **kwargs):
+        assert method == "GET"
+        seen_headers.append(kwargs.get("headers"))
+        return _FakeResponse(url, _jpeg_bytes((1518, 2149))), ""
+
+    monkeypatch.setattr(manager.computed.async_client, "request", fake_request)
+
+    context = MediaResourceContext()
+    try:
+        url = "https://c0.jdbstatic.com/covers/xw/XWPga.jpg"
+        assert await context.probe_original_size(url) == (1518, 2149)
+    finally:
+        context.close()
+
+    assert seen_headers
+    assert seen_headers[0] is not None
+    assert seen_headers[0]["Referer"] == "https://javdb.com/"
+    assert "User-Agent" in seen_headers[0]
+
+
+@pytest.mark.asyncio
 async def test_media_resource_context_saves_original_dmm_image_after_probe(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
