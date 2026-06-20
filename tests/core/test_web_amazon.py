@@ -309,7 +309,6 @@ async def test_javdb_app_small_cover_skips_direct_download_and_crops(monkeypatch
 
     result = CrawlersResult.empty()
     result.number = "URE-018"
-    result.source = "javdb_app"
     result.scraping_type = FixedScrapingType.YOUMA
     result.poster = "https://c0.jdbstatic.com/small_covers/xw/XWPga.jpg"
     result.poster_from = "javdb_app"
