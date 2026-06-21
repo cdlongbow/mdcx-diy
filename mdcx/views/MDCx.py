@@ -9984,7 +9984,7 @@ class Ui_MDCx:
         self.gridLayout_9.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_9.setObjectName("gridLayout_9")
 
-        # 不使用代理网站选择器 - comboBox_no_proxy_sites 和 horizontalLayout_no_proxy
+        # 使用代理网站选择器 - comboBox_no_proxy_sites 和 horizontalLayout_no_proxy
         self.comboBox_no_proxy_sites = QtWidgets.QComboBox(self.gridLayoutWidget_9)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -13043,7 +13043,7 @@ class Ui_MDCx:
         self.lineEdit_cf_bypass_proxy.setPlaceholderText(_translate("MDCx", "例如: http://127.0.0.1:7890（可选）"))
         self.label_65.setText(_translate("MDCx", "重试次数："))
         self.label_64.setText(_translate("MDCx", "代理地址："))
-        self.label_no_proxy_sites.setText(_translate("MDCx", "不使用代理："))
+        self.label_no_proxy_sites.setText(_translate("MDCx", "使用代理："))
         self.label_cf_bypass.setText(_translate("MDCx", "CF Bypass："))
         self.label_cf_bypass_proxy.setText(_translate("MDCx", "CF Bypass代理："))
         self.groupBox_44.setTitle(_translate("MDCx", "网站设置"))

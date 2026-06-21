@@ -308,14 +308,14 @@ class AsyncWebClient:
         timeout: float,
         cf_bypass_url: str = "",
         cf_bypass_proxy: str | None = None,
-        no_proxy_sites: list[str] | None = None,
+        proxy_sites: list[str] | None = None,
         log_fn: Callable[[str], None] | None = None,
         limiters: AsyncWebLimiters | None = None,
     ):
         self.retry = retry
         self.proxy = proxy
         self.timeout = timeout
-        self.no_proxy_sites = [s.strip() for s in (no_proxy_sites or []) if s.strip()]
+        self.proxy_sites = [s.strip() for s in (proxy_sites or []) if s.strip()]
         self.max_clients = 100
         self._session_kwargs = {
             "max_clients": self.max_clients,
@@ -372,30 +372,30 @@ class AsyncWebClient:
             impersonate=impersonate,
         )
 
-    def _is_no_proxy_host(self, host: str) -> bool:
-        """Check if a host should bypass proxy based on no_proxy_sites configuration.
+    def _is_proxy_host(self, host: str) -> bool:
+        """Check if a host should use proxy based on proxy_sites configuration.
 
         Supports both site values (e.g., 'libredmm') and full domains (e.g., 'libredmm.com').
         """
-        if not host or not self.no_proxy_sites:
+        if not host or not self.proxy_sites:
             return False
 
         # Import here to avoid circular dependency
         from .manual import ManualConfig
 
-        for no_proxy in self.no_proxy_sites:
-            no_proxy = no_proxy.strip().lower()
-            if not no_proxy:
+        for proxy_site in self.proxy_sites:
+            proxy_site = proxy_site.strip().lower()
+            if not proxy_site:
                 continue
 
             # Direct match: host equals the configured value
-            if host == no_proxy:
+            if host == proxy_site:
                 return True
 
             # Match site value against domain mappings from WEB_DIC
             # e.g., user inputs 'javdb', host is 'www.javdb.com'
             for domain_key, website_enum in ManualConfig.WEB_DIC.items():
-                if website_enum.value == no_proxy:
+                if website_enum.value == proxy_site:
                     # Check if host matches this domain
                     if host == domain_key or host.endswith("." + domain_key):
                         return True
@@ -407,11 +407,11 @@ class AsyncWebClient:
             # Generic matching: try common TLDs for any site value
             # This handles sites like 'libredmm' that may not be in WEB_DIC
             for tld in [".com", ".net", ".org", ".co", ".jp", ".io"]:
-                if host == no_proxy + tld or host.endswith("." + no_proxy + tld):
+                if host == proxy_site + tld or host.endswith("." + proxy_site + tld):
                     return True
 
             # Standard subdomain matching
-            if host.endswith("." + no_proxy):
+            if host.endswith("." + proxy_site):
                 return True
 
         return False
@@ -1294,8 +1294,8 @@ class AsyncWebClient:
             u = httpx.URL(url)
             host = u.host or ""
 
-            # Check if this host should bypass proxy
-            use_proxy = use_proxy and not self._is_no_proxy_host(host)
+            # Check if this host should use proxy
+            use_proxy = use_proxy and self._is_proxy_host(host)
             request_proxy = self.proxy if use_proxy else None
             purpose = infer_request_purpose(
                 url,

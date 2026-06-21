@@ -2931,7 +2931,7 @@ class MyMAinWindow(QMainWindow):
 
     # 切换配置
 
-    # 设置 - 网络 - 不使用代理 - 添加网站
+    # 设置 - 网络 - 使用代理 - 添加网站
     def _add_no_proxy_site(self, site_value: str):
         """当用户从下拉框选择网站时，添加到输入框"""
         if not site_value or site_value == "选择网站...":

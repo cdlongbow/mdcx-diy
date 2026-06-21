@@ -116,10 +116,9 @@ def Init_Ui(self: "MyMAinWindow"):
     self.Ui.comboBox_website_all.clear()
     self.Ui.comboBox_website_all.addItems(supported_websites)
     self.Ui.comboBox_custom_website.addItems(supported_websites)
-    # 初始化不使用代理网站下拉框
+    # 初始化使用代理网站下拉框
     self.Ui.comboBox_no_proxy_sites.clear()
     self.Ui.comboBox_no_proxy_sites.addItem("选择网站...", "")
-    self.Ui.comboBox_no_proxy_sites.addItem("api.tmdb.org", "api.tmdb.org")
     for site in sorted(supported_websites):
         self.Ui.comboBox_no_proxy_sites.addItem(site, site)
     # 连接选择事件

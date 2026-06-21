@@ -897,8 +897,8 @@ def load_config(self: "MyMAinWindow"):
         self.Ui.lineEdit_cf_bypass_url.setText(manager.config.cf_bypass_url)
         # Cloudflare bypass 独立代理地址
         self.Ui.lineEdit_cf_bypass_proxy.setText(manager.config.cf_bypass_proxy)
-        # 不使用代理的网站
-        self.Ui.lineEdit_no_proxy_sites.setText(manager.config.no_proxy_sites)
+        # 使用代理的网站
+        self.Ui.lineEdit_no_proxy_sites.setText(manager.config.proxy_sites)
         # 超时时间
         self.Ui.horizontalSlider_timeout.setValue(int(manager.config.timeout))
         self.Ui.lcdNumber_timeout.display(int(manager.config.timeout))
