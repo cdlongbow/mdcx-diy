@@ -155,6 +155,12 @@ def _format_asin_worksheet(ws) -> None:
             for cell in row:
                 cell.border = border
 
+        # 数据行字体统一为 11pt
+        data_font = openpyxl.styles.Font(size=11)
+        for row in ws.iter_rows(min_row=2, max_row=ws.max_row, min_col=1, max_col=6):
+            for cell in row:
+                cell.font = data_font
+
         caps = {1: 20, 2: 15, 3: 50, 4: 80, 5: 50, 6: 40}
         col_max = [0] * 7
         for row in ws.iter_rows(min_row=2, values_only=True):

@@ -533,6 +533,12 @@ def _format_db_worksheet(ws) -> None:
             for cell in row:
                 cell.border = border
 
+        # 数据行字体统一为 11pt
+        data_font = openpyxl.styles.Font(size=11)
+        for row in ws.iter_rows(min_row=2, max_row=ws.max_row, min_col=1, max_col=len(DB_HEADERS)):
+            for cell in row:
+                cell.font = data_font
+
         # 自动列宽
         caps = {1: 25, 2: 15, 3: 15, 4: 60, 5: 50, 6: 12, 7: 42}
         col_max = [0] * (len(DB_HEADERS) + 1)
