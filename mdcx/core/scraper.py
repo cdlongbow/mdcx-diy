@@ -700,24 +700,12 @@ class Scraper:
                                 base_url = f"{protocol}{base}" if base else "https://api.tmdb.org"
 
                                 _read_mode_error_count = 0
+                                _read_mode_semaphore = asyncio.Semaphore(3)
 
-                                def _calc_delay() -> float:
-                                    if len(still_missing) <= 2:
-                                        delay = 0.05
-                                    elif len(still_missing) <= 8:
-                                        delay = 0.2
-                                    else:
-                                        delay = 0.45
-
-                                    if _read_mode_error_count > 0:
-                                        delay *= 1.8
-                                    return delay
-
-                                for idx, actor_name in enumerate(still_missing):
-                                    # 优先从 xlsx 找日文原名；找不到时直接使用 NFO 里的演员名查询并补录
+                                async def _query_one_actor(actor_name: str) -> None:
+                                    nonlocal _read_mode_error_count
                                     row = search_actor_db_reverse(actor_name)
                                     jp_name = row.get("jp") if row else actor_name
-
                                     try:
                                         query_result = await query_single_actor_cached(
                                             jp_name, base_url, tmdb_api_key, client
@@ -725,8 +713,6 @@ class Scraper:
                                         if query_result:
                                             tmdbid = query_result["pid"]
                                             existing_tmdb_ids[actor_name] = tmdbid
-
-                                            # 更新 xlsx
                                             translations = query_result.get("translations", {})
                                             aka = query_result.get("also_known_as", [])
                                             jp_original = query_result.get("original_name", "") or jp_name
@@ -770,9 +756,13 @@ class Scraper:
                                     except Exception as e:
                                         _read_mode_error_count += 1
                                         LogBuffer.log().write(f"  ❌ [TMDB] {actor_name} 查询失败: {e}")
-                                    finally:
-                                        if idx != len(still_missing) - 1:
-                                            await asyncio.sleep(_calc_delay())
+
+                                async def _limited_query(actor_name: str) -> None:
+                                    async with _read_mode_semaphore:
+                                        await _query_one_actor(actor_name)
+
+                                tasks = [asyncio.create_task(_limited_query(a)) for a in still_missing]
+                                await asyncio.gather(*tasks)
 
                                 res.actor_tmdb_ids = existing_tmdb_ids
 

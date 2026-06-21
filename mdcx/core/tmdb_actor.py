@@ -148,13 +148,7 @@ def _tmdb_query_cache_set_and_persist(name: str, value: dict | None) -> None:
         return
     _TMDB_QUERY_CACHE[name] = (time.time(), value)
     _tmdb_query_cache_sanitize()
-
-    try:
-        loop = asyncio.get_running_loop()
-    except RuntimeError:
-        _tmdb_query_cache_persist_sync()
-    else:
-        loop.create_task(_tmdb_query_cache_persist_async())
+    # Persist is deferred to explicit flush_tmdb_query_cache() call at batch boundaries
 
 
 def _tmdb_query_cache_path() -> Path:
@@ -648,12 +642,14 @@ async def update_actor_db_row(
     tmdbid: int | None = None,
     append_keyword: bool = False,
     overwrite_names: bool = False,
+    _wb: Any = None,
 ) -> str:
     """
     更新或添加演员数据库行。
 
     默认已有值不覆盖，仅填空白；keyword 在 append_keyword=True 时追加去重。
     当 overwrite_names=True 时，zh_cn/zh_tw 允许用新值覆盖已有值（用于已有 tmdbid 演员翻译补全）。
+    当 _wb 不为 None 时，使用预加载的工作簿，跳过最终 save/close/reload。
     """
     db_path = _get_db_path()
     db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -662,8 +658,12 @@ async def update_actor_db_row(
             import openpyxl
 
             write_status = "unchanged"
+            external_wb = _wb is not None
+            deferred = _wb is not None
 
-            if db_path.exists():
+            if external_wb:
+                wb = _wb
+            elif db_path.exists():
                 wb = openpyxl.load_workbook(db_path)
             else:
                 wb = openpyxl.Workbook()
@@ -736,11 +736,11 @@ async def update_actor_db_row(
                     ws.cell(row=last_row, column=COL_TMDB_URL + 1, value=tmdb_url)
                     ws.cell(row=last_row, column=COL_TMDB_URL + 1).hyperlink = tmdb_url
 
-            _format_db_worksheet(ws)
-
-            wb.save(db_path)
-            wb.close()
-            resources.reload_actor_db()
+            if not deferred:
+                _format_db_worksheet(ws)
+                wb.save(db_path)
+                wb.close()
+                resources.reload_actor_db()
             return write_status
         except ImportError:
             return "missing_openpyxl"
@@ -889,29 +889,35 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
         protocol = "http://"
         tmdb_api_base = tmdb_api_base[7:]
     elif tmdb_api_base.startswith("https://"):
-        protocol = "https://"
         tmdb_api_base = tmdb_api_base[8:]
 
-    base_url = f"{protocol}{tmdb_api_base}"
-
-    actor_db = resources.actor_db or {}
-
-    if resources.actor_db is None:
-        _tmdb_log_line("  ⚠️ [TMDB] actor_db 为 None —— 尝试重新加载演员数据库...")
-        resources.reload_actor_db()
-        actor_db = resources.actor_db or {}
-        if resources.actor_db is not None:
-            _tmdb_log_line(f"  ✅ [TMDB] actor_db 已加载 {len(actor_db)} 条记录")
-        else:
-            _tmdb_log_line("  ⚠️ [TMDB] actor_db 重新加载后仍为 None，将走 TMDB API 搜索")
-    elif len(actor_db) == 0:
-        _tmdb_log_line("  ⚠️ [TMDB] actor_db 为空 (0 条记录) —— 文件可能为空或格式不匹配")
-    else:
-        _tmdb_log_line(f"  ℹ️ [TMDB] actor_db 已加载 {len(actor_db)} 条记录")
+    base_url = f"{protocol}{tmdb_api_base}" if tmdb_api_base else "https://api.tmdb.org"
 
     result: dict[str, int] = {}
     need_query: list[tuple[str, str]] = []
     need_translate: list[tuple[str, str, int]] = []
+    actor_db = resources.actor_db or {}
+
+    # Pre-load workbook for batched writes
+    import openpyxl as _openpyxl
+
+    _wb = None
+    _db_path = _get_db_path()
+    _db_path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        if _db_path.exists():
+            _wb = _openpyxl.load_workbook(_db_path)
+        else:
+            _wb = _openpyxl.Workbook()
+            _ws = _wb.active
+            _ws.title = "演员数据库"
+            for _col, _header in enumerate(DB_HEADERS, 1):
+                _cell = _ws.cell(row=1, column=_col, value=_header)
+                _cell.font = _openpyxl.styles.Font(bold=True)
+                _cell.fill = _openpyxl.styles.PatternFill("solid", fgColor="C0C0C0")
+                _cell.alignment = _openpyxl.styles.Alignment(horizontal="center")
+    except ImportError:
+        pass
 
     for actor in actors:
         if not actor or not actor.strip():
@@ -959,7 +965,7 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
                 zh_tw = zhconv.convert(zh_cn, "zh-hant")
             if zh_cn or zh_tw:
                 write_status = await update_actor_db_row(
-                    jp=jp_name, zh_cn=zh_cn, zh_tw=zh_tw, tmdbid=tid, overwrite_names=True
+                    jp=jp_name, zh_cn=zh_cn, zh_tw=zh_tw, tmdbid=tid, overwrite_names=True, _wb=_wb
                 )
                 _tmdb_log_line(
                     f" 🔄 [TMDB] {actor_name} 翻译补全: zh_cn={zh_cn or '-'} zh_tw={zh_tw or '-'} ({write_status})"
@@ -1014,6 +1020,7 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
                     keyword=keyword_str,
                     tmdbid=tmdbid,
                     append_keyword=True,
+                    _wb=_wb,
                 )
 
                 _tmdb_log_line(f"  ✅ [TMDB] {actor_name} -> tmdbid={tmdbid}{f' (中文:{zh_cn})' if zh_cn else ''}")
@@ -1067,7 +1074,7 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
                     jp_key = row.get("jp", actor_name) if row else actor_name
                     href = await fetch_libredmm_link(jp_key)
                     if href:
-                        await update_actor_db_row(jp=jp_key, href=href)
+                        await update_actor_db_row(jp=jp_key, href=href, _wb=_wb)
                         _tmdb_log_line(f"  ✅ [LibreDMM] {actor_name} -> {href}")
                 except Exception as e:
                     _tmdb_log_line(f"  ⚠️ [LibreDMM] {actor_name} 链接补全失败: {e}")
@@ -1075,6 +1082,18 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
         tasks = [asyncio.create_task(_fetch_and_update(name)) for name in missing_link]
         await asyncio.gather(*tasks)
 
+    # Flush batched workbook writes
+    if _wb is not None:
+        try:
+            _ws = _wb.active
+            _format_db_worksheet(_ws)
+            _wb.save(_db_path)
+            _wb.close()
+            resources.reload_actor_db()
+        except Exception:
+            pass
+
+    flush_tmdb_query_cache()
     return result
 
 
