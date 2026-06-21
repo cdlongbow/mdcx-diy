@@ -36,7 +36,7 @@
 ## 配置参考
 
 - [配置说明](configuration.md) - 全部配置项
-- [网络配置](configuration.md#网络配置详解) - 代理和网站不走代理设置
+- [网络配置](configuration.md#网络配置详解) - 代理和走代理网站设置
 - [命名系统](naming-system.md) - Jinja2 模板和命名规则
 
 ## 进阶使用

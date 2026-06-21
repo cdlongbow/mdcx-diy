@@ -383,7 +383,7 @@ FileInfo -> CrawlerInput -> CrawlTask
 
 **9. 水印设置**：`poster_mark`、`thumb_mark`、`fanart_mark`、`mark_size`、`mark_type`、`mark_fixed`、`mark_pos*`
 
-**10. 网络设置**：`use_proxy`、`proxy`、`no_proxy_sites`、`cf_bypass_*`、`timeout`、`retry`、`theporndb_api_token`、`tmdb_api_key`
+**10. 网络设置**：`use_proxy`、`proxy`、`proxy_sites`、`cf_bypass_*`、`timeout`、`retry`、`theporndb_api_token`、`tmdb_api_key`
 
 **11. 日志设置**：`show_web_log`、`show_from_log`、`show_data_log`、`save_log`
 

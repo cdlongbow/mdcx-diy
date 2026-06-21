@@ -169,11 +169,11 @@ Amazon 请求使用自适应限流器 `_AdaptiveRequestThrottle`：
 }
 ```
 
-### 不走代理网站
+### 走代理网站
 
-Amazon 请求可以通过"不走代理网站"功能配置：
+Amazon 请求可以通过"走代理网站"功能配置：
 
-- 支持设置 `amazon` 或 `amazon.com` 作为不走代理的网站
+- 默认已预填 `amazon.co.jp,m.media-amazon.com`，开箱即用
 - Amazon 请求将直接连接，不经过代理
 
 ## 性能优化

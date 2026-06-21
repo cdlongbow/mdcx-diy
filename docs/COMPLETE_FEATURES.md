@@ -771,6 +771,7 @@ MDCx 支持多种代理配置：
 
 | 代理类型 | 说明 | 配置示例 |
 |---------|------|---------|
+| **使用代理** | 仅对列表中的网站走代理 | 勾选 + 填写走代理网站 |
 | **不使用代理** | 直连网络 | 无需配置 |
 | **HTTP 代理** | HTTP/HTTPS 代理 | `http://proxy.example.com:8080` |
 | **SOCKS5 代理** | SOCKS5 代理 | `socks5://proxy.example.com:1080` |
@@ -778,27 +779,22 @@ MDCx 支持多种代理配置：
 **代理设置**
 
 在"设置" → "网络"中配置：
-- **代理类型**：选择不使用代理、HTTP 代理或 SOCKS5 代理
+- **使用代理**：勾选后通过代理访问填写的网站
 - **代理地址**：输入代理服务器地址和端口
-- **认证**：如需要，输入用户名和密码
+- **走代理网站**：填写需要走代理的域名，逗号分隔
 
-### 不走代理网站功能
+### 走代理网站功能
 
 **功能说明**
 
-"不走代理网站"功能允许您指定某些网站不走代理，直接连接。这对于以下情况特别有用：
-
-- ✅ 某些网站使用代理会导致访问失败
-- ✅ 某些 API 服务（如 TMDB）走代理速度慢
-- ✅ 本地网络访问不需要代理
-- ✅ 某些网站需要真实 IP 地址
+"走代理网站"功能允许您指定哪些网站需要走代理，其他网站全部直连。这样就不怕代理影响国内网站的访问了。默认已预填了亚马逊的两个域名。
 
 **配置方式**
 
-在"设置" → "网络" → "不使用代理网站"中配置：
+在"设置" → "网络" → "使用代理"中配置：
 
 ```
-默认值：api.tmdb.org
+默认值：amazon.co.jp,m.media-amazon.com
 ```
 
 支持以下格式：
@@ -806,20 +802,18 @@ MDCx 支持多种代理配置：
 1. **网站值**（推荐）
    ```
    javdb
-   tmdb
-   libredmm
+   javbus
    ```
 
 2. **完整域名**
    ```
-   api.tmdb.org
+   amazon.co.jp
    www.javdb.com
-   libredmm.com
    ```
 
 3. **多个网站**（逗号分隔）
    ```
-   api.tmdb.org,javdb,libredmm.com
+   amazon.co.jp,m.media-amazon.com,javdb,javbus
    ```
 
 **支持的网站值**
@@ -839,61 +833,63 @@ MDCx 支持多种代理配置：
 
 **使用场景**
 
-**场景 1：TMDB API 走代理速度慢**
+**场景 1：默认只让亚马逊走代理**
 ```
-配置：api.tmdb.org
-说明：TMDB API 直接连接，不走代理
-```
-
-**场景 2：JavDB 使用代理无法访问**
-```
-配置：javdb
-说明：JavDB 直接连接，其他网站走代理
+配置：amazon.co.jp,m.media-amazon.com
+说明：只有亚马逊走代理，其他网站全部直连
 ```
 
-**场景 3：多个网站不走代理**
+**场景 2：JavDB 也需要走代理**
 ```
-配置：api.tmdb.org,javdb,javbus
-说明：这些网站直接连接，其他网站走代理
+配置：amazon.co.jp,m.media-amazon.com,javdb
+说明：亚马逊和 JavDB 走代理，其他直连
+```
+
+**场景 3：多个网站走代理**
+```
+配置：javdb,javbus,dmm
+说明：这三个网站走代理，其余全直连
 ```
 
 **实现原理** (web_async.py)
 
-系统在发起请求前会检查目标主机是否在"不走代理网站"列表中：
+系统在发起请求前会检查目标主机是否在"走代理网站"列表中：
 
 ```python
-def _is_no_proxy_host(self, host: str) -> bool:
-    """检查主机是否应该绕过代理"""
-    if not host or not self.no_proxy_sites:
+def _is_proxy_host(self, host: str) -> bool:
+    """检查主机是否应该走代理"""
+    if not host or not self.proxy_sites:
         return False
 
-    for no_proxy in self.no_proxy_sites:
+    for proxy_site in self.proxy_sites:
         # 直接匹配
-        if host == no_proxy:
+        if host == proxy_site:
             return True
 
         # 匹配网站值对应的域名
         for domain_key, website_enum in WEB_DIC.items():
-            if website_enum.value == no_proxy:
+            if website_enum.value == proxy_site:
                 if host == domain_key or host.endswith("." + domain_key):
                     return True
 
     return False
 
 # 使用代理前检查
-use_proxy = use_proxy and not self._is_no_proxy_host(host)
+use_proxy = use_proxy and self._is_proxy_host(host)
 ```
 
 **注意事项**
 
-⚠️ **优先级**：不走代理列表的优先级高于全局代理设置
+⚠️ **只走列表**：只有填在列表里的网站才会走代理，其他网站全部直连
+
+⚠️ **列表为空**：如果列表为空，即使勾了使用代理，也没有任何网站走代理
 
 ⚠️ **大小写不敏感**：配置中的网站值不区分大小写
 
-⚠️ **域名匹配**：支持子域名匹配（如 `api.tmdb.org` 会匹配 `api.tmdb.org` 和 `sub.api.tmdb.org`）
+⚠️ **域名匹配**：支持子域名匹配（如 `amazon.co.jp` 会匹配 `www.amazon.co.jp`）
 
 ⚠️ **常见问题**：
-- 如果配置后仍然走代理，请检查域名是否正确
+- 如果勾了使用代理但网站还是不通，先检查域名写没写对
 - 某些网站可能需要同时配置多个域名
 - 可以使用开发者工具查看实际请求的域名
 
