@@ -37,7 +37,7 @@ Agent 在任务执行过程中发现的条目应遵循以下格式：
 - Instructions:
   - 默认从全方位、多角度、深层次的角度审查和改进代码。
   - 面向小白解释问题，给出细致、可执行、易落地的建议。
-  - 在发现风险、缺陷、遗漏时主动指出，并尽量直接修复和验证。
+  - 在发现风险、缺陷、遗漏时主动指出，并尽量给出修复方案和进行验证。
 
 [优先自动执行本地检查]
 - Date: 2026-06-09
@@ -63,3 +63,12 @@ Agent 在任务执行过程中发现的条目应遵循以下格式：
   - 每次新会话开始时，自动执行 `pre-commit install` 命令安装 git hooks。
   - 如果 pre-commit 工具未安装，先执行 `pip install pre-commit --break-system-packages` 安装。
   - 安装完成后确认 `.git/hooks/pre-commit` 文件存在且可执行。
+
+[Windows exe 打包依赖约束]
+- Date: 2026-06-21
+- Context: 用户提醒后续修改需兼容 Windows 打包发布场景
+- Category: 环境配置
+- Instructions:
+  - 代码变更优先使用 Python 标准库，不主动引入新三方依赖。
+  - 新增文件持久化路径应使用 `resources`/`userdata` 现有目录习惯，避免新增外部库。
+  - 变更涉及打包入口或运行时依赖时，先确认打包脚本与 PyInstaller 打包配置仍能在 Windows 下正常启动。

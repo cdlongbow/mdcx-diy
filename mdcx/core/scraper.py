@@ -628,7 +628,7 @@ class Scraper:
                 all_actors = [a.strip() for a in (res.actor or "").split(",") if a.strip()]
                 missing_actors = [a for a in all_actors if a not in existing_tmdb_ids]
                 if missing_actors:
-                    from .tmdb_actor import _query_single_actor, search_actor_db_reverse, update_actor_db_row
+                    from .tmdb_actor import query_single_actor_cached, search_actor_db_reverse, update_actor_db_row
 
                     # 用 xlsx 反向搜索：从 NFO 中的演员名（可能是中文名/日文名/繁体名）查找 tmdbid 和日文原名
                     for actor_name in missing_actors:
@@ -659,18 +659,33 @@ class Scraper:
                                     base = base[8:]
                                 base_url = f"{protocol}{base}" if base else "https://api.tmdb.org"
 
-                                for actor_name in still_missing:
+                                _read_mode_error_count = 0
+
+                                def _calc_delay() -> float:
+                                    if len(still_missing) <= 2:
+                                        delay = 0.05
+                                    elif len(still_missing) <= 8:
+                                        delay = 0.2
+                                    else:
+                                        delay = 0.45
+
+                                    if _read_mode_error_count > 0:
+                                        delay *= 1.8
+                                    return delay
+
+                                for idx, actor_name in enumerate(still_missing):
                                     # 优先从 xlsx 找日文原名；找不到时直接使用 NFO 里的演员名查询并补录
                                     row = search_actor_db_reverse(actor_name)
                                     jp_name = row.get("jp") if row else actor_name
 
                                     try:
-                                        query_result = await _query_single_actor(
+                                        query_result = await query_single_actor_cached(
                                             jp_name, base_url, tmdb_api_key, client
                                         )
                                         if query_result:
                                             tmdbid = query_result["pid"]
                                             existing_tmdb_ids[actor_name] = tmdbid
+
                                             # 更新 xlsx
                                             translations = query_result.get("translations", {})
                                             aka = query_result.get("also_known_as", [])
@@ -710,13 +725,16 @@ class Scraper:
                                                 LogBuffer.log().write(
                                                     f"  ⚠️ [演员数据库] 写入失败，未保存 {jp_name} 的 tmdbid: {write_status.split(':', 1)[1]}"
                                                 )
-                                            await asyncio.sleep(0.5)
                                         else:
                                             LogBuffer.log().write(f"  ⚠️ [TMDB] {actor_name} 未找到匹配的 TMDB 演员")
                                     except Exception as e:
+                                        _read_mode_error_count += 1
                                         LogBuffer.log().write(f"  ❌ [TMDB] {actor_name} 查询失败: {e}")
+                                    finally:
+                                        if idx != len(still_missing) - 1:
+                                            await asyncio.sleep(_calc_delay())
 
-                    res.actor_tmdb_ids = existing_tmdb_ids
+                                res.actor_tmdb_ids = existing_tmdb_ids
 
         # 刮削json_data
         # 获取已刮削的json_data

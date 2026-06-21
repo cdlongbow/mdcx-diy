@@ -11,6 +11,7 @@ from PyQt6.QtWidgets import QApplication
 from mdcx.consts import IS_DOCKER, IS_MAC, IS_NFC, IS_PYINSTALLER, IS_WINDOWS, MAIN_PATH
 from mdcx.controllers.main_window.main_window import MyMAinWindow
 from mdcx.controllers.main_window.style import apply_application_palette
+from mdcx.core.tmdb_actor import flush_tmdb_query_cache
 from mdcx.utils.video import VIDEO_BACKEND
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
@@ -54,10 +55,13 @@ def main() -> int:
     show_constants()
     app, _ui = _create_application()
     try:
-        return app.exec()
+        return_code = app.exec()
+        return return_code
     except Exception as e:
         print(e)
         return 1
+    finally:
+        flush_tmdb_query_cache()
 
 
 if __name__ == "__main__":

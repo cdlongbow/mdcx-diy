@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import pytest
@@ -14,6 +15,12 @@ def _tmp_actor_db(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     userdata = tmp_path / "userdata"
     userdata.mkdir(parents=True, exist_ok=True)
     return userdata / "actor_database.xlsx"
+
+
+@pytest.fixture(autouse=True)
+def _reset_tmdb_query_cache():
+    tmdb_actor._TMDB_QUERY_CACHE.clear()
+    tmdb_actor._TMDB_QUERY_INFLIGHT.clear()
 
 
 def test_expand_name_variants_supports_kana_ko_and_kanji_ko():
@@ -230,6 +237,64 @@ def test_load_actor_db_derives_tmdb_url_from_tmdbid(_tmp_actor_db: Path):
     row3 = list(ws3.iter_rows(min_row=2, max_row=2, values_only=True))[0]
     assert row3[5] == 6233846
     assert row3[6] == f"https://www.themoviedb.org/person/{6233846}"
+
+
+def test_tmdb_query_cache_path_fallback_to_userdata_when_invalid(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
+    monkeypatch.setattr(tmdb_actor.manager, "data_folder", tmp_path)
+    monkeypatch.setattr(tmdb_actor.resources, "tmdb_query_cache_path", Path(), raising=False)
+
+    cache_path = tmdb_actor._tmdb_query_cache_path()
+    assert cache_path == tmp_path / "userdata" / "actor_tmdb_query_cache.json"
+
+
+def test_tmdb_query_cache_path_fallback_to_userdata_when_dot_path(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
+    monkeypatch.setattr(tmdb_actor.manager, "data_folder", tmp_path)
+    monkeypatch.setattr(tmdb_actor.resources, "tmdb_query_cache_path", Path("."), raising=False)
+
+    cache_path = tmdb_actor._tmdb_query_cache_path()
+    assert cache_path == tmp_path / "userdata" / "actor_tmdb_query_cache.json"
+
+
+def test_tmdb_query_cache_sanitize_removes_stale_and_limits_size(monkeypatch: pytest.MonkeyPatch):
+    now = 2_000_000_000.0
+    monkeypatch.setattr(tmdb_actor, "_TMDB_QUERY_CACHE_MAX_ENTRIES", 8)
+
+    tmdb_actor._TMDB_QUERY_CACHE.update(
+        {
+            "stale": (now - tmdb_actor._TMDB_QUERY_CACHE_TTL_SECONDS - 1, {"a": 1}),
+            **{f"name-{i}": (now - i, {"idx": i}) for i in range(13)},
+        }
+    )
+
+    tmdb_actor._tmdb_query_cache_sanitize(now=now)
+
+    assert "stale" not in tmdb_actor._TMDB_QUERY_CACHE
+    assert len(tmdb_actor._TMDB_QUERY_CACHE) == tmdb_actor._TMDB_QUERY_CACHE_MAX_ENTRIES
+    for i in range(8):
+        assert f"name-{i}" in tmdb_actor._TMDB_QUERY_CACHE
+    for i in range(8, 13):
+        assert f"name-{i}" not in tmdb_actor._TMDB_QUERY_CACHE
+
+
+def test_tmdb_query_cache_persist_sync_filters_invalid_and_limits_size(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
+    cache_file = tmp_path / "actor_tmdb_query_cache.json"
+    monkeypatch.setattr(tmdb_actor.manager, "data_folder", tmp_path)
+    monkeypatch.setattr(tmdb_actor.resources, "tmdb_query_cache_path", cache_file, raising=False)
+    monkeypatch.setattr(tmdb_actor, "_TMDB_QUERY_CACHE_MAX_ENTRIES", 1, raising=False)
+    now = 2_000_000_000.0
+
+    tmdb_actor._TMDB_QUERY_CACHE.update(
+        {
+            "a": (now - 10, {"k": "v1"}),
+            "b": (now - 5, {"k": "v2"}),
+            "bad": (now - 1, "invalid"),
+        }
+    )
+
+    tmdb_actor._tmdb_query_cache_persist_sync()
+
+    loaded = json.loads(cache_file.read_text(encoding="utf-8"))
+    assert list(loaded.keys()) == ["b"]
 
 
 @pytest.mark.asyncio

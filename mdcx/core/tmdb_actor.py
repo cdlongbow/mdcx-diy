@@ -6,6 +6,7 @@
 
 import asyncio
 import json
+import os
 import time
 from pathlib import Path
 from typing import Any
@@ -33,6 +34,14 @@ from ..utils import convert_half
 # 演员数据库写锁：防止多个并发任务同时写 xlsx 导致文件损坏
 _actor_db_write_lock = asyncio.Lock()
 
+# TMDB 查询内存缓存与并发去重（避免同名演员重复请求）
+_TMDB_QUERY_CACHE_TTL_SECONDS = 24 * 60 * 60
+_TMDB_QUERY_CACHE_MAX_ENTRIES = 2000
+_TMDB_QUERY_CACHE: dict[str, tuple[float, dict | None]] = {}
+_TMDB_QUERY_INFLIGHT: dict[str, asyncio.Task[dict | None]] = {}
+_TMDB_QUERY_STATE_LOCK = asyncio.Lock()
+_TMDB_QUERY_CACHE_IO_LOCK = asyncio.Lock()
+
 
 async def _read_text_file(path: Path, encoding: str = "utf-8") -> str:
     return await asyncio.to_thread(path.read_text, encoding=encoding)
@@ -44,24 +53,225 @@ async def _read_text_file(path: Path, encoding: str = "utf-8") -> str:
 class _TmdbRateLimiter:
     """令牌桶限流器，控制 TMDB API 请求速率。"""
 
-    def __init__(self, rate: float = 3.5, burst: int = 10):
-        self.rate = rate
+    def __init__(self, rate: float = 3.5, burst: int = 10, min_rate: float = 1.0, max_rate: float = 6.0):
+        self._base_rate = float(rate)
+        self._rate = float(rate)
+        self._min_rate = float(min_rate)
+        self._max_rate = float(max_rate)
         self._tokens = float(burst)
         self._max_tokens = float(burst)
         self._last = time.monotonic()
         self._lock = asyncio.Lock()
+        self._last_success = time.monotonic()
+        self._consecutive_errors = 0
+        self._inflight_requests = 0
+
+    def _effective_rate(self) -> float:
+        load_factor = 1.0 + (self._inflight_requests / 8)
+        return max(self._min_rate, self._rate / load_factor)
+
+    def _calc_rate(self, ok: bool) -> float:
+        if not ok:
+            # 遇到错误时迅速降速，保守重试
+            self._consecutive_errors = min(self._consecutive_errors + 1, 8)
+            return max(self._min_rate, self._rate * (0.7**self._consecutive_errors))
+
+        self._consecutive_errors = 0
+        elapsed = time.monotonic() - self._last_success
+        if elapsed >= 1.5:
+            # 稳定成功后慢慢恢复速率
+            return min(self._max_rate, self._rate + 0.2)
+        return self._rate
+
+    def _reclaim_tokens_locked(self, now: float) -> None:
+        self._tokens = min(self._max_tokens, self._tokens + (now - self._last) * self._rate)
+        self._last = now
 
     async def acquire(self) -> None:
         async with self._lock:
+            self._inflight_requests += 1
             now = time.monotonic()
-            self._tokens = min(self._max_tokens, self._tokens + (now - self._last) * self.rate)
-            self._last = now
+            self._reclaim_tokens_locked(now)
+            effective_rate = self._effective_rate()
             if self._tokens < 1:
-                delay = (1 - self._tokens) / self.rate
+                delay = (1 - self._tokens) / effective_rate
                 await asyncio.sleep(delay)
                 self._tokens = 0
             else:
                 self._tokens -= 1
+
+    async def finish(self, status_code: int) -> None:
+        async with self._lock:
+            self._inflight_requests = max(0, self._inflight_requests - 1)
+            now = time.monotonic()
+            self._reclaim_tokens_locked(now)
+            if 200 <= status_code < 300:
+                self._last_success = now
+                self._rate = self._calc_rate(ok=True)
+                return
+
+            if status_code == 429:
+                # TMDB 限流时快速降速
+                self._rate = max(self._min_rate, self._rate * 0.45)
+                self._consecutive_errors = min(self._consecutive_errors + 2, 8)
+                return
+
+            self._rate = self._calc_rate(ok=False)
+
+
+def _tmdb_query_cache_key(actor_name: str) -> str:
+    candidates = _actor_index_keys(actor_name)
+    if not candidates:
+        return norm_name(actor_name).upper()
+    return sorted(candidates, key=len)[0]
+
+
+def _tmdb_query_cache_get(name: str) -> dict | None:
+    cached = _TMDB_QUERY_CACHE.get(name)
+    if not cached:
+        return None
+    ts, value = cached
+    if time.time() - ts > _TMDB_QUERY_CACHE_TTL_SECONDS:
+        _TMDB_QUERY_CACHE.pop(name, None)
+        return None
+    return value
+
+
+def _tmdb_query_cache_set(name: str, value: dict | None) -> None:
+    _tmdb_query_cache_set_and_persist(name, value)
+
+
+def _tmdb_query_cache_set_and_persist(name: str, value: dict | None) -> None:
+    if not isinstance(name, str):
+        return
+    if not isinstance(value, (dict, type(None))):
+        return
+    _TMDB_QUERY_CACHE[name] = (time.time(), value)
+    _tmdb_query_cache_sanitize()
+
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        _tmdb_query_cache_persist_sync()
+    else:
+        loop.create_task(_tmdb_query_cache_persist_async())
+
+
+def _tmdb_query_cache_path() -> Path:
+    cache_path = getattr(resources, "tmdb_query_cache_path", None)
+    if isinstance(cache_path, Path):
+        if cache_path == Path() or str(cache_path) in (".", "./"):
+            return _tmdb_query_cache_fallback_path()
+        return cache_path
+    if not cache_path:
+        return _tmdb_query_cache_fallback_path()
+    candidate = Path(cache_path)
+    if candidate == Path() or str(candidate) in (".", "./"):
+        return _tmdb_query_cache_fallback_path()
+    if not candidate.is_absolute():
+        return _tmdb_query_cache_fallback_path()
+    return candidate
+
+
+def _tmdb_query_cache_fallback_path() -> Path | None:
+    data_folder = getattr(manager, "data_folder", None)
+    base = data_folder if isinstance(data_folder, Path) else Path(str(data_folder)) if data_folder else Path.cwd()
+    return base / "userdata" / "actor_tmdb_query_cache.json"
+
+
+def _tmdb_query_cache_sanitize(now: float | None = None) -> None:
+    if now is None:
+        now = time.time()
+
+    entries = _TMDB_QUERY_CACHE.items()
+    valid: dict[str, tuple[float, dict | None]] = {}
+    for name, cached in entries:
+        if not isinstance(name, str):
+            continue
+        if not isinstance(cached, tuple) or len(cached) != 2:
+            continue
+        ts, value = cached
+        if not isinstance(ts, (int, float)):
+            continue
+        if not isinstance(value, (dict, type(None))):
+            continue
+        if now - float(ts) > _TMDB_QUERY_CACHE_TTL_SECONDS:
+            continue
+        valid[name] = (float(ts), value)
+
+    if not valid:
+        _TMDB_QUERY_CACHE.clear()
+        return
+
+    if len(valid) > _TMDB_QUERY_CACHE_MAX_ENTRIES:
+        # keep latest update time
+        valid = dict(sorted(valid.items(), key=lambda kv: kv[1][0], reverse=True)[:_TMDB_QUERY_CACHE_MAX_ENTRIES])
+
+    _TMDB_QUERY_CACHE.clear()
+    _TMDB_QUERY_CACHE.update(valid)
+
+
+def _tmdb_query_cache_load() -> None:
+    cache_path = _tmdb_query_cache_path()
+    if cache_path is None or not cache_path.exists():
+        return
+
+    try:
+        raw = cache_path.read_text(encoding="utf-8")
+        data = json.loads(raw) if raw.strip() else {}
+    except Exception:
+        return
+
+    if not isinstance(data, dict):
+        return
+
+    now = time.time()
+    for name, payload in data.items():
+        if not isinstance(name, str) or not isinstance(payload, dict):
+            continue
+
+        ts = payload.get("ts")
+        value = payload.get("value")
+        if not isinstance(ts, (int, float)):
+            continue
+        if value is not None and not isinstance(value, dict):
+            continue
+
+        _TMDB_QUERY_CACHE[name] = (float(ts), value)
+
+    _tmdb_query_cache_sanitize(now=now)
+
+
+async def _tmdb_query_cache_persist_async() -> None:
+    async with _TMDB_QUERY_CACHE_IO_LOCK:
+        _tmdb_query_cache_persist_sync()
+
+
+def _tmdb_query_cache_persist_sync() -> None:
+    cache_path = _tmdb_query_cache_path()
+    if not cache_path:
+        return
+
+    now = time.time()
+    payload = {}
+    _tmdb_query_cache_sanitize()
+    for name, (ts, value) in _TMDB_QUERY_CACHE.items():
+        if now - ts > _TMDB_QUERY_CACHE_TTL_SECONDS:
+            continue
+        payload[name] = {"ts": ts, "value": value}
+
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = cache_path.with_suffix(cache_path.suffix + ".tmp")
+    tmp_path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+    os.replace(tmp_path, cache_path)
+
+
+_tmdb_query_cache_load()
+
+
+def flush_tmdb_query_cache() -> None:
+    """Flush pending TMDB query cache data to disk immediately."""
+    _tmdb_query_cache_persist_sync()
 
 
 _tmdb_rate_limiter = _TmdbRateLimiter()
@@ -101,15 +311,21 @@ async def _tmdb_request(client: Any, method: str, url: str, **kwargs) -> _TmdbRe
     await _tmdb_rate_limiter.acquire()
     params = kwargs.get("params")
     follow_redirects = kwargs.get("follow_redirects", True)
-    if hasattr(client, "request"):
-        resp, err = await client.request(method, url, params=params)
-        if resp is None:
-            return None
-        return _TmdbResponse(resp.status_code, resp.text)
-    elif hasattr(client, method.lower()):
-        send = getattr(client, method.lower())
-        resp = await send(url, params=params, allow_redirects=follow_redirects)
-        return _TmdbResponse(resp.status, await resp.text())
+    status_code = 0
+    try:
+        if hasattr(client, "request"):
+            resp, err = await client.request(method, url, params=params)
+            if resp is None:
+                return None
+            status_code = int(resp.status_code)
+            return _TmdbResponse(status_code, resp.text)
+        elif hasattr(client, method.lower()):
+            send = getattr(client, method.lower())
+            resp = await send(url, params=params, allow_redirects=follow_redirects)
+            status_code = int(resp.status)
+            return _TmdbResponse(status_code, await resp.text())
+    finally:
+        await _tmdb_rate_limiter.finish(status_code)
     return None
 
 
@@ -723,6 +939,9 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
         _tmdb_log_line(f"  ⚠️ [TMDB] '{actor_stripped}' 未匹配，将进入 TMDB API 搜索")
         need_query.append((actor_stripped, row.get("jp") if row and row.get("jp") else actor_stripped))
 
+    async def _query_or_cached(actor_name: str, query_name: str) -> tuple[str, dict | None]:
+        return actor_name, await query_single_actor_cached(query_name, base_url, tmdb_api_key, client)
+
     async def _translate_and_update(actor_name: str, jp_name: str, tid: int) -> None:
         try:
             translations = await _fetch_person_translations(tid, base_url, tmdb_api_key, client)
@@ -761,7 +980,7 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
 
     async def _query_and_update(actor_name: str, query_name: str) -> None:
         try:
-            query_result = await _query_single_actor(query_name, base_url, tmdb_api_key, client)
+            _, query_result = await _query_or_cached(actor_name, query_name)
             if query_result:
                 tmdbid = query_result["pid"]
                 result[actor_name] = tmdbid
@@ -853,6 +1072,36 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
     return result
 
 
+async def query_single_actor_cached(actor_name: str, base_url: str, api_key: str, client: Any) -> dict | None:
+    """Query a single actor with in-memory dedupe + cache."""
+    key = _tmdb_query_cache_key(actor_name)
+    cached = _tmdb_query_cache_get(key)
+    if cached is not None:
+        return cached
+
+    async with _TMDB_QUERY_STATE_LOCK:
+        cached = _tmdb_query_cache_get(key)
+        if cached is not None:
+            return cached
+
+        running = _TMDB_QUERY_INFLIGHT.get(key)
+        if running is not None:
+            return await running
+
+        task = asyncio.create_task(_query_single_actor(actor_name, base_url, api_key, client))
+        _TMDB_QUERY_INFLIGHT[key] = task
+
+    try:
+        result_data = await task
+        _tmdb_query_cache_set(key, result_data)
+        return result_data
+    except Exception:
+        _tmdb_query_cache_set(key, None)
+        return None
+    finally:
+        _TMDB_QUERY_INFLIGHT.pop(key, None)
+
+
 async def _query_single_actor(actor_name: str, base_url: str, api_key: str, client: Any) -> dict | None:
     """
     查询单个演员的 TMDB 信息。返回匹配结果或 None。
@@ -932,8 +1181,6 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
         known_for_count = len(detail.get("known_for", [])) if "known_for" in detail else 0
         place_has_japan = is_japan_place(place)
 
-        translations = await _fetch_person_translations(pid, base_url, api_key, client)
-
         candidates.append(
             {
                 "pid": pid,
@@ -946,7 +1193,7 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
                 "original_name": item.get("original_name", ""),
                 "raw_names": sorted(all_names),
                 "all_norm": sorted(all_norm),
-                "translations": translations,
+                "translations": {},
                 "also_known_as": [a for a in aka_list if a],
             }
         )
@@ -977,7 +1224,12 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
             f"(popularity={matched[0]['popularity']:.2f})"
         )
 
-    return matched[0]
+    selected = matched[0]
+    translations = await _fetch_person_translations(selected["pid"], base_url, api_key, client)
+    if translations:
+        selected["translations"] = translations
+
+    return selected
 
 
 async def _fetch_person_translations(pid: int, base_url: str, api_key: str, client: Any) -> dict:

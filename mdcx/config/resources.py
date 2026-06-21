@@ -88,6 +88,7 @@ class Resources:
         # 获取资源路径
         self.actor_db_backup_path = self.r("userdata/actor_database.xlsx")  # 内置演员数据库 xlsx
         self.info_db_backup_path = self.r("userdata/info_database.xlsx")  # 内置信息映射数据库 xlsx
+        self.tmdb_query_cache_path = self.u("actor_tmdb_query_cache.json")  # TMDB 查询缓存（与 actor_database 同目录）
 
         self.icon_ico = self.qtr("Img/MDCx.ico")  # 任务栏图标
         self.right_menu = self.qtr("Img/menu.svg")  # 主界面菜单按钮

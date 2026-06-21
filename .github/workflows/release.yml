@@ -149,6 +149,41 @@ jobs:
           body: ${{ steps.get-changelog.outputs.CHANGELOG }}
           tag: ${{ steps.release-tag.outputs.tag }}
 
+      - name: Pre-check Windows artifact for release upload
+        if: ${{ matrix.build == 'windows' }}
+        shell: pwsh
+        run: |
+          $releaseTag = "${{ steps.release-tag.outputs.tag }}"
+          $platform = "${{ matrix.build }}"
+          $arch = "${{ matrix.arch }}"
+          $sha = "${{ github.sha }}"
+          $artifactPath = "dist/MDCx.exe"
+          $expectedAssetName = "MDCx-${releaseTag}-${platform}-${arch}-${sha}.exe"
+
+          Write-Host "检查发布产物：$artifactPath"
+          Write-Host "计划发布文件名：$expectedAssetName"
+
+          if (-not (Test-Path -LiteralPath $artifactPath)) {
+            throw "发布产物缺失：$artifactPath，请先确认构建成功"
+          }
+
+          if ((Get-Item -LiteralPath $artifactPath).Length -le 0) {
+            throw "发布产物为空文件：$artifactPath"
+          }
+
+          if ([string]::IsNullOrWhiteSpace($releaseTag)) {
+            throw "发布 Tag 为空，无法确认上传文件名规则"
+          }
+
+          if ([string]::IsNullOrWhiteSpace($platform) -or [string]::IsNullOrWhiteSpace($arch)) {
+            throw "发布平台/架构信息缺失，无法确认上传文件名规则"
+          }
+
+          $artifactSizeBytes = (Get-Item -LiteralPath $artifactPath).Length
+          if ($artifactSizeBytes -lt 1048576) {
+            Write-Warning "产物文件较小，可能异常：$artifactPath size=${artifactSizeBytes} bytes。请确认构建输出是否完整。"
+          }
+
       - name: Create Release - Windows
         uses: svenstaro/upload-release-action@v2
         if: ${{ matrix.build == 'windows' }}
