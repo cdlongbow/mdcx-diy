@@ -71,6 +71,14 @@ def _tmdb_debug_enabled() -> bool:
     return bool(getattr(manager.config, "show_data_log", False))
 
 
+def _tmdb_log_line(message: str) -> None:
+    """Write one TMDB log entry as a separate line."""
+    if message.startswith("\n"):
+        LogBuffer.log().write(message)
+    else:
+        LogBuffer.log().write(f"\n{message}")
+
+
 # ============= HTTP 适配器 =============
 
 
@@ -667,17 +675,17 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
     actor_db = resources.actor_db or {}
 
     if resources.actor_db is None:
-        LogBuffer.log().write("  ⚠️ [TMDB] actor_db 为 None —— 尝试重新加载演员数据库...")
+        _tmdb_log_line("  ⚠️ [TMDB] actor_db 为 None —— 尝试重新加载演员数据库...")
         resources.reload_actor_db()
         actor_db = resources.actor_db or {}
         if resources.actor_db is not None:
-            LogBuffer.log().write(f"  ✅ [TMDB] 延迟加载成功: actor_db 已加载 {len(actor_db)} 条记录")
+            _tmdb_log_line(f"  ✅ [TMDB] actor_db 已加载 {len(actor_db)} 条记录")
         else:
-            LogBuffer.log().write("  ⚠️ [TMDB] actor_db 重新加载后仍为 None，将走 TMDB API 搜索")
+            _tmdb_log_line("  ⚠️ [TMDB] actor_db 重新加载后仍为 None，将走 TMDB API 搜索")
     elif len(actor_db) == 0:
-        LogBuffer.log().write("  ⚠️ [TMDB] actor_db 为空 (0 条记录) —— 文件可能为空或格式不匹配")
+        _tmdb_log_line("  ⚠️ [TMDB] actor_db 为空 (0 条记录) —— 文件可能为空或格式不匹配")
     else:
-        LogBuffer.log().write(f"  ℹ️ [TMDB] actor_db 已加载 {len(actor_db)} 条记录")
+        _tmdb_log_line(f"  ℹ️ [TMDB] actor_db 已加载 {len(actor_db)} 条记录")
 
     result: dict[str, int] = {}
     need_query: list[tuple[str, str]] = []
@@ -690,13 +698,13 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
 
         in_actor_db = actor_stripped in actor_db
         if not in_actor_db:
-            LogBuffer.log().write(f"  🔍 [TMDB] '{actor_stripped}' 不在 actor_db 中 (actor_db size={len(actor_db)})")
+            _tmdb_log_line(f"  🔍 [TMDB] '{actor_stripped}' 不在 actor_db 中 (actor_db size={len(actor_db)})")
 
         row = None
         if actor_stripped in actor_db and actor_db[actor_stripped].get("tmdbid"):
             result[actor_stripped] = actor_db[actor_stripped]["tmdbid"]
             row_data = actor_db[actor_stripped]
-            LogBuffer.log().write(
+            _tmdb_log_line(
                 f"  ✅ [TMDB] '{actor_stripped}' 从 actor_db 直接匹配, tmdbid={actor_db[actor_stripped]['tmdbid']}"
             )
             if not row_data.get("zh_cn") or not row_data.get("zh_tw"):
@@ -706,13 +714,13 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
         row = search_actor_db_reverse(actor_stripped)
         if row and row.get("tmdbid"):
             result[actor_stripped] = row["tmdbid"]
-            LogBuffer.log().write(f"  ✅ [TMDB] '{actor_stripped}' 从反查匹配, tmdbid={row['tmdbid']}")
-            LogBuffer.log().write(f" ℹ️ [TMDB] {actor_stripped} -> tmdbid={row['tmdbid']} (xlsx反查缓存)")
+            _tmdb_log_line(f"  ✅ [TMDB] '{actor_stripped}' 从反查匹配, tmdbid={row['tmdbid']}")
+            _tmdb_log_line(f" ℹ️ [TMDB] {actor_stripped} -> tmdbid={row['tmdbid']} (xlsx反查缓存)")
             if not row.get("zh_cn") or not row.get("zh_tw"):
                 need_translate.append((actor_stripped, row.get("jp", actor_stripped), row["tmdbid"]))
             continue
 
-        LogBuffer.log().write(f"  ⚠️ [TMDB] '{actor_stripped}' 未匹配，将进入 TMDB API 搜索")
+        _tmdb_log_line(f"  ⚠️ [TMDB] '{actor_stripped}' 未匹配，将进入 TMDB API 搜索")
         need_query.append((actor_stripped, row.get("jp") if row and row.get("jp") else actor_stripped))
 
     async def _translate_and_update(actor_name: str, jp_name: str, tid: int) -> None:
@@ -728,14 +736,14 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
                 write_status = await update_actor_db_row(
                     jp=jp_name, zh_cn=zh_cn, zh_tw=zh_tw, tmdbid=tid, overwrite_names=True
                 )
-                LogBuffer.log().write(
+                _tmdb_log_line(
                     f" 🔄 [TMDB] {actor_name} 翻译补全: zh_cn={zh_cn or '-'} zh_tw={zh_tw or '-'} ({write_status})"
                 )
         except Exception as e:
-            LogBuffer.log().write(f" ⚠️ [TMDB] {actor_name} 翻译补全失败: {e}")
+            _tmdb_log_line(f" ⚠️ [TMDB] {actor_name} 翻译补全失败: {e}")
 
     if need_translate:
-        LogBuffer.log().write(f"\n 🔄 [TMDB] 补全 {len(need_translate)} 个已有 tmdbid 演员的翻译")
+        _tmdb_log_line(f" 🔄 [TMDB] 补全 {len(need_translate)} 个已有 tmdbid 演员的翻译")
         trans_semaphore = asyncio.Semaphore(3)
 
         async def _limited_translate(actor_name: str, jp_name: str, tid: int) -> None:
@@ -746,10 +754,10 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
         await asyncio.gather(*trans_tasks)
 
     if not need_query:
-        LogBuffer.log().write("  ℹ️ [TMDB] 所有演员已在 actor_db 中匹配，无需 API 查询")
+        _tmdb_log_line("  ℹ️ [TMDB] 所有演员已在 actor_db 中匹配，无需 API 查询")
         return result
 
-    LogBuffer.log().write(f"\n 🎬 [TMDB] 开始查询 {len(need_query)} 个演员的 TMDB ID: {[a[0] for a in need_query]}")
+    _tmdb_log_line(f" 🎬 [TMDB] 开始查询 {len(need_query)} 个演员的 TMDB ID: {[a[0] for a in need_query]}")
 
     async def _query_and_update(actor_name: str, query_name: str) -> None:
         try:
@@ -783,27 +791,25 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
                     append_keyword=True,
                 )
 
-                LogBuffer.log().write(
-                    f"  ✅ [TMDB] {actor_name} -> tmdbid={tmdbid}{f' (中文:{zh_cn})' if zh_cn else ''}"
-                )
+                _tmdb_log_line(f"  ✅ [TMDB] {actor_name} -> tmdbid={tmdbid}{f' (中文:{zh_cn})' if zh_cn else ''}")
                 if write_status == "inserted_tmdbid":
-                    LogBuffer.log().write(f"  ✅ [演员数据库] 已写入 {actor_name} -> tmdbid={tmdbid}")
+                    _tmdb_log_line(f"  ✅ [演员数据库] 已写入 {actor_name} -> tmdbid={tmdbid}")
                 elif write_status == "inserted_new_row":
-                    LogBuffer.log().write(f"  ✅ [演员数据库] 已新增 {actor_name}，并写入 tmdbid={tmdbid}")
+                    _tmdb_log_line(f"  ✅ [演员数据库] 已新增 {actor_name}，并写入 tmdbid={tmdbid}")
                 elif write_status == "kept_existing_tmdbid":
-                    LogBuffer.log().write(f"  ℹ️ [演员数据库] {actor_name} 已存在 tmdbid，保留原值")
+                    _tmdb_log_line(f"  ℹ️ [演员数据库] {actor_name} 已存在 tmdbid，保留原值")
                 elif write_status == "missing_openpyxl":
-                    LogBuffer.log().write(f"  ⚠️ [演员数据库] 缺少 openpyxl，未写入 {actor_name} 的 tmdbid")
+                    _tmdb_log_line(f"  ⚠️ [演员数据库] 缺少 openpyxl，未写入 {actor_name} 的 tmdbid")
                 elif write_status == "file_locked":
-                    LogBuffer.log().write(f"  ⚠️ [演员数据库] 文件被占用，未写入 {actor_name} 的 tmdbid")
+                    _tmdb_log_line(f"  ⚠️ [演员数据库] 文件被占用，未写入 {actor_name} 的 tmdbid")
                 elif write_status.startswith("write_failed:"):
-                    LogBuffer.log().write(
+                    _tmdb_log_line(
                         f"  ⚠️ [演员数据库] 写入失败，未保存 {actor_name} 的 tmdbid: {write_status.split(':', 1)[1]}"
                     )
             else:
-                LogBuffer.log().write(f"  ❌ [TMDB] {actor_name} (搜索名:{query_name}) 未找到匹配的 TMDB 演员")
+                _tmdb_log_line(f"  ❌ [TMDB] {actor_name} (搜索名:{query_name}) 未找到匹配的 TMDB 演员")
         except Exception as e:
-            LogBuffer.log().write(f"  ❌ [TMDB] {actor_name} 查询失败: {e}")
+            _tmdb_log_line(f"  ❌ [TMDB] {actor_name} 查询失败: {e}")
 
     semaphore = asyncio.Semaphore(3)
 
@@ -817,7 +823,7 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
     old_db = dict(resources.actor_db) if resources.actor_db else {}
 
     cached_before = len([a for a in actors if a.strip() in old_db and old_db[a.strip()].get("tmdbid")])
-    LogBuffer.log().write(
+    _tmdb_log_line(
         f" 🎬 [TMDB] 查询完成: 缓存命中 {len(actors) - len(need_query)} 个, "
         f"本次匹配 {len(result) - cached_before} 个, 共 {len(result)} 个"
     )
@@ -826,7 +832,7 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
     actor_db = resources.actor_db or {}
     missing_link = [name for name in result if not (actor_db.get(name, {}).get("href") or "")]
     if missing_link:
-        LogBuffer.log().write(f"\n 🔗 [LibreDMM] 补全 {len(missing_link)} 个演员的链接")
+        _tmdb_log_line(f" 🔗 [LibreDMM] 补全 {len(missing_link)} 个演员的链接")
         link_semaphore = asyncio.Semaphore(3)
 
         async def _fetch_and_update(actor_name: str) -> None:
@@ -837,9 +843,9 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
                     href = await fetch_libredmm_link(jp_key)
                     if href:
                         await update_actor_db_row(jp=jp_key, href=href)
-                        LogBuffer.log().write(f"  ✅ [LibreDMM] {actor_name} -> {href}")
+                        _tmdb_log_line(f"  ✅ [LibreDMM] {actor_name} -> {href}")
                 except Exception as e:
-                    LogBuffer.log().write(f"  ⚠️ [LibreDMM] {actor_name} 链接补全失败: {e}")
+                    _tmdb_log_line(f"  ⚠️ [LibreDMM] {actor_name} 链接补全失败: {e}")
 
         tasks = [asyncio.create_task(_fetch_and_update(name)) for name in missing_link]
         await asyncio.gather(*tasks)
@@ -877,11 +883,11 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
     results = data.get("results", [])
 
     if _tmdb_debug_enabled():
-        LogBuffer.log().write(
+        _tmdb_log_line(
             f"  🔎 [TMDB] 搜索演员「{actor_name}」返回 {len(results)} 个候选，目标规范名={sorted(target_variants)}"
         )
     else:
-        LogBuffer.log().write(f"  🔎 [TMDB] 搜索演员「{actor_name}」返回 {len(results)} 个候选")
+        _tmdb_log_line(f"  🔎 [TMDB] 搜索演员「{actor_name}」返回 {len(results)} 个候选")
 
     if not results:
         return None
@@ -946,8 +952,9 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
         )
 
         if _tmdb_debug_enabled():
-            LogBuffer.log().write(
-                f"    {'✅' if is_match else '·'} [TMDB] pid={pid} name={detail.get('name', '')} "
+            status = "✅" if is_match else "ℹ️"
+            _tmdb_log_line(
+                f"    {status} [TMDB] pid={pid} name={detail.get('name', '')} "
                 f"place={place or '-'} aliases={sorted(all_names)} norm={sorted(all_norm)}"
             )
 
@@ -955,7 +962,7 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
 
     if not matched:
         reason = "无候选通过名字匹配" if candidates else "候选列表为空 (搜索失败/性别过滤/detail请求失败)"
-        LogBuffer.log().write(f"  ⚠️ [TMDB] 演员「{actor_name}」{reason}，候选数={len(candidates)}")
+        _tmdb_log_line(f"  ⚠️ [TMDB] 演员「{actor_name}」{reason}，候选数={len(candidates)}")
         return None
 
     matched.sort(
@@ -964,7 +971,7 @@ async def _query_single_actor(actor_name: str, base_url: str, api_key: str, clie
     )
 
     if len(matched) > 1:
-        LogBuffer.log().write(
+        _tmdb_log_line(
             f"  ⚠️ [TMDB] 演员「{actor_name}」匹配到 {len(matched)} 个结果，"
             f"已自动选择 tmdbid={matched[0]['pid']} "
             f"(popularity={matched[0]['popularity']:.2f})"
