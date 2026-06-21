@@ -45,11 +45,11 @@ uv run check
 
 - `ruff format --check`
 - `ruff check`
-- `python -m pytest tests/test_tmdb_actor.py tests/test_mapping_resources.py tests/test_nfo_read.py tests/test_nfo_write_escape.py tests/test_nfo_tag_priority.py tests/test_nfo_actor_tmdbid.py tests/test_nfo_external_id_tag.py`
+- `python -m pytest tests/`
 
 ### 核心特色
 
-- **42 个网站爬虫** - 有码、无码、FC2、国产、欧美
+- **40 个网站爬虫** - 有码、无码、FC2、国产、欧美
 - **智能番号识别** - 自动判断番号类型并分类处理
 - **标准 NFO 生成** - 符合 KODI/Emby/Jellyfin 规范
 - **图片处理** - 人脸裁剪、水印、高清封面、图片修复
@@ -72,16 +72,15 @@ uv run check
 
 ### 智能抓取系统
 
-**42 个网站覆盖各类内容**
+**40 个网站覆盖各类内容**
 
 | 类型 | 网站 |
 |-----|------|
-| **有码** | DMM、MGStage、Prestige、Official、JavBus、Jav321、JavDB、JavDBAPI、MissAV、AVSOX、MMTV、MyWife、Getchu 等 |
-| **无码** | Kin8、Love6 等 |
+| **有码** | DMM、JavDB、JavBus、Jav321、MGStage、Prestige、Official、JavLibrary、MissAV、AVSOX、MMTV、MyWife、Getchu、GetchuDMM、Faleno、Fantastica、Dahlia、Giga、XCity、CableAV、FreeJavBT、Hscangku、AVBASE、Mdtv |
+| **无码** | Kin8、JavDB（无码分类）、airav_cc |
 | **FC2** | FC2、FC2Club、FC2Hub、FC2PPVDB |
-| **国产** | HDOUBAN、CNMDB、GUOCHAN、MADOUQU |
-| **欧美** | THEPORNDB |
-| **其他** | Giga、Faleno、Fantastica、Dahlia、XCity 等 |
+| **国产** | HDOUBAN、CNMDB、MADOUQU、Lulubar、IQQTV、JavDay |
+| **欧美** | THEPORNDB、LibreDMM |
 
 **智能番号识别**
 - 国产番号（MD/MKY 系列）自动标记
@@ -224,7 +223,7 @@ uv run check
 **代理配置**
 - HTTP/HTTPS 代理
 - SOCKS5 代理
-- 不走代理网站功能（指定某些网站直连，支持网站名如 `javdb` 和完整域名如 `api.tmdb.org`）
+- 走代理网站功能（仅指定网站走代理，其余直连，支持网站名如 `javdb` 和完整域名如 `amazon.co.jp`）
 
 **反爬措施**
 - 浏览器指纹伪装
@@ -237,7 +236,7 @@ uv run check
 - [文档中心](docs/README.md) - 所有文档入口
 - [Code Wiki](docs/CODE_WIKI.md) - 完整技术文档
 - [功能特色](docs/FEATURES.md)
-- [完整功能列表](docs/COMPLETE_FEATURES.md) - 42 个网站爬虫和全部功能
+- [完整功能列表](docs/COMPLETE_FEATURES.md) - 40 个网站爬虫和全部功能
 - [使用场景](docs/SCENARIOS.md)
 - [开发指南](docs/DEVELOPMENT.md)
 - [FAQ](docs/FAQ.md)
