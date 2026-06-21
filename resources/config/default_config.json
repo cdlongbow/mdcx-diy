@@ -154,8 +154,8 @@
   "field_priority_try_all_images": false,
   "website_single": "fc2",
   "website_youma": [
-    "libredmm",
     "javdbapi",
+    "libredmm",
     "javbus",
     "iqqtv",
     "airav_cc"
@@ -828,52 +828,52 @@
     "youma": {
       "title": {
         "site_prority": [
-          "libredmm",
-          "javdbapi"
+          "javdbapi",
+          "libredmm"
         ]
       },
       "originaltitle": {
         "site_prority": [
-          "libredmm",
-          "javdbapi"
+          "javdbapi",
+          "libredmm"
         ]
       },
       "outline": {
         "site_prority": [
           "iqqtv",
           "airav_cc",
-          "libredmm",
-          "javdbapi"
+          "javdbapi",
+          "libredmm"
         ]
       },
       "originalplot": {
         "site_prority": [
-          "libredmm",
-          "javdbapi"
+          "javdbapi",
+          "libredmm"
         ]
       },
       "actors": {
         "site_prority": [
-          "libredmm",
-          "javdbapi"
+          "javdbapi",
+          "libredmm"
         ]
       },
       "all_actors": {
         "site_prority": [
-          "libredmm",
-          "javdbapi"
+          "javdbapi",
+          "libredmm"
         ]
       },
       "thumb": {
         "site_prority": [
-          "libredmm",
-          "javdbapi"
+          "javdbapi",
+          "libredmm"
         ]
       },
       "poster": {
         "site_prority": [
-          "libredmm",
-          "javdbapi"
+          "javdbapi",
+          "libredmm"
         ]
       },
       "extrafanart": {
@@ -881,20 +881,20 @@
       },
       "tags": {
         "site_prority": [
-          "libredmm",
-          "javdbapi"
+          "javdbapi",
+          "libredmm"
         ]
       },
       "release": {
         "site_prority": [
-          "libredmm",
-          "javdbapi"
+          "javdbapi",
+          "libredmm"
         ]
       },
       "runtime": {
         "site_prority": [
-          "libredmm",
-          "javdbapi"
+          "javdbapi",
+          "libredmm"
         ]
       },
       "score": {
@@ -911,14 +911,14 @@
       },
       "studio": {
         "site_prority": [
-          "libredmm",
-          "javdbapi"
+          "javdbapi",
+          "libredmm"
         ]
       },
       "publisher": {
         "site_prority": [
-          "libredmm",
-          "javdbapi"
+          "javdbapi",
+          "libredmm"
         ]
       },
       "trailer": {
