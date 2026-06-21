@@ -3,7 +3,7 @@ import platform
 import sys
 from pathlib import Path
 
-LOCAL_VERSION = 220260621
+LOCAL_VERSION = 220260622
 
 GITHUB_REPO = "cdlongbow/mdcx-diy"
 GITHUB_RELEASES_URL = f"https://github.com/{GITHUB_REPO}/releases"
