@@ -530,6 +530,46 @@ class Scraper:
             signal.show_log_text(traceback.format_exc())
             signal.show_log_text(str(e))
 
+    async def _download_images(
+        self,
+        res: CrawlersResult,
+        other: OtherInfo,
+        file_info: FileInfo,
+        folder_new_path: Path,
+        thumb_final_path: Path,
+        fanart_final_path: Path,
+        poster_final_path: Path,
+        media_context: MediaResourceContext | None = None,
+        single_folder_catched: bool = False,
+    ) -> bool:
+        if not await thumb_download(res, other, file_info.cd_part, folder_new_path, thumb_final_path, media_context):
+            return False
+
+        fanart_task = asyncio.create_task(fanart_download(res.number, other, file_info.cd_part, fanart_final_path))
+        poster_task = asyncio.create_task(
+            poster_download(res, other, file_info.cd_part, folder_new_path, poster_final_path, media_context)
+        )
+        extrafanart_task = (
+            asyncio.create_task(extrafanart_download(res.extrafanart, res.extrafanart_from, folder_new_path))
+            if single_folder_catched
+            else None
+        )
+
+        await asyncio.gather(fanart_task, poster_task)
+
+        if not poster_task.result():
+            return False
+
+        await pic_some_deal(res.number, thumb_final_path, fanart_final_path)
+        await add_mark(other, file_info, res.mosaic)
+
+        if extrafanart_task is not None:
+            await extrafanart_task
+            await extrafanart_copy2(folder_new_path)
+            await extrafanart_extras_copy(folder_new_path)
+
+        return True
+
     async def _process_one_file(
         self, file_info: FileInfo, file_mode: FileMode
     ) -> tuple[CrawlersResult | None, OtherInfo | None]:
@@ -985,32 +1025,18 @@ class Scraper:
 
         # 如果 final_pic_path 没处理过，这时才需要下载和加水印
         if pic_final_catched and file_can_download:
-            # 下载thumb
-            if not await thumb_download(
-                res, other, file_info.cd_part, folder_new_path, thumb_final_path, media_context
+            if not await self._download_images(
+                res,
+                other,
+                file_info,
+                folder_new_path,
+                thumb_final_path,
+                fanart_final_path,
+                poster_final_path,
+                media_context,
+                single_folder_catched,
             ):
                 return None, None
-
-            # 下载艺术图
-            await fanart_download(res.number, other, file_info.cd_part, fanart_final_path)
-
-            # 下载poster
-            if not await poster_download(
-                res, other, file_info.cd_part, folder_new_path, poster_final_path, media_context
-            ):
-                return None, None
-
-            # 清理冗余图片
-            await pic_some_deal(res.number, thumb_final_path, fanart_final_path)
-
-            # 加水印
-            await add_mark(other, file_info, res.mosaic)
-
-            # 下载剧照和剧照副本
-            if single_folder_catched:
-                await extrafanart_download(res.extrafanart, res.extrafanart_from, folder_new_path)
-                await extrafanart_copy2(folder_new_path)
-                await extrafanart_extras_copy(folder_new_path)
 
         if file_can_download:
             # trailer 有带文件名、不带文件名两种命名方式，不能依赖图片处理权。
