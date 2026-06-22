@@ -1,58 +1,9 @@
 #!/usr/bin/python
-import urllib.parse
 from typing import Any, override
 
 from ..config.manager import manager
 from ..config.models import Website
-from ..crawlers.javdb_app import (
-    _API_BASE as _JD_BASE,
-)
-from ..crawlers.javdb_app import (
-    _API_FALLBACKS as _JD_FALLBACKS,
-)
-from ..crawlers.javdb_app import (
-    _build_api_params,
-    make_signature,
-)
 from .base import BaseCrawler, Context, CrawlerData, CrawlerException
-
-
-def _build_jd_headers() -> dict[str, str]:
-    return {
-        "jdsignature": make_signature(),
-        "accept-language": "zh",
-        "User-Agent": "Dart/3.5 (dart:io)",
-    }
-
-
-def _build_jd_params() -> dict[str, str]:
-    p = _build_api_params()
-    p["page"] = "1"
-    return p
-
-
-async def _javdb_search_actor(actor_name: str, client: Any) -> str | None:
-    """通过 JavDB 搜索演员，返回 JavDB 上的名字（通常是日文原名）。"""
-    headers = _build_jd_headers()
-    params = _build_jd_params()
-    params["q"] = actor_name
-    for domain in [_JD_BASE] + _JD_FALLBACKS:
-        url = f"{domain}/api/v2/search?{urllib.parse.urlencode(params)}"
-        html, error = await client.get_text(url, headers=headers)
-        if html is None:
-            continue
-        try:
-            import json
-
-            data = json.loads(html)
-            for movie in (data.get("data") or {}).get("movies") or []:
-                for actor in movie.get("actors") or []:
-                    name = (actor.get("name") or "").strip()
-                    if name and name != actor_name:
-                        return name
-        except Exception:
-            continue
-    return None
 
 
 class XcityCrawler(BaseCrawler):
@@ -111,11 +62,7 @@ class XcityCrawler(BaseCrawler):
         for person in program.get("person") or []:
             name = person.get("name")
             if name:
-                javdb_name = await _javdb_search_actor(name, self.async_client)
-                if javdb_name:
-                    actors.append(javdb_name)
-                else:
-                    actors.append(name)
+                actors.append(name)
 
         genre = program.get("genre") or []
 
