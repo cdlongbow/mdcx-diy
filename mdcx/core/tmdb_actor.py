@@ -1012,7 +1012,11 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
                 )
 
                 # 优先保留站点原始演员名作为 jp 主名，TMDB 主名/别名只作为反查关键字。
+                # 但如果原始名是中文译名（与 TMDB original_name 不一致），则以 TMDB 的为准
                 jp_name = query_name
+                tmdb_original = query_result.get("original_name", "") or ""
+                if tmdb_original and tmdb_original != query_name:
+                    jp_name = tmdb_original
                 write_status = await update_actor_db_row(
                     jp=jp_name,
                     zh_cn=zh_cn,
