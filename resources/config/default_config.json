@@ -157,6 +157,7 @@
     "javdbapi",
     "libredmm",
     "javbus",
+    "xcity",
     "iqqtv",
     "airav_cc"
   ],
@@ -828,6 +829,7 @@
     "youma": {
       "title": {
         "site_prority": [
+          "xcity",
           "javdbapi",
           "libredmm"
         ]
@@ -840,6 +842,7 @@
       },
       "outline": {
         "site_prority": [
+          "xcity",
           "iqqtv",
           "airav_cc",
           "javdbapi",
@@ -881,6 +884,7 @@
       },
       "tags": {
         "site_prority": [
+          "xcity",
           "javdbapi",
           "libredmm"
         ]
@@ -905,18 +909,21 @@
       },
       "series": {
         "site_prority": [
+          "xcity",
           "javdbapi",
           "javbus"
         ]
       },
       "studio": {
         "site_prority": [
+          "xcity",
           "javdbapi",
           "libredmm"
         ]
       },
       "publisher": {
         "site_prority": [
+          "xcity",
           "javdbapi",
           "libredmm"
         ]
