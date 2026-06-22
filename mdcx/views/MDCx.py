@@ -12047,7 +12047,7 @@ class Ui_MDCx:
         self.checkBox_read_download_file_again.setText(_translate("MDCx", "重新下载图片等文件（nfo 需有链接）"))
         self.label_347.setText(_translate("MDCx", "将按「设置」-「下载」，更新文件"))
         self.checkBox_read_no_nfo_scrape.setText(
-            _translate("MDCx", "本地之前刮削失败的文件和没有nfo的文件，重新刮削（按更新模式规则）")
+            _translate("MDCx", "没有 nfo 的文件，刮削并整理（使用正常命名规则）")
         )
         self.label_36.setText(
             _translate("MDCx", "流程同正常模式，但命名按照更新模式规则执行（在下方设置），适合二次刮削")
