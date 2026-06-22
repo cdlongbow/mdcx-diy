@@ -1,124 +1,14 @@
 #!/usr/bin/python
-import re
-from typing import override
-
-from lxml import etree
-from parsel import Selector
+from typing import Any, override
 
 from ..config.manager import manager
 from ..config.models import Website
 from .base import BaseCrawler, Context, CrawlerData, CrawlerException
 
 
-def getTitle(html):
-    result = html.xpath('//span[@id="program_detail_title"]/text()')
-    result = result[0] if result else ""
-    return result
-
-
-def getWebNumber(html, number):
-    result = html.xpath('//span[@id="hinban"]/text()')
-    return result[0] if result else number
-
-
-def getActor(html):
-    try:
-        result = str(html.xpath('//li[@class="credit-links"]/a/text()')).strip("['']").replace("'", "")
-    except Exception:
-        result = ""
-    return result
-
-
-def getCover(html):
-    result = html.xpath('//div[@class="photo"]/p/a/@href')
-    result = "https:" + result[0] if result else ""
-    return result
-
-
-def getOutline(html):
-    result = html.xpath('//p[@class="lead"]/text()')
-    result = result[0].strip().replace('"', "") if result else ""
-    return result
-
-
-def getRelease(html):
-    result = html.xpath('//li/span[@class="koumoku" and (contains(text(), "発売日"))]/../text()')
-    result = re.findall(r"[\d]+/[\d]+/[\d]+", str(result))
-    result = result[0].replace("/", "-") if result else ""
-    return result
-
-
-def getYear(release):
-    try:
-        result = str(re.search(r"\d{4}", release).group())
-        return result
-    except Exception:
-        return release[:4]
-
-
-def getTag(html):
-    result = html.xpath('//a[@class="genre"]/text()')
-    if result:
-        result = str(result).strip(" ['']").replace("'", "").replace(", ", ",").replace("\\n", "").replace("\\t", "")
-    else:
-        result = ""
-    return result
-
-
-def getStudio(html):
-    result = html.xpath('//span[@id="program_detail_maker_name"]/text()')
-    result = result[0].strip() if result else ""
-    return result
-
-
-def getPublisher(html):
-    result = html.xpath('//span[@id="program_detail_label_name"]/text()')
-    result = result[0].strip() if result else ""
-    return result
-
-
-def getRuntime(html):
-    result = str(html.xpath('//span[@class="koumoku"][contains(text(), "収録時間")]/../text()'))
-    result = re.findall(r"[\d]+", result)
-    result = result[0].strip() if result else ""
-    return result
-
-
-def getDirector(html):
-    result = html.xpath('//span[@id="program_detail_director"]/text()')
-    result = result[0].replace("\\n", "").replace("\\t", "").strip() if result else ""
-    return result
-
-
-def getExtrafanart(html):
-    result = html.xpath('//a[contains(@class, "thumb")]/@href')
-    if result:
-        result = (
-            str(result)
-            .replace("//faws.xcity.jp/scene/small/", "https://faws.xcity.jp/")
-            .strip(" []")
-            .replace("'", "")
-            .replace(", ", ",")
-        )
-        result = result.split(",")
-    else:
-        result = ""
-    return result
-
-
-def getCoverSmall(html):
-    result = html.xpath('//img[@class="packageThumb"]/@src')
-    result = "https:" + result[0] if result else ""
-    return result.replace("package/medium/", "")
-
-
-def getSeries(html):
-    result = html.xpath('//a[contains(@href, "series")]/span/text()')
-    result = result[0] if result else ""
-    return result
-
-
 class XcityCrawler(BaseCrawler):
+    _cached_program: dict[str, Any] | None = None
+
     @classmethod
     @override
     def site(cls) -> Website:
@@ -131,56 +21,94 @@ class XcityCrawler(BaseCrawler):
 
     @override
     async def _generate_search_url(self, ctx: Context) -> list[str] | str | None:
-        return f"{self.base_url}/result_published/?q={ctx.input.number.replace('-', '')}"
+        return f"{self.base_url}/api/search?q={ctx.input.number.replace('-', '')}"
 
     @override
-    async def _parse_search_page(self, ctx: Context, html: Selector, search_url: str) -> list[str] | str | None:
-        html_search = html.get()
-        if "該当する作品はみつかりませんでした" in html_search:
-            ctx.debug("xcity 搜索页没有匹配结果")
+    async def _parse_search_page(self, ctx: Context, html: Any, search_url: str) -> list[str] | str | None:
+        import json
+
+        try:
+            data = json.loads(html.get())
+        except Exception as e:
+            ctx.debug(f"xcity JSON解析失败: {e}")
             return None
-        search_page = etree.fromstring(html_search, etree.HTMLParser())
-        detail_urls = search_page.xpath("//table[@class='resultList']/tr/td/a/@href")
-        if not detail_urls:
-            ctx.debug("xcity 搜索页没有匹配结果")
+
+        program_list = (data.get("frontprogramlist") or {}).get("program") or []
+        if not program_list:
+            ctx.debug("xcity 搜索没有匹配结果")
             return None
-        return [self.base_url + detail_urls[0]]
+
+        self._cached_program = program_list[0]
+
+        program_id = program_list[0].get("id")
+        if program_id:
+            return [f"{self.base_url}/avod/detail?id={program_id}"]
+
+        ctx.debug("xcity 搜索结果缺少 id")
+        return None
 
     @override
-    async def _parse_detail_page(self, ctx: Context, html: Selector, detail_url: str) -> CrawlerData | None:
-        detail_page = etree.fromstring(html.get(), etree.HTMLParser())
-        title = getTitle(detail_page)
+    async def _parse_detail_page(self, ctx: Context, html: Any, detail_url: str) -> CrawlerData | None:
+        program = self._cached_program
+        if not program:
+            raise CrawlerException("xcity 数据缺失: 未获取到节目数据")
+
+        title = program.get("title") or ""
         if not title:
-            raise CrawlerException("数据获取失败: 未获取到title！")
-        web_number = getWebNumber(detail_page, ctx.input.number)
-        title = title.replace(f" {web_number}", "").strip()
-        actor = getActor(detail_page)
-        actors = [item.strip() for item in actor.split(",") if item.strip()]
-        tag = getTag(detail_page)
-        director = getDirector(detail_page)
-        directors = [item.strip() for item in director.split(",") if item.strip()]
-        release = getRelease(detail_page)
-        extrafanart = getExtrafanart(detail_page)
+            raise CrawlerException("数据获取失败: 未获取到title")
+
+        actors = []
+        for person in program.get("person") or []:
+            name = person.get("name")
+            if name:
+                actors.append(name)
+
+        genre = program.get("genre") or []
+
+        release = (program.get("releaseDate") or "").replace("/", "-")
+
+        runtime = str(program.get("duration") or "")
+
+        series_name = ""
+        series_data = program.get("series")
+        if isinstance(series_data, dict):
+            series_name = series_data.get("name") or ""
+
+        maker_name = ""
+        maker_data = program.get("maker")
+        if isinstance(maker_data, dict):
+            maker_name = maker_data.get("name") or ""
+
+        label_name = ""
+        label_data = program.get("label")
+        if isinstance(label_data, dict):
+            label_name = label_data.get("name") or ""
+
+        front_image = program.get("frontPackageImage") or ""
+        poster = program.get("posterImage") or ""
+        back_image = program.get("backPackageImage") or ""
+
+        sample_video = program.get("sampleVideoUrl") or ""
+
         return CrawlerData(
             number=ctx.input.number,
             title=title,
             originaltitle=title,
             actors=actors,
             all_actors=actors,
-            directors=directors,
-            outline=getOutline(detail_page),
-            originalplot=getOutline(detail_page),
-            tags=[item.strip() for item in tag.split(",") if item.strip()],
+            outline=program.get("synopsis") or "",
+            originalplot=program.get("synopsis") or "",
+            tags=genre,
             release=release,
-            year=getYear(release),
-            runtime=getRuntime(detail_page),
-            series=getSeries(detail_page),
-            studio=getStudio(detail_page),
-            publisher=getPublisher(detail_page),
-            thumb=getCover(detail_page),
-            poster=getCoverSmall(detail_page),
-            extrafanart=extrafanart if isinstance(extrafanart, list) else [],
-            trailer="",
+            year=release[:4] if len(release) >= 4 else "",
+            runtime=runtime,
+            series=series_name,
+            studio=maker_name,
+            publisher=label_name,
+            thumb=front_image,
+            poster=poster,
+            extrafanart=[poster] if poster else [],
+            trailer=sample_video,
             image_download=False,
             mosaic="有码",
             external_id=detail_url,
