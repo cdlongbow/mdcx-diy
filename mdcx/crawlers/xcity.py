@@ -54,6 +54,7 @@ class XcityCrawler(BaseCrawler):
             raise CrawlerException("xcity 数据缺失: 未获取到节目数据")
 
         title = program.get("title") or ""
+        originaltitle = program.get("titleKana") or title
         if not title:
             raise CrawlerException("数据获取失败: 未获取到title")
 
@@ -84,16 +85,13 @@ class XcityCrawler(BaseCrawler):
         if isinstance(label_data, dict):
             label_name = label_data.get("name") or ""
 
-        front_image = program.get("frontPackageImage") or ""
-        poster = program.get("posterImage") or ""
-        back_image = program.get("backPackageImage") or ""
-
-        sample_video = program.get("sampleVideoUrl") or ""
+        front_image = (program.get("frontPackageImage") or "").replace("/medium/", "/large/")
+        poster = (program.get("posterImage") or "").replace("/medium/", "/large/")
 
         return CrawlerData(
             number=ctx.input.number,
             title=title,
-            originaltitle=title,
+            originaltitle=originaltitle,
             actors=actors,
             all_actors=actors,
             outline=program.get("synopsis") or "",
@@ -107,8 +105,6 @@ class XcityCrawler(BaseCrawler):
             publisher=label_name,
             thumb=front_image,
             poster=poster,
-            extrafanart=[poster] if poster else [],
-            trailer=sample_video,
             image_download=False,
             mosaic="有码",
             external_id=detail_url,
