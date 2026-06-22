@@ -44,12 +44,9 @@ class XcityCrawler(BaseCrawler):
 
     @override
     async def _parse_search_page(self, ctx: Context, html: Any, search_url: str) -> list[str] | str | None:
-        import json
-
-        try:
-            data = json.loads(html.get())
-        except Exception as e:
-            ctx.debug(f"xcity JSON解析失败: {e}")
+        data = html.get()
+        if not isinstance(data, dict):
+            ctx.debug(f"xcity 搜索结果格式异常: {type(data).__name__}")
             return None
 
         program_list = (data.get("frontprogramlist") or {}).get("program") or []
