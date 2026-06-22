@@ -86,7 +86,7 @@ class XcityCrawler(BaseCrawler):
             label_name = label_data.get("name") or ""
 
         front_image = (program.get("frontPackageImage") or "").replace("/medium/", "/large/")
-        poster = (program.get("posterImage") or "").replace("/medium/", "/large/")
+        back_image = (program.get("backPackageImage") or "").replace("/medium/", "/large/")
 
         return CrawlerData(
             number=ctx.input.number,
@@ -103,8 +103,8 @@ class XcityCrawler(BaseCrawler):
             series=series_name,
             studio=maker_name,
             publisher=label_name,
-            thumb=front_image,
-            poster=poster,
+            thumb=back_image,
+            poster=front_image,
             image_download=False,
             mosaic="有码",
             external_id=detail_url,
