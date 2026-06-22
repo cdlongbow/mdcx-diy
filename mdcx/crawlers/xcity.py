@@ -4,6 +4,7 @@ from typing import Any, override
 
 from ..config.manager import manager
 from ..config.models import Website
+from ..models.types import CrawlerInput
 from .base import BaseCrawler, Context, CrawlerData, CrawlerException
 
 _JP_ACTOR_CACHE: dict[str, str] = {}
@@ -25,8 +26,14 @@ async def _fetch_jp_actor_name(actor_id: str, client: Any) -> str | None:
     return None
 
 
+class XcityContext(Context):
+    cached_program: dict[str, Any] | None = None
+
+
 class XcityCrawler(BaseCrawler):
-    _cached_program: dict[str, Any] | None = None
+    @override
+    def new_context(self, input: CrawlerInput) -> XcityContext:
+        return XcityContext(input=input)
 
     @classmethod
     @override
@@ -47,7 +54,7 @@ class XcityCrawler(BaseCrawler):
         return f"{self.base_url}/api/search?q={ctx.input.number.replace('-', '')}"
 
     @override
-    async def _parse_search_page(self, ctx: Context, html: Any, search_url: str) -> list[str] | str | None:
+    async def _parse_search_page(self, ctx: XcityContext, html: Any, search_url: str) -> list[str] | str | None:
         data = html.get()
         if not isinstance(data, dict):
             ctx.debug(f"xcity 搜索结果格式异常: {type(data).__name__}")
@@ -58,7 +65,7 @@ class XcityCrawler(BaseCrawler):
             ctx.debug("xcity 搜索没有匹配结果")
             return None
 
-        self._cached_program = program_list[0]
+        ctx.cached_program = program_list[0]
 
         program_id = program_list[0].get("id")
         if program_id:
@@ -68,8 +75,8 @@ class XcityCrawler(BaseCrawler):
         return None
 
     @override
-    async def _parse_detail_page(self, ctx: Context, html: Any, detail_url: str) -> CrawlerData | None:
-        program = self._cached_program
+    async def _parse_detail_page(self, ctx: XcityContext, html: Any, detail_url: str) -> CrawlerData | None:
+        program = ctx.cached_program
         if not program:
             raise CrawlerException("xcity 数据缺失: 未获取到节目数据")
 
