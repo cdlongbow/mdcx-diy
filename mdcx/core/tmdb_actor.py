@@ -28,6 +28,16 @@ from ..config.resources import (
     read_actor_db_xlsx,
     resources,
 )
+from ..crawlers.javdb_app import (
+    _API_BASE as _JD_API_BASE,
+)
+from ..crawlers.javdb_app import (
+    _API_FALLBACKS as _JD_API_FALLBACKS,
+)
+from ..crawlers.javdb_app import (
+    _build_api_params,
+    make_signature,
+)
 from ..models.log_buffer import LogBuffer
 from ..utils import convert_half
 
@@ -868,6 +878,41 @@ async def migrate_xml_to_xlsx() -> bool:
     return migrated
 
 
+async def _lookup_javdb_actor_name(actor_name: str, client: Any) -> str | None:
+    """通过 JavDB 搜索演员日文名，作为 TMDB 查询失败的补充。"""
+    import urllib.parse
+
+    signature = make_signature()
+    headers = {
+        "jdsignature": signature,
+        "accept-language": "zh",
+        "User-Agent": "Dart/3.5 (dart:io)",
+    }
+    params = _build_api_params()
+    params["q"] = actor_name
+    params["page"] = "1"
+    domains = [_JD_API_BASE] + _JD_API_FALLBACKS
+    for domain in domains:
+        url = f"{domain}/api/v2/search?{urllib.parse.urlencode(params)}"
+        html, error = await client.get_text(url, headers=headers)
+        if html is None:
+            continue
+        try:
+            data = json.loads(html)
+            movies = (data.get("data") or {}).get("movies") or []
+            if not movies:
+                continue
+            for movie in movies:
+                for actor in movie.get("actors") or []:
+                    name = (actor.get("name") or "").strip()
+                    if name and name != actor_name:
+                        return name
+            return None
+        except Exception:
+            continue
+    return None
+
+
 # ============= TMDB API 查询 =============
 
 
@@ -1044,6 +1089,12 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
                     )
             else:
                 _tmdb_log_line(f"  ❌ [TMDB] {actor_name} (搜索名:{query_name}) 未找到匹配的 TMDB 演员")
+                javdb_jp = await _lookup_javdb_actor_name(actor_name, client)
+                if javdb_jp:
+                    _tmdb_log_line(f"  ✅ [JavDB] 从 JavDB 查到 {actor_name} 的日文名: {javdb_jp}")
+                    write_status = await update_actor_db_row(
+                        jp=javdb_jp, keyword=actor_name, append_keyword=True, _wb=_wb
+                    )
         except Exception as e:
             _tmdb_log_line(f"  ❌ [TMDB] {actor_name} 查询失败: {e}")
 
