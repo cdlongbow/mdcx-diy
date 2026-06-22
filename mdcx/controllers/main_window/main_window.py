@@ -2678,6 +2678,7 @@ class MyMAinWindow(QMainWindow):
   <p><span style=" font-weight:700;">所有可用网站:</span></p>
   <li>airav_cc</li>
   <li>avbase</li>
+  <li>avsex</li>
   <li>avsox</li>
   <li>cableav</li>
   <li>cnmdb</li>
@@ -2705,6 +2706,7 @@ class MyMAinWindow(QMainWindow):
   <li>javlibrary</li>
   <li>kin8</li>
   <li>libredmm</li>
+  <li>love6</li>
   <li>lulubar</li>
   <li>madouqu</li>
   <li>mdtv</li>

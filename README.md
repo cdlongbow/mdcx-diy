@@ -3,7 +3,7 @@
 ![python](https://img.shields.io/badge/Python-3.13-3776AB.svg?style=flat&logo=python&logoColor=white)
 ![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)
-![Crawlers](https://img.shields.io/badge/Crawlers-40%2B-brightgreen.svg)
+![Crawlers](https://img.shields.io/badge/Crawlers-42%2B-brightgreen.svg)
 ![Architecture](https://img.shields.io/badge/Architecture-Async%20%2F%20Modular-blue.svg)
 
 ## 简介
@@ -49,7 +49,7 @@ uv run check
 
 ### 核心特色
 
-- **40 个网站爬虫** - 有码、无码、FC2、国产、欧美
+- **42 个网站爬虫** - 有码、无码、FC2、国产、欧美
 - **智能番号识别** - 自动判断番号类型并分类处理
 - **标准 NFO 生成** - 符合 KODI/Emby/Jellyfin 规范
 - **图片处理** - 人脸裁剪、水印、高清封面、图片修复
@@ -72,7 +72,7 @@ uv run check
 
 ### 智能抓取系统
 
-**40 个网站覆盖各类内容**
+**42 个网站覆盖各类内容**
 
 | 类型 | 网站 |
 |-----|------|
@@ -236,7 +236,7 @@ uv run check
 - [文档中心](docs/README.md) - 所有文档入口
 - [Code Wiki](docs/CODE_WIKI.md) - 完整技术文档
 - [功能特色](docs/FEATURES.md)
-- [完整功能列表](docs/COMPLETE_FEATURES.md) - 40 个网站爬虫和全部功能
+- [完整功能列表](docs/COMPLETE_FEATURES.md) - 42 个网站爬虫和全部功能
 - [使用场景](docs/SCENARIOS.md)
 - [开发指南](docs/DEVELOPMENT.md)
 - [FAQ](docs/FAQ.md)

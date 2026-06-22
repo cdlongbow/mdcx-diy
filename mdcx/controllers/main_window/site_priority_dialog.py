@@ -689,7 +689,12 @@ def _make_inline_button(text: str) -> QPushButton:
 def _open_site_editor(window: "MyMAinWindow", scraping_type: FixedScrapingType) -> None:
     info = window._type_website_ui[scraping_type]
     selected_sites = _parse_sites(info.line_edit.text())
-    registered_sites = [Website(site) for site in get_registered_crawler_site_values() if site in Website]
+    registered_sites: list[Website] = []
+    for site in get_registered_crawler_site_values():
+        try:
+            registered_sites.append(Website(site))
+        except ValueError:
+            pass
     all_sites = list(dict.fromkeys(selected_sites + registered_sites))
     dialog = SiteListEditorDialog(f"编辑{info.title}网站源", selected_sites, all_sites, window)
     if dialog.exec() != QDialog.DialogCode.Accepted:

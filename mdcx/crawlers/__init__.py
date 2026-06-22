@@ -23,6 +23,7 @@ from . import (
 )
 from .airav_cc import AiravCcCrawler
 from .avbase_new import AvbaseCrawler
+from .avsex import AvsexCrawler
 from .avsox import AvsoxCrawler
 from .base import get_crawler, get_registered_crawler_sites, register_crawler
 from .cableav import CableavCrawler
@@ -50,10 +51,12 @@ from .javdb_new import JavdbCrawler
 from .javlibrary import JavlibraryCrawler
 from .kin8 import Kin8Crawler
 from .libredmm import LibredmmCrawler
+from .love6 import Love6Crawler
 from .lulubar import LulubarCrawler
 from .madouqu import MadouquCrawler
 from .mdtv import MdtvCrawler
 from .mgstage import MgstageCrawler
+from .missav import MissavCrawler
 from .mmtv import MmtvCrawler
 from .mywife import MywifeCrawler
 from .official import OfficialCrawler
@@ -95,9 +98,11 @@ register_crawler(FreejavbtCrawler)
 register_crawler(HdoubanCrawler)
 register_crawler(IqqtvCrawler)
 register_crawler(AiravCcCrawler)
+register_crawler(AvsexCrawler)
 register_crawler(GetchuCrawler)
 register_crawler(GetchuDmmCrawler)
 register_crawler(MywifeCrawler)
+register_crawler(Love6Crawler)
 register_crawler(JavlibraryCrawler)
 register_crawler(OfficialCrawler)
 register_crawler(TheporndbCrawler)
