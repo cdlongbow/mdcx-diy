@@ -635,7 +635,7 @@ class Scraper:
                 if not redownload:
                     file_can_download = False
             else:
-                if "no_nfo_scrape" not in read_mode:  # 无 nfo 且未勾选「没有 nfo 的文件刮削并整理」
+                if "no_nfo_scrape" not in read_mode:  # 无 nfo 且未勾选「本地没有nfo的文件重新刮削」
                     return None, None
 
         # 判断是否write_nfo
@@ -647,7 +647,7 @@ class Scraper:
         elif manager.config.main_mode in [1, 2, 3] or (
             manager.config.main_mode == 4 and not is_nfo_existed and ReadMode.NO_NFO_SCRAPE in read_mode
         ):
-            # 1、2、3模式，或4模式启用了“没有 nfo 的文件刮削并整理”（变量命名有点问题，存在"no_nfo_scrape"意思其实是要刮削）
+            # 1、2、3模式，或4模式启用了“本地没有nfo的文件重新刮削”（变量命名有点问题，存在"no_nfo_scrape"意思其实是要刮削）
             # 且
             if DownloadableFile.NFO not in manager.config.download_files:
                 # [下载]处不勾选下载nfo时
