@@ -1,9 +1,28 @@
 #!/usr/bin/python
+import re
 from typing import Any, override
 
 from ..config.manager import manager
 from ..config.models import Website
 from .base import BaseCrawler, Context, CrawlerData, CrawlerException
+
+_JP_ACTOR_CACHE: dict[str, str] = {}
+
+
+async def _fetch_jp_actor_name(actor_id: str, client: Any) -> str | None:
+    """从 xcity.jp 源站抓取演员日文名。"""
+    if actor_id in _JP_ACTOR_CACHE:
+        return _JP_ACTOR_CACHE[actor_id]
+    url = f"https://xcity.jp/idol/detail/{actor_id}/"
+    html, error = await client.get_text(url)
+    if html is None:
+        return None
+    m = re.search(r"<title>([^(]+?)(?:\s*\(|無料|\||$)", html)
+    if m:
+        name = m.group(1).strip()
+        _JP_ACTOR_CACHE[actor_id] = name
+        return name
+    return None
 
 
 class XcityCrawler(BaseCrawler):
@@ -61,7 +80,11 @@ class XcityCrawler(BaseCrawler):
         actors = []
         for person in program.get("person") or []:
             name = person.get("name")
-            if name:
+            actor_id = person.get("id")
+            if name and actor_id:
+                jp_name = await _fetch_jp_actor_name(actor_id, self.async_client)
+                actors.append(jp_name or name)
+            elif name:
                 actors.append(name)
 
         genre = program.get("genre") or []
