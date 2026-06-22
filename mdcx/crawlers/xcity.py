@@ -33,6 +33,10 @@ class XcityCrawler(BaseCrawler):
     def site(cls) -> Website:
         return Website.XCITY
 
+    @override
+    def _get_headers(self, ctx: Context) -> dict[str, str] | None:
+        return {"Accept-Language": "zh-TW,zh;q=0.9,ja;q=0.8,en;q=0.5"}
+
     @classmethod
     @override
     def base_url_(cls) -> str:
