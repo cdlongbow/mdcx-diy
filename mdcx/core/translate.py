@@ -181,9 +181,29 @@ def translate_info(json_data: CrawlersResult, has_sub: bool):
     tag = clean_list(tag)
 
     json_data.tag = tag.strip(",")
+
+    if series_language == Language.ZH_CN:
+        series = zhconv.convert(series, "zh-cn")
+    elif series_language == Language.ZH_TW:
+        series = zhconv.convert(series, "zh-hant")
     json_data.series = series
+
+    if studio_language == Language.ZH_CN:
+        studio = zhconv.convert(studio, "zh-cn")
+    elif studio_language == Language.ZH_TW:
+        studio = zhconv.convert(studio, "zh-hant")
     json_data.studio = studio
+
+    if publisher_language == Language.ZH_CN:
+        publisher = zhconv.convert(publisher, "zh-cn")
+    elif publisher_language == Language.ZH_TW:
+        publisher = zhconv.convert(publisher, "zh-hant")
     json_data.publisher = publisher
+
+    if director_language == Language.ZH_CN:
+        director = zhconv.convert(director, "zh-cn")
+    elif director_language == Language.ZH_TW:
+        director = zhconv.convert(director, "zh-hant")
     json_data.director = director
     return json_data
 
