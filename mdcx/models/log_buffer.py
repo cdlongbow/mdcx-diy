@@ -108,6 +108,8 @@ class LogBuffer:
         if with_task_name:
             task_name = LogBuffer.get_task_name()
             message = f"[{task_name}] {message}"
+        if self.buffer and self.buffer[-1] == message:
+            return
         self.buffer.append(message)
 
     def get(self):
