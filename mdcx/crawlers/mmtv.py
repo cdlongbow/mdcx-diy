@@ -5,6 +5,7 @@ from typing import override
 from lxml import etree
 from parsel import Selector
 
+from ..config.manager import manager
 from ..config.models import Website
 from ..number import is_uncensored
 from .base import BaseCrawler, CrawlerData, CrawlerException
@@ -172,7 +173,7 @@ class MmtvCrawler(BaseCrawler):
     @classmethod
     @override
     def base_url_(cls) -> str:
-        return "https://www.7mmtv.sx"
+        return manager.config.get_site_url(Website.MMTV, "https://www.7mmtv.sx")
 
     @override
     async def _generate_search_url(self, ctx) -> list[str] | str | None:

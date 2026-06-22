@@ -7,6 +7,7 @@ import zhconv
 from lxml import etree
 from parsel import Selector
 
+from ..config.manager import manager
 from ..config.models import Website
 from ..models.types import CrawlerInput
 from .base import BaseCrawler, Context, CrawlerData, CrawlerException
@@ -56,7 +57,7 @@ class CableavCrawler(BaseCrawler):
     @classmethod
     @override
     def base_url_(cls) -> str:
-        return "https://cableav.tv"
+        return manager.config.get_site_url(Website.CABLEAV, "https://cableav.video")
 
     @override
     def new_context(self, input: CrawlerInput) -> CableavContext:

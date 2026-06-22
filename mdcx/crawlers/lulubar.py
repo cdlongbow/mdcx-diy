@@ -6,6 +6,7 @@ from typing import override
 from lxml import etree
 from parsel import Selector
 
+from ..config.manager import manager
 from ..config.models import Website
 from ..models.types import CrawlerInput
 from .base import BaseCrawler, Context, CrawlerData, CrawlerException
@@ -125,7 +126,7 @@ class LulubarCrawler(BaseCrawler):
     @classmethod
     @override
     def base_url_(cls) -> str:
-        return "https://lulubar.co"
+        return manager.config.get_site_url(Website.LULUBAR, "https://lulubar.co")
 
     @override
     def new_context(self, input: CrawlerInput) -> LulubarContext:

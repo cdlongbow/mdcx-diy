@@ -157,7 +157,7 @@ class AvsexCrawler(BaseCrawler):
     @classmethod
     @override
     def base_url_(cls) -> str:
-        return manager.config.get_site_url(Website.AVSEX, "https://gg5.co")
+        return manager.config.get_site_url(Website.AVSEX, "https://avsex.cc")
 
     @override
     def new_context(self, input: CrawlerInput) -> AvsexContext:

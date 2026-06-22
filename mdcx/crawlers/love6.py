@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from lxml import etree
 from parsel import Selector
 
+from ..config.manager import manager
 from ..config.models import Website
 from ..models.types import CrawlerInput
 from .base import BaseCrawler, Context, CrawlerData, CrawlerException
@@ -134,7 +135,7 @@ class Love6Crawler(BaseCrawler):
 
     @classmethod
     def base_url_(cls) -> str:
-        return "https://love6.tv"
+        return manager.config.get_site_url(Website.LOVE6, "https://love6.tv")
 
     def new_context(self, input: CrawlerInput) -> Love6Context:
         return Love6Context(input=input)

@@ -4,6 +4,7 @@ from urllib.parse import quote, urljoin, urlparse
 
 from parsel import Selector
 
+from ..config.manager import manager
 from ..config.models import Website
 from ..number import get_file_number, is_uncensored, normalize_uncensored_digit_number
 from ..signals import signal
@@ -319,7 +320,7 @@ class MissavCrawler(BaseCrawler):
     @classmethod
     @override
     def base_url_(cls) -> str:
-        return "https://missav.ws"
+        return manager.config.get_site_url(Website.MISSAV, "https://missav.ws")
 
     @staticmethod
     def _normalize_keyword(value: str) -> str:

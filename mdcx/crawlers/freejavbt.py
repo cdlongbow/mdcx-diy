@@ -7,6 +7,7 @@ from lxml import etree
 from lxml.html import soupparser
 
 from ..base.web import get_dmm_trailer
+from ..config.manager import manager
 from ..config.models import Website
 from .base import BaseCrawler, Context, CrawlerData, CrawlerException
 from .base.types import split_csv
@@ -345,7 +346,7 @@ class FreejavbtCrawler(BaseCrawler):
     @classmethod
     @override
     def base_url_(cls) -> str:
-        return "https://freejavbt.com"
+        return manager.config.get_site_url(Website.FREEJAVBT, "https://freejavbt.com")
 
     @override
     async def _run(self, ctx: Context):
