@@ -80,7 +80,7 @@ uv run check
 | **无码** | Kin8、JavDB（无码分类）、airav_cc |
 | **FC2** | FC2、FC2Club、FC2Hub、FC2PPVDB |
 | **国产** | HDOUBAN、CNMDB、MADOUQU、Lulubar、IQQTV、JavDay |
-| **欧美** | THEPORNDB、LibreDMM |
+| **欧美** | THEPORNDB |
 
 **智能番号识别**
 - 国产番号（MD/MKY 系列）自动标记
