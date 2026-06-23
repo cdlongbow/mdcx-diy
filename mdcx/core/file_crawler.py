@@ -341,6 +341,9 @@ class FileScraper:
             f_sites = [s for s in type_field_config.site_prority if s in type_site_set]
             f_lang = f_config.language
 
+            if not f_sites:
+                continue
+
             reduced.field_log += (
                 f"\n\n    📌 {field} \n    ====================================\n"
                 f"    🌐 优先级设置: {' -> '.join(s.value for s in f_sites)}"
