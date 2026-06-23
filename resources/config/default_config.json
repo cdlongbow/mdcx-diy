@@ -825,7 +825,6 @@
   "timed_interval": "PT40M",
   "rest_count": 500,
   "rest_time": "PT20M",
-  "no_proxy_sites": "api.tmdb.org,libredmm,javdbapi,dmmsee.cyou",
   "fixed_scraping_type": "auto",
   "type_field_configs": {
     "youma": {
