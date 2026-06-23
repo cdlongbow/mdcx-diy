@@ -6,7 +6,7 @@
 
 - **xcity 刮不出中文**：修复了 xcity 刮出来全是英文的问题（加了请求头让网站返回繁体中文，再自动转成简体）
 - **多任务同时刮会串数据**：修复了同时刮多个影片时，xcity 的数据会串到别的影片上的问题
-- **dmm 走代理**：dmm.co.jp 加入默认代理列表，现在走代理也能正常刮 dmm
+- **预置4个默认代理**：amazon.co.jp、m.media-amazon.com、xcity.jp、dmm.co.jpdmm.co.jp 保障正常刮削 dmm、xcity及下载日亚高清封面
 
 ### 日志精简
 
