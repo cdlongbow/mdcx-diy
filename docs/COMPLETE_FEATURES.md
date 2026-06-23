@@ -128,7 +128,7 @@
 | `mdtv` | MDTV | MDTV |
 | `avbase_new` | AVBase | AVBase |
 
-**总计：40 个网站爬虫**
+**总计：42 个网站爬虫**
 
 ---
 
@@ -1069,7 +1069,7 @@ results = await asyncio.gather(*tasks)
 ---
 
 **功能统计**
-- 🌐 43 个网站爬虫
+- 🌐 42 个网站爬虫
 - 📝 30+ NFO 字段
 - 🌐 5 大翻译引擎
 - 🎭 8 大功能模块
