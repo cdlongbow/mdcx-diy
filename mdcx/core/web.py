@@ -286,7 +286,6 @@ async def _is_existing_poster_better_than_youma_crop(
 ) -> bool:
     poster_size = await _get_image_size(result.poster, media_context)
     if not _is_known_image_size(poster_size):
-        LogBuffer.log().write("\n 🖼 Amazon搜索：当前 Poster 尺寸未知，继续搜索高清图")
         return False
 
     crop_size = await _get_thumb_right_crop_size_from_path(other.fanart_path or other.thumb_path)
@@ -432,10 +431,7 @@ async def _verify_soft_amazon_poster(
     original_poster_url: str,
     original_poster_from: str,
     media_context: MediaResourceContext | None = None,
-    strict: bool = False,
 ) -> bool:
-    verify_mode = "严格模式" if strict else "软匹配"
-    LogBuffer.log().write(f"\n 🔎 Amazon图片校验：{verify_mode}，开始与已获取图片比对")
     amazon_img = await _download_image_to_memory(amazon_url, media_context)
     if amazon_img is None:
         LogBuffer.log().write("\n 🟡 Amazon图片校验未通过：Amazon图片读取失败")
@@ -561,7 +557,6 @@ async def trailer_download(
                     trailer_new_folder_path
                 ):
                     await to_thread(shutil.rmtree, trailer_new_folder_path, ignore_errors=True)
-        LogBuffer.log().write(f"\n 🍀 Trailer done! (old)({get_used_time(start_time)}s) ")
         return True
 
     # 带文件名时，选择下载不保留，或者选择保留但没有预告片，检查是否有其他分集已下载或本地预告片
@@ -637,8 +632,7 @@ async def trailer_download(
                     trailer_new_folder_path
                 ):
                     await to_thread(shutil.rmtree, trailer_new_folder_path, ignore_errors=True)
-        LogBuffer.log().write("\n 🟠 Trailer download failed! 将继续使用之前的本地文件！")
-        LogBuffer.log().write(f"\n 🍀 Trailer done! (old)({get_used_time(start_time)}s)")
+        LogBuffer.log().write("\n 🟠 Trailer download failed! 将继续使用本地旧文件！")
         return True
 
 
@@ -701,7 +695,6 @@ async def _get_big_poster(
                 original_poster_url=poster_url,
                 original_poster_from=poster_from_before_amazon,
                 media_context=media_context,
-                strict=manager.config.amazon_strict_pic_verify,
             )
             if amazon_verify_passed:
                 if poster_auto_best:
@@ -753,7 +746,6 @@ async def thumb_download(
 
     # 本地存在 thumb.jpg，且勾选保留旧文件时，不下载
     if thumb_path and thumb_policy.should_keep:
-        LogBuffer.log().write(f"\n 🍀 Thumb done! (old)({get_used_time(start_time)}s) ")
         return True
 
     # 如果thumb不下载，看fanart、poster要不要下载，都不下载则返回
@@ -827,20 +819,15 @@ async def thumb_download(
 
     # 下载失败，本地有图
     if thumb_path:
-        LogBuffer.log().write("\n 🟠 Thumb download failed! 将继续使用之前的图片！")
-        LogBuffer.log().write(f"\n 🍀 Thumb done! (old)({get_used_time(start_time)}s) ")
+        LogBuffer.log().write("\n 🟠 Thumb download failed! 将继续使用本地旧文件！")
         return True
     else:
         if DownloadableFile.IGNORE_PIC_FAIL in manager.config.download_files:
-            LogBuffer.log().write("\n 🟠 Thumb download failed! (你已勾选「图片下载失败时，不视为失败！」) ")
-            LogBuffer.log().write(f"\n 🍀 Thumb done! (none)({get_used_time(start_time)}s)")
+            LogBuffer.log().write(f"\n 🟠 Thumb download failed（已忽略）({get_used_time(start_time)}s)")
             return True
         else:
             LogBuffer.log().write(
                 "\n 🔴 Thumb download failed! 你可以到「设置」-「下载」，勾选「图片下载失败时，不视为失败！」 "
-            )
-            LogBuffer.error().write(
-                "Thumb download failed! 你可以到「设置」-「下载」，勾选「图片下载失败时，不视为失败！」"
             )
             return False
 
@@ -988,7 +975,6 @@ async def poster_download(
 
     # 本地有poster时，且勾选保留旧文件时，不下载
     if poster_path and poster_policy.should_keep:
-        LogBuffer.log().write(f"\n 🍀 Poster done! (old)({get_used_time(start_time)}s)")
         return True
 
     # 不下载时返回
@@ -1017,8 +1003,9 @@ async def poster_download(
             other.poster_marked = other.thumb_marked
             result.poster_from = "copy thumb"
             other.poster_path = poster_final_path
-            LogBuffer.log().write(f"\n 🖼 Poster策略: 命中直复制缩略图({result.scraping_type.value})")
-            LogBuffer.log().write(f"\n 🍀 Poster done! (copy thumb)({get_used_time(start_time)}s)")
+            LogBuffer.log().write(
+                f"\n 🍀 Poster done! (copy thumb, {result.scraping_type.value})({get_used_time(start_time)}s)"
+            )
             return True
 
     poster_auto_best = (
@@ -1102,15 +1089,11 @@ async def poster_download(
     if not poster_path and not thumb_path:
         other.poster_path = None
         if DownloadableFile.IGNORE_PIC_FAIL in download_files:
-            LogBuffer.log().write("\n 🟠 Poster download failed! (你已勾选「图片下载失败时，不视为失败！」) ")
-            LogBuffer.log().write(f"\n 🍀 Poster done! (none)({get_used_time(start_time)}s)")
+            LogBuffer.log().write(f"\n 🟠 Poster download failed（已忽略）({get_used_time(start_time)}s)")
             return True
         else:
             LogBuffer.log().write(
                 "\n 🔴 Poster download failed! 你可以到「设置」-「下载」，勾选「图片下载失败时，不视为失败！」 "
-            )
-            LogBuffer.error().write(
-                "Poster download failed! 你可以到「设置」-「下载」，勾选「图片下载失败时，不视为失败！」"
             )
             return False
 
@@ -1132,19 +1115,16 @@ async def poster_download(
 
     # 裁剪失败，本地有图
     if poster_path:
-        LogBuffer.log().write("\n 🟠 Poster cut failed! 将继续使用之前的图片！")
-        LogBuffer.log().write(f"\n 🍀 Poster done! (old)({get_used_time(start_time)}s) ")
+        LogBuffer.log().write("\n 🟠 Poster cut failed! 将继续使用本地旧文件！")
         return True
     else:
         if DownloadableFile.IGNORE_PIC_FAIL in download_files:
-            LogBuffer.log().write("\n 🟠 Poster cut failed! (你已勾选「图片下载失败时，不视为失败！」) ")
-            LogBuffer.log().write(f"\n 🍀 Poster done! (none)({get_used_time(start_time)}s)")
+            LogBuffer.log().write(f"\n 🟠 Poster cut failed（已忽略）({get_used_time(start_time)}s)")
             return True
         else:
             LogBuffer.log().write(
                 "\n 🔴 Poster cut failed! 你可以到「设置」-「下载」，勾选「图片下载失败时，不视为失败！」 "
             )
-            LogBuffer.error().write("Poster failed！你可以到「设置」-「下载」，勾选「图片下载失败时，不视为失败！」")
             return False
 
 
@@ -1177,7 +1157,6 @@ async def fanart_download(
 
     # 保留，并且本地存在 fanart.jpg，不下载返回
     if fanart_policy.should_keep and fanart_path:
-        LogBuffer.log().write(f"\n 🍀 Fanart done! (old)({get_used_time(start_time)}s)")
         return True
 
     # 不下载时，返回
@@ -1213,21 +1192,16 @@ async def fanart_download(
     else:
         # 本地有 fanart 时，不下载
         if fanart_path:
-            LogBuffer.log().write("\n 🟠 Fanart copy failed! 未找到 thumb 图片，将继续使用之前的图片！")
-            LogBuffer.log().write(f"\n 🍀 Fanart done! (old)({get_used_time(start_time)}s)")
+            LogBuffer.log().write("\n 🟠 Fanart copy failed! 将继续使用本地旧文件！")
             return True
 
         else:
             if DownloadableFile.IGNORE_PIC_FAIL in download_files:
-                LogBuffer.log().write("\n 🟠 Fanart failed! (你已勾选「图片下载失败时，不视为失败！」) ")
-                LogBuffer.log().write(f"\n 🍀 Fanart done! (none)({get_used_time(start_time)}s)")
+                LogBuffer.log().write(f"\n 🟠 Fanart failed（已忽略）({get_used_time(start_time)}s)")
                 return True
             else:
                 LogBuffer.log().write(
                     "\n 🔴 Fanart failed! 你可以到「设置」-「下载」，勾选「图片下载失败时，不视为失败！」 "
-                )
-                LogBuffer.error().write(
-                    "Fanart 下载失败！你可以到「设置」-「下载」，勾选「图片下载失败时，不视为失败！」"
                 )
                 return False
 
@@ -1253,7 +1227,6 @@ async def extrafanart_download(extrafanart: list[str], extrafanart_from: str, fo
 
     # 本地存在 extrafanart_folder，且勾选保留旧文件时，不下载
     if extrafanart_policy.should_keep and await aiofiles.os.path.exists(extrafanart_folder_path):
-        LogBuffer.log().write(f"\n 🍀 Extrafanart done! (old)({get_used_time(start_time)}s) ")
         return True
 
     # 如果 extrafanart 不下载
@@ -1304,7 +1277,6 @@ async def extrafanart_download(extrafanart: list[str], extrafanart_from: str, fo
             else:
                 LogBuffer.log().write(f"\n 🍀 ExtraFanart done! (incomplete)({get_used_time(start_time)}s)")
                 return False
-        LogBuffer.log().write("\n 🟠 ExtraFanart download failed! 将继续使用之前的本地文件！")
+        LogBuffer.log().write("\n 🟠 ExtraFanart download failed! 将继续使用本地旧文件！")
     if await aiofiles.os.path.exists(extrafanart_folder_path):  # 使用旧文件
-        LogBuffer.log().write(f"\n 🍀 ExtraFanart done! (old)({get_used_time(start_time)}s)")
         return True

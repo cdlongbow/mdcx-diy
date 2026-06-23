@@ -307,9 +307,10 @@ async def translate_title_outline(json_data: CrawlersResult, cd_part: str, movie
             LogBuffer.log().write("\n 🟡 Translation skipped: 未配置任何翻译引擎")
         else:
             random.shuffle(translate_by_list)
+            skipped_engines = []
             for each in translate_by_list:
                 if skip_reason := get_translator_skip_reason(each):
-                    LogBuffer.log().write(f"\n 🟡 Translation skipped!({each.capitalize()}) {skip_reason}")
+                    skipped_engines.append(f"{each.capitalize()}({skip_reason})")
                     continue
                 result = await translate_with_engine(
                     each,
@@ -333,10 +334,15 @@ async def translate_title_outline(json_data: CrawlersResult, cd_part: str, movie
                 json_data.outline_from = each
                 break
             else:
-                engine_names = "、".join(e.capitalize() for e in translate_by_list)
-                LogBuffer.log().write(
-                    f"\n 🔴 Translation failed! {engine_names} 均失败或不可用！({get_used_time(start_time)}s)"
-                )
+                if all(get_translator_skip_reason(e) for e in translate_by_list):
+                    LogBuffer.log().write(
+                        f"\n 🟡 Translation skipped: {', '.join(skipped_engines)}({get_used_time(start_time)}s)"
+                    )
+                else:
+                    engine_names = "、".join(e.capitalize() for e in translate_by_list)
+                    LogBuffer.log().write(
+                        f"\n 🔴 Translation failed! {engine_names} 均失败或不可用！({get_used_time(start_time)}s)"
+                    )
 
     # 简繁转换
     if title_language == "zh_cn" and (not trans_title or title_translation_applied or not (title_is_jp or title_is_en)):

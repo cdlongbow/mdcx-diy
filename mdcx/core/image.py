@@ -143,7 +143,6 @@ def cut_thumb_to_poster(
 
         w, h = img.size
         prop = h / w
-        log(f"\n 🖼 Poster裁剪: 开始处理({scraping_type.value})，源图={w}x{h}")
 
         # 优先按图片比例决定基础裁剪方式，保持旧版自动裁剪行为。
         if prop >= 1.4:
@@ -155,29 +154,31 @@ def cut_thumb_to_poster(
         if prop >= 1:
             json_data.poster_from = "thumb center"
             ax, ay, bx, by = _center_crop_box(w, h)
-            log("\n 🖼 Poster裁剪: 图片接近竖图，使用居中裁剪")
+            log(f"\n 🖼 Poster裁剪: {scraping_type.value} {w}x{h}，竖图居中裁剪")
 
         # 横图有码作品固定走右裁剪；其余已枚举类型优先做人脸识别，失败后回退居中裁剪。
         elif scraping_type in YOUMA_RIGHT_CROP_TYPES:
             json_data.poster_from = "thumb right"
             ax, ay, bx, by = _right_crop_box(w, h)
-            log("\n 🖼 Poster裁剪: 命中有码右裁策略")
+            log(f"\n 🖼 Poster裁剪: {scraping_type.value} {w}x{h}，有码右裁策略")
         elif scraping_type in FACE_FALLBACK_CROP_TYPES:
             crop_width = int(h / 1.5)
             face_left = get_face_crop_left(img, crop_width, log_fn=log)
             if face_left is None:
                 json_data.poster_from = "thumb center"
                 ax, ay, bx, by = _center_crop_box(w, h)
+                log(f"\n 🖼 Poster裁剪: {scraping_type.value} {w}x{h}，人脸未识别到，居中裁剪")
             else:
                 json_data.poster_from = "thumb face"
                 ax, ay, bx, by = face_left, 0, face_left + crop_width, h
                 if bx > w:
                     bx = w
                     ax = max(bx - crop_width, 0)
+                log(f"\n 🖼 Poster裁剪: {scraping_type.value} {w}x{h}，人脸识别裁剪")
         else:
             json_data.poster_from = "thumb center"
             ax, ay, bx, by = _center_crop_box(w, h)
-            log("\n 🖼 Poster裁剪: 未配置专用策略，默认居中裁剪")
+            log(f"\n 🖼 Poster裁剪: {scraping_type.value} {w}x{h}，默认居中裁剪")
 
         # 裁剪并保存
         img_new = img.convert("RGB")

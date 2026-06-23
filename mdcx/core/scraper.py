@@ -779,7 +779,6 @@ class Scraper:
                 LogBuffer.log().write(f"\n 🟡 [Same Number] 首次刮削，开始共享番号数据：{movie_number}")
             else:
                 # 同番号任务等待首个任务完成；若首个任务失败，直接结束等待，避免线程卡死
-                LogBuffer.log().write(f"\n 🟡 [Same Number] 等待同番号任务完成：{movie_number}")
                 wait_timeout = 300
                 waited = 0
                 while Flags.json_get_status.get(movie_number) is None:
