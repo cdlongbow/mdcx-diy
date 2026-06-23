@@ -79,7 +79,7 @@ uv run pre-commit install
 │   ├── config/            # 配置管理
 │   ├── controllers/       # 控制器 (业务逻辑)
 │   ├── core/              # 核心功能
-│   ├── crawlers/          # 爬虫实现 (42+ 个站点)
+│   ├── crawlers/          # 爬虫实现 (42 个站点)
 │   ├── gen/               # 自动生成的枚举
 │   ├── models/            # 数据模型
 │   ├── tools/             # 工具模块
