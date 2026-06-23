@@ -143,6 +143,7 @@
   ],
   "keep_files": [
     "poster",
+    "thumb",
     "fanart"
   ],
   "download_hd_pics": [
@@ -152,10 +153,11 @@
   "amazon_strict_pic_verify": true,
   "scrape_like": "info",
   "field_priority_try_all_images": false,
-  "website_single": "fc2",
+  "website_single": "javbus",
   "website_youma": [
     "javdbapi",
     "libredmm",
+    "javdb_app",
     "javbus",
     "xcity",
     "iqqtv",
@@ -707,7 +709,7 @@
   "nfo_tag_publisher": "发行: publisher",
   "nfo_tag_actor": "actor",
   "nfo_tag_actor_contains": [],
-  "folder_name": "{{ letters }}/{{ number }}",
+  "folder_name": "{{ actor }}/{{ number }}",
   "naming_file": "{{ number }}",
   "naming_media": "{% if number %}{{ number }}{% endif %}{% if title and title != number %} {{ title }}{% endif %}",
   "prevent_char": "",
@@ -739,9 +741,9 @@
     "underline"
   ],
   "pic_simple_name": false,
-  "trailer_simple_name": true,
+  "trailer_simple_name": false,
   "hd_name": "height",
-  "hd_get": "path",
+  "hd_get": "none",
   "folder_moword": true,
   "file_moword": true,
   "folder_hd": false,
@@ -857,14 +859,14 @@
       },
       "actors": {
         "site_prority": [
-          "javdbapi",
-          "libredmm"
+          "libredmm",
+          "javdbapi"
         ]
       },
       "all_actors": {
         "site_prority": [
-          "javdbapi",
-          "libredmm"
+          "libredmm",
+          "javdbapi"
         ]
       },
       "thumb": {
@@ -884,13 +886,14 @@
       },
       "tags": {
         "site_prority": [
-          "xcity",
+          "javdb_app",
           "javdbapi",
           "libredmm"
         ]
       },
       "release": {
         "site_prority": [
+          "javdb_app",
           "javdbapi",
           "libredmm"
         ]
