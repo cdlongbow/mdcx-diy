@@ -1,0 +1,42 @@
+name: Build Windows EXE
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-2025
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          activate-environment: true
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          if ! uv sync --locked --all-extras --dev 2>/dev/null; then
+            echo "Lock file out of date, running uv lock..."
+            uv lock
+            uv sync --all-extras --dev
+          fi
+
+      - name: Build Windows EXE
+        env:
+          PYTHONIOENCODING: utf-8
+        run: uv run scripts/build.py --debug
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: MDCx-Windows-EXE
+          path: dist/MDCx.exe
