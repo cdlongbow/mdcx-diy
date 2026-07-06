@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
+import json
+import re
 from http.cookies import SimpleCookie
 from typing import Any, override
+from urllib.parse import urljoin
+
+from lxml import html as lxml_html
 
 from ..config.manager import manager
 from ..config.models import Website
 from .base import BaseCrawler, Context, CrawlerData, CrawlerException
+
+FC2CMADB_BASE_URL = "https://fc2cmadb.com"
 
 
 def get_title(data):  # 获取标题
@@ -48,10 +55,130 @@ def get_video_type(data):  # 获取视频类型
 
 
 def get_video_url(data):  # 获取视频URL
-    # video_id = data.get("article", {}).get("video_id")
-    # if video_id:
-    #     return f"https://example.com/videos/{video_id}.mp4"
     return ""
+
+
+def normalize_label(value: str) -> str:
+    return re.sub(r"\s+", "", value).replace("：", "").replace(":", "")
+
+
+def clean_text(value: str) -> str:
+    return " ".join(str(value or "").split()).strip()
+
+
+def clean_title(value: str) -> str:
+    return re.sub(r"\s*(?:コメント|评论|評論)\s*\(\d+\)\s*$", "", clean_text(value)).strip()
+
+
+def absolute_url(base_url: str, value: str) -> str:
+    value = clean_text(value)
+    if not value or "no-image" in value:
+        return ""
+    return urljoin(base_url.rstrip("/") + "/", value)
+
+
+def table_map_from_html(html_text: str) -> dict[str, str]:
+    doc = lxml_html.fromstring(html_text)
+    data: dict[str, str] = {}
+    for row in doc.xpath("//tr"):
+        cells = [clean_text(" ".join(cell.xpath(".//text()"))) for cell in row.xpath("./th|./td")]
+        cells = [cell for cell in cells if cell]
+        if len(cells) >= 2:
+            data[normalize_label(cells[0])] = cells[1]
+    return data
+
+
+def title_from_html(doc) -> str:
+    title = clean_title(" ".join(doc.xpath("//h1[1]//text()")))
+    if title:
+        return title
+    page_title = clean_text(" ".join(doc.xpath("//title//text()")))
+    title = re.sub(r"^\s*\d+\s*", "", page_title)
+    return clean_title(re.sub(r"\s*作品\s*-\s*FC2CMADB\s*$", "", title))
+
+
+def dict_name(value: Any) -> str:
+    if isinstance(value, dict):
+        return clean_text(value.get("name", ""))
+    return ""
+
+
+def list_names(values: Any) -> list[dict[str, str]]:
+    if not isinstance(values, list):
+        return []
+    names = []
+    for value in values:
+        if name := dict_name(value):
+            names.append({"name": name})
+    return names
+
+
+def parse_fc2cmadb_inertia_html(html_text: str) -> dict[str, Any] | None:
+    doc = lxml_html.fromstring(html_text)
+    for script_text in doc.xpath('//script[@data-page="app" and @type="application/json"]/text()'):
+        try:
+            page_data = json.loads(script_text)
+        except (TypeError, json.JSONDecodeError):
+            continue
+        props = page_data.get("props", {}) if isinstance(page_data, dict) else {}
+        article = props.get("article", {}) if isinstance(props, dict) else {}
+        if not isinstance(article, dict):
+            continue
+        title = clean_title(article.get("title", ""))
+        if not title or title == "FC2CMADB":
+            continue
+        writer = article.get("writer", {})
+        return {
+            "article": {
+                "title": title,
+                "image_url": absolute_url(FC2CMADB_BASE_URL, article.get("image_url", "")),
+                "release_date": clean_text(article.get("release_date", "")),
+                "actresses": list_names(article.get("actresses")),
+                "tags": list_names(article.get("tags")),
+                "writer": {"name": dict_name(writer)},
+                "censored": clean_text(article.get("censored", "")),
+                "duration": clean_text(article.get("duration", "")),
+                "video_id": clean_text(article.get("video_id", "")),
+            }
+        }
+    return None
+
+
+def parse_fc2cmadb_html(html_text: str, *, base_url: str, number: str) -> dict[str, Any] | None:
+    if not html_text or "FC2CMADB" not in html_text:
+        return None
+    inertia_info = parse_fc2cmadb_inertia_html(html_text)
+    if inertia_info is not None:
+        return inertia_info
+    doc = lxml_html.fromstring(html_text)
+    table_data = table_map_from_html(html_text)
+    title = title_from_html(doc)
+    image_url = ""
+    for src in doc.xpath("//img/@src"):
+        src = absolute_url(base_url, src)
+        if src and "/storage/images/actress/" not in src:
+            image_url = src
+            break
+    actresses = [
+        {"name": name.strip()} for name in re.split(r"[,、/，]\s*|\s+", table_data.get("女優", "")) if name.strip()
+    ]
+    tags = [{"name": tag} for tag in table_data.get("タグ", "").split() if tag]
+    mosaic = table_data.get("モザイク", "")
+    if not title or title == "FC2CMADB":
+        return None
+    return {
+        "article": {
+            "title": title,
+            "image_url": image_url,
+            "release_date": table_data.get("販売日", ""),
+            "actresses": actresses,
+            "tags": tags,
+            "writer": {"name": table_data.get("販売者") or table_data.get("卖家") or table_data.get("販売者名") or ""},
+            "censored": "無" if mosaic in {"無", "无码", "無碼"} else "有" if mosaic else "",
+            "duration": table_data.get("収録時間", ""),
+            "video_id": number,
+        }
+    }
 
 
 def get_video_time(data):  # 获取视频时长
@@ -119,6 +246,10 @@ def get_response_final_url(response) -> str:
     return str(headers.get("x-mdcx-final-url") or getattr(response, "url", "") or "")
 
 
+def response_text(response) -> str:
+    return str(getattr(response, "text", "") or "")
+
+
 async def fetch_article_info(
     async_client,
     *,
@@ -170,6 +301,10 @@ async def fetch_article_info_with_warmup(
     if "/login" in final_url:
         return None, f"详情页跳转到登录页，fc2ppvdb Cookie 未生效: {final_url}"
 
+    html_info = parse_fc2cmadb_html(response_text(response_article), base_url=base_url, number=number)
+    if html_info is not None:
+        return html_info, ""
+
     return await fetch_article_info(
         async_client,
         base_url=base_url,
@@ -188,7 +323,7 @@ class Fc2ppvdbCrawler(BaseCrawler):
     @classmethod
     @override
     def base_url_(cls) -> str:
-        return "https://fc2ppvdb.com"
+        return FC2CMADB_BASE_URL
 
     @override
     async def _run(self, ctx: Context):

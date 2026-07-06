@@ -58,6 +58,7 @@ class TranslateConfig(BaseModel):
     translate_by: list[Translator] = Field(
         default_factory=lambda: [
             Translator.GOOGLE,
+            Translator.BING,
             Translator.BAIDU,
             Translator.DEEPL,
             Translator.DEEPLX,

@@ -1,5 +1,6 @@
 import asyncio
 import hashlib
+import json
 import random
 import re
 import time
@@ -60,6 +61,18 @@ def _get_deepl_source_language(text: str) -> Literal["JA", "EN"]:
 
 def _is_chinese_target(language: Language | str) -> bool:
     return language in (Language.ZH_CN, Language.ZH_CN.value, Language.ZH_TW, Language.ZH_TW.value)
+
+
+def get_bing_target_language(language: Language | str) -> str:
+    if language == Language.ZH_CN or language == Language.ZH_CN.value:
+        return "zh-Hans"
+    if language == Language.ZH_TW or language == Language.ZH_TW.value:
+        return "zh-Hant"
+    if language == Language.EN or language == Language.EN.value:
+        return "en"
+    if language == Language.JP or language == Language.JP.value:
+        return "ja"
+    return "zh-Hans"
 
 
 def get_llm_target_language(language: Language | str) -> str:
@@ -238,6 +251,15 @@ async def translate_with_engine(
         )
         return _build_translate_result(engine, title, outline, title_result or "", outline_result or "", error)
 
+    if engine == Translator.BING:
+        title_result, outline_result, error = await bing_translate(
+            title,
+            outline,
+            get_bing_target_language(title_language),
+            get_bing_target_language(outline_language),
+        )
+        return _build_translate_result(engine, title, outline, title_result, outline_result, error)
+
     if (title and not _is_chinese_target(title_language)) or (outline and not _is_chinese_target(outline_language)):
         return _build_translate_result(engine, title, outline, "", "", "Google 当前仅支持中文目标语言")
     title_result, outline_result, error = await google_translate(title, outline)
@@ -262,6 +284,120 @@ async def google_translate(title: str, outline: str) -> tuple[str, str, str | No
     (r1, e1), (r2, e2) = await asyncio.gather(_google_translate(title), _google_translate(outline))
     if r1 is None or r2 is None:
         return "", "", f"google 翻译失败! {e1} {e2}"
+    return r1, r2, None
+
+
+async def _get_bing_auth_params() -> tuple[str, str, str, str, str] | tuple[None, str]:
+    headers = {
+        "Referer": "https://www.bing.com/",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+    }
+    async with manager.acquire_computed() as computed:
+        html, error = await computed.async_client.get_text(
+            "https://www.bing.com/translator",
+            headers=headers,
+            retry_count=1,
+        )
+        if html is None:
+            html, direct_error = await computed.async_client.get_text(
+                "https://www.bing.com/translator",
+                headers=headers,
+                use_proxy=False,
+                retry_count=1,
+            )
+            if html is None:
+                return None, f"{error}; 直连失败: {direct_error}"
+    if html is None:
+        return None, error
+
+    ig_match = re.search(r'IG:"([^"]+)"', html)
+    abuse_match = re.search(r'params_AbusePreventionHelper\s*=\s*\[(\d+),"([^"]+)",(\d+)\]', html)
+    path_match = re.search(r'params_RichTranslate\s*=\s*\["([^"]+)"', html)
+    iid_match = re.search(r"translator\.(\d+)", html)
+    if not ig_match or not abuse_match:
+        return None, "Bing Translator 页面参数提取失败"
+
+    path = "/ttranslatev3?isVertical=1&"
+    if path_match:
+        try:
+            path = json.loads(f'"{path_match.group(1)}"')
+        except Exception:
+            path = path_match.group(1).replace(r"\u0026", "&")
+    iid = f"translator.{iid_match.group(1)}" if iid_match else "translator.5021"
+    key, token, _ttl = abuse_match.groups()
+    return ig_match.group(1), key, token, path, iid
+
+
+def _extract_bing_translation(response: object) -> str | None:
+    if not isinstance(response, list) or not response:
+        return None
+    first = response[0]
+    if not isinstance(first, dict):
+        return None
+    translations = first.get("translations")
+    if not isinstance(translations, list) or not translations:
+        return None
+    translated = translations[0]
+    if not isinstance(translated, dict):
+        return None
+    text = translated.get("text")
+    return str(text) if text is not None else None
+
+
+async def _bing_translate(msg: str, target_lang: str = "zh-Hans") -> tuple[str | None, str]:
+    if not msg:
+        return "", ""
+
+    auth = await _get_bing_auth_params()
+    if auth[0] is None:
+        return None, auth[1]
+    ig, key, token, path, iid = auth
+    url = f"https://www.bing.com{path}IG={ig}&IID={iid}&key={key}&token={quote(token)}"
+    headers = {
+        "Referer": "https://www.bing.com/translator",
+        "Origin": "https://www.bing.com",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+    }
+    data = {"fromLang": "auto-detect", "text": msg, "to": target_lang}
+    async with manager.acquire_computed() as computed:
+        response, error = await computed.async_client.post_json(
+            url,
+            data=data,
+            headers=headers,
+            retry_count=1,
+        )
+        if response is None:
+            response, direct_error = await computed.async_client.post_json(
+                url,
+                data=data,
+                headers=headers,
+                use_proxy=False,
+                retry_count=1,
+            )
+            if response is None:
+                return None, f"{error}; 直连失败: {direct_error}"
+    if response is None:
+        return None, error
+
+    translated = _extract_bing_translation(response)
+    if translated is None:
+        return None, f"Bing 翻译返回数据异常: {response}"
+    return translated, ""
+
+
+async def bing_translate(
+    title: str,
+    outline: str,
+    title_target_lang: str = "zh-Hans",
+    outline_target_lang: str = "zh-Hans",
+) -> tuple[str, str, str | None]:
+    (r1, e1), (r2, e2) = await asyncio.gather(
+        _bing_translate(title, title_target_lang),
+        _bing_translate(outline, outline_target_lang),
+    )
+    if r1 is None or r2 is None:
+        return "", "", f"Bing 翻译失败! {e1} {e2}"
     return r1, r2, None
 
 

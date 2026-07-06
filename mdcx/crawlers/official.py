@@ -8,8 +8,15 @@ from ..config.enums import Website
 from ..config.manager import manager
 from ..number import get_number_letters
 from .base import BaseCrawler, Context, CrawlerData, CrawlerException
-from .base.types import split_csv
+from .dahlia import DahliaCrawler
+from .faleno import FalenoCrawler
+from .official_uncensored import crawl_uncensored_official
 from .prestige import PrestigeCrawler
+
+OFFICIAL_CRAWLER_BY_PREFIX = {
+    "DLDSS": DahliaCrawler,
+    "FNS": FalenoCrawler,
+}
 
 DIRECTOR_PLACEHOLDER_CHARS = frozenset("-—－ー―‐~～·•. ")
 
@@ -103,6 +110,10 @@ def get_cover(html):
     return (result.pop(0), result) if result else ("", [])
 
 
+def split_csv(value: str) -> list[str]:
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+
 class OfficialCrawler(BaseCrawler):
     @classmethod
     @override
@@ -117,6 +128,25 @@ class OfficialCrawler(BaseCrawler):
     @override
     async def _run(self, ctx: Context):
         number = ctx.input.number
+        uncensored_data = await crawl_uncensored_official(ctx, self.async_client, number)
+        if uncensored_data is not None:
+            result = uncensored_data.to_result()
+            ctx.debug("official uncensored data success")
+            return result
+
+        number_letters = get_number_letters(number)
+        official_crawler_cls = OFFICIAL_CRAWLER_BY_PREFIX.get(number_letters.upper())
+        if official_crawler_cls is not None:
+            child_response = await official_crawler_cls(client=self.async_client).run(ctx.input)
+            ctx.debug_info.logs.extend(child_response.debug_info.logs)
+            ctx.debug_info.search_urls = child_response.debug_info.search_urls
+            ctx.debug_info.detail_urls = child_response.debug_info.detail_urls
+            if child_response.debug_info.error is not None:
+                raise child_response.debug_info.error
+            if child_response.data is None:
+                raise CrawlerException("官网子爬虫未返回数据")
+            return child_response.data
+
         official_url = manager.computed.official_websites.get(get_number_letters(number))
         if not official_url:
             raise CrawlerException("不在官网番号前缀列表中")
