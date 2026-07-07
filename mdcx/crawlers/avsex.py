@@ -18,22 +18,30 @@ def get_web_number(html, number):
 
 
 def get_title(html):
-    result = html.xpath('//span[@class="truncate p-2 text-primary font-bold dark:text-primary-200"]/text()')
+    result = html.xpath('//h1[contains(@class, "sr-only")]/text()')
+    if not result:
+        result = html.xpath('//meta[@name="title"]/@content')
+    if not result:
+        result = html.xpath("//title/text()")
     title = result[0] if result else ""
-    rep_char_list = ["[VIP会员点播] ", "[VIP會員點播] ", "[VIP] ", "★ (请到免费赠片区观赏)", "(破解版獨家中文)"]
+    rep_char_list = ["[VIP会员点播] ", "[VIP會員點播] ", "[VIP] ", "★ (请到免费赠片区观赏)", "(破解版独家中文)"]
     for rep_char in rep_char_list:
         title = title.replace(rep_char, "")
     return title.strip()
 
 
 def get_actor(html):
-    actor_list = html.xpath('//dd[@class="flex gap-2 flex-wrap"]/a[contains(@href, "actor")]/text()')
+    actor_list = html.xpath(
+        '//dt[contains(text(), "演员") or contains(text(), "演員")]/following-sibling::dd[1]//a/@title'
+    )
     new_list = [each.strip() for each in actor_list]
     return ",".join(new_list)
 
 
 def get_outline(html):
-    result = html.xpath('string(//h2[contains(text(), "劇情簡介")]/following-sibling::p)')
+    result = html.xpath(
+        'string(//h2[normalize-space(.)="劇情簡介" or normalize-space(.)="剧情简介"]/following-sibling::*[1][self::p])'
+    )
     rep_list = [
         "(中文字幕1280x720)",
         "(日本同步最新‧中文字幕1280x720)",
@@ -56,13 +64,15 @@ def get_outline(html):
 
 
 def get_studio(html):
-    result = html.xpath('string(//dt[contains(text(), "製作商")]/following-sibling::dd)')
+    result = html.xpath('string(//dt[contains(text(), "製作商") or contains(text(), "制作商")]/following-sibling::dd)')
     return result.strip()
 
 
 def get_runtime(html):
     runtime = ""
-    result = html.xpath('string(//dt[contains(text(), "片長")]/following-sibling::dd)').strip()
+    result = html.xpath(
+        'string(//dt[contains(text(), "片長") or contains(text(), "片长")]/following-sibling::dd)'
+    ).strip()
     result = re.findall(r"\d+", result)
     if len(result) == 3:
         runtime = int(result[0]) * 60 + int(result[1])
@@ -93,7 +103,9 @@ def get_year(release):
 
 
 def get_tag(html):
-    result = html.xpath('//dt[contains(text(), "類別")]/following-sibling::dd/a/@title')
+    result = html.xpath(
+        '//dt[contains(text(), "類別") or contains(text(), "类别") or contains(text(), "標籤") or contains(text(), "标签")]/following-sibling::dd/a/@title'
+    )
     return ",".join(result)
 
 
@@ -104,14 +116,15 @@ def get_cover(html):
 
 def get_extrafanart(html):
     ex_list = html.xpath(
-        '//h2[contains(text(), "精彩劇照")]/following-sibling::ul/li/div[@class="relative overflow-hidden rounded-md"]/img/@src'
+        '//h2[normalize-space(.)="精彩劇照" or normalize-space(.)="精彩剧照"]'
+        '/following-sibling::*[1]//img[contains(@class, "object-cover")]/@src'
     )
     return ex_list
 
 
 def get_mosaic(html, studio):
-    result = html.xpath('string(//h1[@class="vv_title col-12"])')
-    mosaic = "无码" if "無碼" in result and "破解版" not in result else "有码"
+    result = html.xpath('string(//span[contains(@class, "bg-blue-800")])')
+    mosaic = "无码" if "無" in result or "无" in result else "有码"
     return "国产" if "國產" in studio else mosaic
 
 
@@ -149,6 +162,8 @@ class AvsexContext(Context):
 
 
 class AvsexCrawler(BaseCrawler):
+    UTF8_PARSER = etree.HTMLParser(encoding="utf-8")
+
     @classmethod
     @override
     def site(cls) -> Website:
@@ -189,7 +204,7 @@ class AvsexCrawler(BaseCrawler):
 
     @override
     async def _parse_search_page(self, ctx: AvsexContext, html: Selector, search_url: str) -> list[str] | str | None:
-        search_page = etree.fromstring(html.get(), etree.HTMLParser())
+        search_page = etree.fromstring(html.get(), AvsexCrawler.UTF8_PARSER)
         detail_url, poster_url = get_real_url(search_page, ctx.number)
         if not detail_url:
             ctx.debug("avsex 搜索页没有匹配结果")
@@ -199,7 +214,7 @@ class AvsexCrawler(BaseCrawler):
 
     @override
     async def _parse_detail_page(self, ctx: AvsexContext, html: Selector, detail_url: str) -> CrawlerData | None:
-        detail_page = etree.fromstring(html.get(), etree.HTMLParser())
+        detail_page = etree.fromstring(html.get(), AvsexCrawler.UTF8_PARSER)
         title = get_title(detail_page)
         if not title:
             raise CrawlerException("数据获取失败: 未获取到title！")
