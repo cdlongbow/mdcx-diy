@@ -13,6 +13,18 @@ from .base import BaseCrawler, Context, CrawlerData, CrawlerException
 
 FC2CMADB_BASE_URL = "https://fc2cmadb.com"
 
+# Cookie 关键字段白名单：fc2cmadb (Laravel/Inertia) 常见 session/CSRF/remember cookie 名，
+# 以及旧版 fc2ppvdb 兼容。命中其一即视为 cookie 至少含登录态字段，
+# 不再硬性要求必须出现 fc2ppvdb_session。
+FC2_LOGIN_COOKIE_KEYS: tuple[str, ...] = (
+    "fc2cmadb_session",
+    "fc2ppvdb_session",
+    "laravel_session",
+    "XSRF-TOKEN",
+    "remember_web_",
+    "PHPSESSID",
+)
+
 
 def get_title(data):  # 获取标题
     return data.get("article", {}).get("title", "")
@@ -208,6 +220,14 @@ def cookie_str_to_dict(cookie_str: str) -> dict:  # cookie 转为字典
     except Exception:
         return {}
     return {key: morsel.value for key, morsel in cookie.items()}
+
+
+def cookie_has_login_key(cookie_str: str) -> bool:
+    """检查 cookie 字符串中是否包含 fc2cmadb/fc2ppvdb 常见登录态关键字段。"""
+
+    if not cookie_str:
+        return False
+    return any(key in cookie_str for key in FC2_LOGIN_COOKIE_KEYS)
 
 
 def normalize_fc2_number(number: str) -> str:

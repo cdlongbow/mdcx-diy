@@ -52,7 +52,12 @@ from mdcx.core.naming import NameRenderOptions, NamingTarget, render_name
 from mdcx.core.network_check import run_network_check
 from mdcx.core.nfo import write_nfo
 from mdcx.core.scraper import again_search, get_remain_list, start_new_scrape
-from mdcx.crawlers.fc2ppvdb import cookie_str_to_dict, fetch_article_info_with_warmup
+from mdcx.crawlers.fc2ppvdb import (
+    FC2CMADB_BASE_URL,
+    cookie_has_login_key,
+    cookie_str_to_dict,
+    fetch_article_info_with_warmup,
+)
 from mdcx.image import PreviewImageLoader
 from mdcx.models.enums import FileMode
 from mdcx.models.flags import Flags
@@ -360,7 +365,9 @@ class MyMAinWindow(QMainWindow):
             "                                border-radius: 1px;\n"
             '                                font: "Courier";'
         )
-        self.Ui.plainTextEdit_cookie_fc2ppvdb.setPlaceholderText("FC2 独立刮削请填写 fc2ppvdb cookie")
+        self.Ui.plainTextEdit_cookie_fc2ppvdb.setPlaceholderText(
+            "请粘贴 fc2cmadb.com 登录后的完整 Cookie（含 XSRF-TOKEN 与 session 项）"
+        )
         self.Ui.plainTextEdit_cookie_fc2ppvdb.setObjectName("plainTextEdit_cookie_fc2ppvdb")
         self.Ui.gridLayout_10.addWidget(self.Ui.plainTextEdit_cookie_fc2ppvdb, 4, 1, 1, 1)
 
@@ -3197,15 +3204,15 @@ class MyMAinWindow(QMainWindow):
             self.set_fc2ppvdb_status.emit(tips)
             return tips
 
-        if "fc2ppvdb_session" not in input_cookie:
-            tips = "❌ Cookie 无效！缺少 fc2ppvdb_session"
+        if not cookie_has_login_key(input_cookie):
+            tips = "❌ Cookie 无效！请粘贴 fc2cmadb.com 登录后的完整 cookie（含 XSRF-TOKEN 与 session 项）"
         else:
             cookies = cookie_str_to_dict(input_cookie)
             with manager.acquire_computed() as computed:
                 response, error = executor.run(
                     fetch_article_info_with_warmup(
                         computed.async_client,
-                        base_url="https://fc2ppvdb.com",
+                        base_url=FC2CMADB_BASE_URL,
                         number="3259498",
                         cookies=cookies,
                         use_proxy=manager.config.use_proxy,
