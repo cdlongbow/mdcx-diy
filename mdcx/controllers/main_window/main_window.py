@@ -366,7 +366,8 @@ class MyMAinWindow(QMainWindow):
             '                                font: "Courier";'
         )
         self.Ui.plainTextEdit_cookie_fc2ppvdb.setPlaceholderText(
-            "请粘贴 fc2cmadb.com 登录后的完整 Cookie（含 XSRF-TOKEN 与 session 项）"
+            "请粘贴 fc2cmadb.com 登录后的完整 Cookie（含 XSRF-TOKEN 与 session 项）\n"
+            "（需登录状态才能刮取演员数据，建议在浏览器登录后从开发者工具复制 Cookie）"
         )
         self.Ui.plainTextEdit_cookie_fc2ppvdb.setObjectName("plainTextEdit_cookie_fc2ppvdb")
         self.Ui.gridLayout_10.addWidget(self.Ui.plainTextEdit_cookie_fc2ppvdb, 4, 1, 1, 1)
@@ -3222,6 +3223,10 @@ class MyMAinWindow(QMainWindow):
                 tips = f"❌ Cookie 检查失败：{error}"
             elif not response.get("article"):
                 tips = "❌ Cookie 检查失败：返回数据异常"
+            elif not response.get("actresses") and not response.get("article", {}).get("actresses"):
+                tips = "⚠️ Cookie 连通但未获取到演员数据，请确认已登录 fc2cmadb.com"
+                if manager.config.fc2ppvdb != input_cookie:
+                    self.exec_save_config.emit()
             elif manager.config.fc2ppvdb != input_cookie:
                 self.exec_save_config.emit()
                 tips = "✅ 连接正常，Cookie 已保存！"

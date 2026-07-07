@@ -42,8 +42,28 @@ def get_release_date(data):  # 获取发行日期
 
 
 def get_actors(data):  # 获取演员
-    actresses = data.get("article", {}).get("actresses", [])
-    return [actress.get("name", "") for actress in actresses if actress.get("name")] if actresses else []
+    # fc2cmadb 的 `actresses` 字段由 Inertia 的 `<Deferred data="actresses">` 异步拉取，
+    # 位置可能出现在顶层 props.actresses（partial reload 后）或 article 子对象。
+    actors: list[str] = []
+    seen: set[str] = set()
+
+    def push(value: Any) -> None:
+        name = clean_text(str(value or "")).strip()
+        if name and name not in seen:
+            seen.add(name)
+            actors.append(name)
+
+    for source in (
+        data.get("actresses"),
+        data.get("article", {}).get("actresses") if isinstance(data.get("article"), dict) else None,
+    ):
+        if isinstance(source, list):
+            for item in source:
+                if isinstance(item, dict):
+                    push(dict_name(item) or item.get("id") or item)
+                else:
+                    push(item)
+    return actors
 
 
 def get_tags(data):  # 获取标签
@@ -120,9 +140,28 @@ def list_names(values: Any) -> list[dict[str, str]]:
         return []
     names = []
     for value in values:
-        if name := dict_name(value):
-            names.append({"name": name})
+        if isinstance(value, dict):
+            name = dict_name(value)
+            if name:
+                names.append({"name": name})
+        elif value is not None:
+            text = clean_text(str(value))
+            if text:
+                names.append({"name": text})
     return names
+
+
+def merge_actresses(*sources: Any) -> list[dict[str, str]]:
+    """合并多来源的 actresses，并按 name 去重。"""
+    merged: list[dict[str, str]] = []
+    seen: set[str] = set()
+    for source in sources:
+        items = list_names(source)
+        for item in items:
+            if item["name"] not in seen:
+                seen.add(item["name"])
+                merged.append(item)
+    return merged
 
 
 def parse_fc2cmadb_inertia_html(html_text: str) -> dict[str, Any] | None:
@@ -242,6 +281,18 @@ def get_xhr_headers(article_url: str) -> dict[str, str]:
     }
 
 
+def get_inertia_partial_reload_headers(article_url: str) -> dict[str, str]:
+    """构造 Inertia 2.x partial reload 请求头，仅拉取指定字段。"""
+    return {
+        "Accept": "text/html, application/xhtml+xml",
+        "Referer": article_url,
+        "X-Requested-With": "XMLHttpRequest",
+        "X-Inertia": "true",
+        "X-Inertia-Partial-Component": "Articles/Show",
+        "X-Inertia-Partial-Data": "actresses",
+    }
+
+
 def describe_xhr_json_error(response, error: Exception) -> str:
     content_type = str(response.headers.get("content-type", "")).strip() or "未知"
     text = str(getattr(response, "text", "") or "")
@@ -298,6 +349,40 @@ async def fetch_article_info(
     return data, ""
 
 
+async def fetch_actresses_via_partial_reload(
+    async_client,
+    *,
+    base_url: str,
+    number: str,
+    cookies: dict[str, str],
+    use_proxy: bool,
+) -> tuple[list[dict[str, Any]] | None, str]:
+    """通过 Inertia 2.x partial reload 异步拉取 actresses（登录后方有数据）。"""
+    article_url = f"{base_url}/articles/{number}"
+    response, error = await async_client.request(
+        "GET",
+        article_url,
+        headers=get_inertia_partial_reload_headers(article_url),
+        cookies=cookies,
+        use_proxy=use_proxy,
+    )
+    if response is None:
+        return None, error
+    try:
+        data = response.json()
+    except Exception as e:
+        return None, describe_xhr_json_error(response, e)
+    if not isinstance(data, dict):
+        return None, f"Partial reload 返回 JSON 结构异常: {type(data).__name__}"
+    props = data.get("props", {})
+    if not isinstance(props, dict):
+        return [], ""
+    actresses = props.get("actresses")
+    if not isinstance(actresses, list):
+        return [], ""
+    return actresses, ""
+
+
 async def fetch_article_info_with_warmup(
     async_client,
     *,
@@ -323,6 +408,19 @@ async def fetch_article_info_with_warmup(
 
     html_info = parse_fc2cmadb_html(response_text(response_article), base_url=base_url, number=number)
     if html_info is not None:
+        # fc2cmadb: 尝试 Inertia partial reload 异步获取 actresses（登录态下有效）
+        actresses, pr_error = await fetch_actresses_via_partial_reload(
+            async_client,
+            base_url=base_url,
+            number=number,
+            cookies=cookies,
+            use_proxy=use_proxy,
+        )
+        if actresses:
+            html_info["actresses"] = actresses
+            if isinstance(html_info.get("article"), dict):
+                merged = merge_actresses(actresses, html_info["article"].get("actresses"))
+                html_info["article"]["actresses"] = merged
         return html_info, ""
 
     return await fetch_article_info(
