@@ -38,7 +38,15 @@ from ..utils import executor, get_current_time, get_real_time, get_used_time, sp
 from ..utils.dataclass import update
 from ..utils.file import copy_file_async, move_file_async
 from ..utils.path import is_any_descendant
-from .file import _generate_file_name, creat_folder, deal_old_files, get_file_info_v2, get_output_name, move_movie
+from .file import (
+    _generate_file_name,
+    _get_folder_path,
+    creat_folder,
+    deal_old_files,
+    get_file_info_v2,
+    get_output_name,
+    move_movie,
+)
 from .file_crawler import FileScraper, classify_existing_scrape_result, classify_scrape_task
 from .image import add_mark
 from .media_resource import MediaResourceContext
@@ -895,9 +903,15 @@ class Scraper:
             poster_new_path_with_filename = success_folder / (naming_rule + "-poster.jpg")
             thumb_new_path_with_filename = success_folder / (naming_rule + "-thumb.jpg")
             fanart_new_path_with_filename = success_folder / (naming_rule + "-fanart.jpg")
-            poster_final_path = poster_new_path_with_filename
-            thumb_final_path = thumb_new_path_with_filename
-            fanart_final_path = fanart_new_path_with_filename
+            _, folder_name = _get_folder_path(success_folder, file_info, res)
+            if manager.config.pic_simple_name and folder_name:
+                poster_final_path = success_folder / "poster.jpg"
+                thumb_final_path = success_folder / "thumb.jpg"
+                fanart_final_path = success_folder / "fanart.jpg"
+            else:
+                poster_final_path = poster_new_path_with_filename
+                thumb_final_path = thumb_new_path_with_filename
+                fanart_final_path = fanart_new_path_with_filename
         else:
             # 生成输出文件夹和输出文件的路径
             (
@@ -937,9 +951,15 @@ class Scraper:
             poster_new_path_with_filename = folder_old_path / (file_name + "-poster.jpg")
             thumb_new_path_with_filename = folder_old_path / (file_name + "-thumb.jpg")
             fanart_new_path_with_filename = folder_old_path / (file_name + "-fanart.jpg")
-            poster_final_path = poster_new_path_with_filename
-            thumb_final_path = thumb_new_path_with_filename
-            fanart_final_path = fanart_new_path_with_filename
+            _, folder_name = _get_folder_path(folder_old_path, file_info, res)
+            if manager.config.pic_simple_name and folder_name:
+                poster_final_path = folder_old_path / "poster.jpg"
+                thumb_final_path = folder_old_path / "thumb.jpg"
+                fanart_final_path = folder_old_path / "fanart.jpg"
+            else:
+                poster_final_path = poster_new_path_with_filename
+                thumb_final_path = thumb_new_path_with_filename
+                fanart_final_path = fanart_new_path_with_filename
 
         # 判断输出文件夹和文件是否已存在，如无则创建输出文件夹
         other = OtherInfo.empty()
