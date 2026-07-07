@@ -15,6 +15,7 @@
 - **avsex 更新修复**: 兼容 /cn/ 简体中文页面，修复 title/actor/tag/outline/extrafanart XPath 提取
 - **iqqtv 标题清理**：去除标题末尾的 `caribbeancom_番号` / `1pondo_番号` 等站点前缀，避免污染无码影片标题
 - **fc2cmadb 演员刮取修复**：fc2cmadb 使用 Inertia Deferred Props 异步加载演员数据，初始 HTML 不含 actresses 字段。爬虫现会主动模拟 Inertia partial reload 请求拉取演员，登录状态下可正常获取
+- **fix**: 图片简化命名(poster.jpg)在 skip_reorganize 和不移动文件路径下被忽略
 
 ## v1.3.3 (2026-06-23)
 
