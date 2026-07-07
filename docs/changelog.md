@@ -11,6 +11,7 @@
 
 ### 修复
 
+- **fc2ppvdb Cookie 检查修复**:基础域名已迁移至 fc2cmadb,cookie 检查不再依赖 `fc2ppvdb_session` 关键字
 - **avsex 更新修复**: 兼容 /cn/ 简体中文页面，修复 title/actor/tag/outline/extrafanart XPath 提取
 - **iqqtv 标题清理**：去除标题末尾的 `caribbeancom_番号` / `1pondo_番号` 等站点前缀，避免污染无码影片标题
 
