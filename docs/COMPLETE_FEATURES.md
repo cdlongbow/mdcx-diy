@@ -309,7 +309,27 @@ def detect_and_crop(image_path: str, output_path: str) -> str:
 }
 ```
 
-#### 2. 百度翻译
+#### 2. Bing 翻译
+
+**配置要求**
+- 无需 API Key
+- 免费免配置，自动爬取微软翻译接口
+
+**支持语言**
+- 中文（简体/繁体）
+- 日语
+- 英语
+- 70+ 种语言
+
+**配置示例**
+```json
+{
+  "engine": "bing",
+  "target_lang": "zh-CN"
+}
+```
+
+#### 3. 百度翻译
 
 **配置要求**
 - 需要 API Key
@@ -324,7 +344,7 @@ def detect_and_crop(image_path: str, output_path: str) -> str:
 }
 ```
 
-#### 3. DeepL 翻译
+#### 4. DeepL 翻译
 
 **配置要求**
 - 需要 API Key
@@ -344,7 +364,7 @@ def detect_and_crop(image_path: str, output_path: str) -> str:
 }
 ```
 
-#### 4. DeepLX 翻译
+#### 5. DeepLX 翻译
 
 **特点**
 - 开源的 DeepL 翻译接口
@@ -358,7 +378,7 @@ def detect_and_crop(image_path: str, output_path: str) -> str:
 }
 ```
 
-#### 5. LLM 翻译
+#### 6. LLM 翻译
 
 **支持的 LLM 服务**
 - OpenAI (GPT-3.5/GPT-4)
@@ -1071,6 +1091,6 @@ results = await asyncio.gather(*tasks)
 **功能统计**
 - 🌐 42 个网站爬虫
 - 📝 30+ NFO 字段
-- 🌐 5 大翻译引擎
+- 🌐 6 大翻译引擎
 - 🎭 8 大功能模块
 - ⚡ 异步并发架构
