@@ -3,7 +3,7 @@ import traceback
 import webbrowser
 from typing import TYPE_CHECKING
 
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtWidgets import QAbstractItemView, QComboBox, QListView, QMenu, QSystemTrayIcon, QTreeWidgetItem
 
@@ -26,9 +26,9 @@ def Init_Ui(self: "MyMAinWindow"):
     self.setWindowIcon(QIcon(resources.icon_ico))  # 设置任务栏图标
     self.setWindowOpacity(1.0)  # 设置窗口透明度
     if IS_WINDOWS:
-        self.setMinimumSize(self.size())
+        self.setMinimumSize(QSize(850, 550))
     else:
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)  # 设置窗口背景透明
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
     self.Ui.progressBar_scrape.setValue(0)  # 进度条清0
     self.Ui.progressBar_scrape.setTextVisible(False)  # 不显示进度条文字
     self.Ui.pushButton_start_cap.setCheckable(True)  # 主界面开始按钮可点状态
