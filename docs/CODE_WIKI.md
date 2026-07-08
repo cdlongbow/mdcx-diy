@@ -587,14 +587,15 @@ mdcx/core/naming/
 
 **启动流程**：
 1. 显示运行时常量（平台、版本等）
-2. 设置高 DPI 缩放策略
-3. 创建 QApplication 实例
-4. 设置应用样式（Fusion）
-5. 应用主题配色
-6. 加载主窗口 (`MyMAinWindow`)
-7. 显示窗口
-8. 安装事件过滤器
-9. 启动事件循环
+2. 读取配置中的界面缩放比例，若 >0 则设置 `QT_SCALE_FACTOR` 环境变量
+3. 根据 `highdpi_passthrough` 标记设置高 DPI 缩放策略
+4. 创建 QApplication 实例
+5. 设置应用样式（Fusion）
+6. 应用主题配色
+7. 加载主窗口 (`MyMAinWindow`)
+8. 显示窗口
+9. 安装事件过滤器
+10. 启动事件循环
 
 **关键代码**：
 ```python

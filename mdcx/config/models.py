@@ -658,6 +658,13 @@ class Config(BaseModel):
     netdisk_path: str = Field(default="", title="网盘路径")
     localdisk_path: str = Field(default="", title="本地磁盘路径")
     window_title: str = Field(default="hide", title="窗口标题")
+    ui_scale_factor: float = Field(
+        default=0.0,
+        ge=0.0,
+        le=3.0,
+        title="界面缩放比例",
+        description="0.0=跟随系统，1.0=100%，1.25=125%...",
+    )
     switch_on: list[Switch] = Field(
         default_factory=lambda: [
             Switch.AUTO_EXIT,

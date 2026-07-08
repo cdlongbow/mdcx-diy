@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import json
 import os
 import platform
 import sys
@@ -15,6 +16,21 @@ from mdcx.core.tmdb_actor import flush_tmdb_query_cache
 from mdcx.utils.video import VIDEO_BACKEND
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
+
+
+def _apply_ui_scale_factor():
+    mark_file = MAIN_PATH / "MDCx.config"
+    if not mark_file.is_file():
+        return
+    with open(mark_file, encoding="UTF-8") as f:
+        config_path = f.read().strip()
+    if not config_path or not os.path.isfile(config_path):
+        return
+    with open(config_path, encoding="UTF-8") as f:
+        config = json.load(f)
+    scale = config.get("ui_scale_factor", 0.0)
+    if scale > 0:
+        os.environ["QT_SCALE_FACTOR"] = str(scale)
 
 
 def show_constants():
@@ -53,6 +69,7 @@ def _create_application() -> tuple[QApplication, MyMAinWindow]:
 
 def main() -> int:
     show_constants()
+    _apply_ui_scale_factor()
     app, _ui = _create_application()
     try:
         return_code = app.exec()

@@ -22966,6 +22966,25 @@
                               </widget>
                             </item>
                             <item>
+                              <widget class="QComboBox" name="comboBox_ui_scale">
+                                <property name="sizePolicy">
+                                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                  </sizepolicy>
+                                </property>
+                                <property name="minimumSize">
+                                  <size>
+                                    <width>90</width>
+                                    <height>0</height>
+                                  </size>
+                                </property>
+                                <property name="toolTip">
+                                  <string>界面缩放比例，保存后重启软件生效</string>
+                                </property>
+                              </widget>
+                            </item>
+                            <item>
                               <widget class="QLabel" name="label_427">
                                 <property name="sizePolicy">
                                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">

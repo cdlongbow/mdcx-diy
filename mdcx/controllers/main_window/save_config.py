@@ -723,6 +723,11 @@ def save_config(self: "MyMAinWindow"):
     manager.config.netdisk_path = self.Ui.lineEdit_netdisk_path.text()  # 网盘路径
     manager.config.localdisk_path = self.Ui.lineEdit_localdisk_path.text()  # 本地磁盘路径
     manager.config.window_title = "hide" if self.Ui.checkBox_hide_window_title.isChecked() else "show"
+
+    scale_index = self.Ui.comboBox_ui_scale.currentIndex()
+    scale_values = {0: 0.0, 1: 1.0, 2: 1.25, 3: 1.5, 4: 1.75, 5: 2.0}
+    manager.config.ui_scale_factor = scale_values.get(scale_index, 0.0)
+
     # endregion
     manager.config.auto_link = get_checkbox(self.Ui.checkBox_create_link)  # 刮削中自动创建软链接
 

@@ -1065,26 +1065,41 @@ def load_config(self: "MyMAinWindow"):
                     delete_file_sync("highdpi_passthrough")
         else:
             self.Ui.checkBox_highdpi_passthrough.setEnabled(False)
-            if Switch.HIDE_MENU in switch_on:
-                self.Ui.checkBox_hide_menu_icon.setChecked(True)
-                try:
-                    if hasattr(self, "tray_icon"):
-                        self.tray_icon.hide()
-                except Exception:
-                    signal_qt.show_traceback_log(traceback.format_exc())
-            else:
-                self.Ui.checkBox_hide_menu_icon.setChecked(False)
-                try:
-                    self.tray_icon.show()
-                except Exception:
-                    self.Init_QSystemTrayIcon()
-                    if not mdcx_config:
-                        self.tray_icon.showMessage(
-                            f"MDCx {self.localversion}",
-                            "配置写入失败！所在目录没有读写权限！",
-                            QIcon(resources.icon_ico),
-                            3000,
-                        )
+
+        scale_factor: float = manager.config.ui_scale_factor
+        scale_index = 0
+        if scale_factor >= 1.95:
+            scale_index = 5
+        elif scale_factor >= 1.70:
+            scale_index = 4
+        elif scale_factor >= 1.45:
+            scale_index = 3
+        elif scale_factor >= 1.20:
+            scale_index = 2
+        elif scale_factor >= 0.95:
+            scale_index = 1
+        self.Ui.comboBox_ui_scale.setCurrentIndex(scale_index)
+
+        if Switch.HIDE_MENU in switch_on:
+            self.Ui.checkBox_hide_menu_icon.setChecked(True)
+            try:
+                if hasattr(self, "tray_icon"):
+                    self.tray_icon.hide()
+            except Exception:
+                signal_qt.show_traceback_log(traceback.format_exc())
+        else:
+            self.Ui.checkBox_hide_menu_icon.setChecked(False)
+            try:
+                self.tray_icon.show()
+            except Exception:
+                self.Init_QSystemTrayIcon()
+                if not mdcx_config:
+                    self.tray_icon.showMessage(
+                        f"MDCx {self.localversion}",
+                        "配置写入失败！所在目录没有读写权限！",
+                        QIcon(resources.icon_ico),
+                        3000,
+                    )
         # endregion
 
         self.Ui.checkBox_create_link.setChecked(manager.config.auto_link)
