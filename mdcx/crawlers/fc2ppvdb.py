@@ -3,7 +3,7 @@ import json
 import re
 from http.cookies import SimpleCookie
 from typing import Any, override
-from urllib.parse import urljoin
+from urllib.parse import unquote, urljoin
 
 from lxml import html as lxml_html
 
@@ -195,12 +195,24 @@ def parse_fc2cmadb_inertia_html(html_text: str) -> dict[str, Any] | None:
     return None
 
 
+def extract_inertia_version(html_text: str) -> str | None:
+    doc = lxml_html.fromstring(html_text)
+    for script_text in doc.xpath('//script[@data-page="app" and @type="application/json"]/text()'):
+        try:
+            page_data = json.loads(script_text)
+        except (TypeError, json.JSONDecodeError):
+            continue
+        if isinstance(page_data, dict):
+            version = page_data.get("version")
+            if version:
+                return str(version)
+    return None
+
+
 def parse_fc2cmadb_html(html_text: str, *, base_url: str, number: str) -> dict[str, Any] | None:
     if not html_text or "FC2CMADB" not in html_text:
         return None
     inertia_info = parse_fc2cmadb_inertia_html(html_text)
-    if inertia_info is not None:
-        return inertia_info
     doc = lxml_html.fromstring(html_text)
     table_data = table_map_from_html(html_text)
     title = title_from_html(doc)
@@ -210,11 +222,19 @@ def parse_fc2cmadb_html(html_text: str, *, base_url: str, number: str) -> dict[s
         if src and "/storage/images/actress/" not in src:
             image_url = src
             break
-    actresses = [
+    actresses_from_table = [
         {"name": name.strip()} for name in re.split(r"[,、/，]\s*|\s+", table_data.get("女優", "")) if name.strip()
     ]
-    tags = [{"name": tag} for tag in table_data.get("タグ", "").split() if tag]
+    tags_from_table = [{"name": tag} for tag in table_data.get("タグ", "").split() if tag]
     mosaic = table_data.get("モザイク", "")
+    if inertia_info is not None:
+        inertia_actresses = inertia_info.get("article", {}).get("actresses", [])
+        if not inertia_actresses and actresses_from_table:
+            if isinstance(inertia_info.get("article"), dict):
+                inertia_info["article"]["actresses"] = actresses_from_table
+        if not inertia_info.get("article", {}).get("title") and title:
+            inertia_info["article"]["title"] = title
+        return inertia_info
     if not title or title == "FC2CMADB":
         return None
     return {
@@ -222,8 +242,8 @@ def parse_fc2cmadb_html(html_text: str, *, base_url: str, number: str) -> dict[s
             "title": title,
             "image_url": image_url,
             "release_date": table_data.get("販売日", ""),
-            "actresses": actresses,
-            "tags": tags,
+            "actresses": actresses_from_table,
+            "tags": tags_from_table,
             "writer": {"name": table_data.get("販売者") or table_data.get("卖家") or table_data.get("販売者名") or ""},
             "censored": "無" if mosaic in {"無", "无码", "無碼"} else "有" if mosaic else "",
             "duration": table_data.get("収録時間", ""),
@@ -281,9 +301,13 @@ def get_xhr_headers(article_url: str) -> dict[str, str]:
     }
 
 
-def get_inertia_partial_reload_headers(article_url: str) -> dict[str, str]:
-    """构造 Inertia 2.x partial reload 请求头，仅拉取指定字段。"""
-    return {
+def get_inertia_partial_reload_headers(
+    article_url: str,
+    *,
+    version: str | None = None,
+    xsrf_token: str | None = None,
+) -> dict[str, str]:
+    headers = {
         "Accept": "text/html, application/xhtml+xml",
         "Referer": article_url,
         "X-Requested-With": "XMLHttpRequest",
@@ -291,6 +315,11 @@ def get_inertia_partial_reload_headers(article_url: str) -> dict[str, str]:
         "X-Inertia-Partial-Component": "Articles/Show",
         "X-Inertia-Partial-Data": "actresses",
     }
+    if version:
+        headers["X-Inertia-Version"] = version
+    if xsrf_token:
+        headers["X-XSRF-TOKEN"] = xsrf_token
+    return headers
 
 
 def describe_xhr_json_error(response, error: Exception) -> str:
@@ -356,13 +385,21 @@ async def fetch_actresses_via_partial_reload(
     number: str,
     cookies: dict[str, str],
     use_proxy: bool,
+    inertia_version: str | None = None,
 ) -> tuple[list[dict[str, Any]] | None, str]:
-    """通过 Inertia 2.x partial reload 异步拉取 actresses（登录后方有数据）。"""
     article_url = f"{base_url}/articles/{number}"
+    xsrf_token = ""
+    raw_xsrf = cookies.get("XSRF-TOKEN", "")
+    if raw_xsrf:
+        xsrf_token = unquote(raw_xsrf)
     response, error = await async_client.request(
         "GET",
         article_url,
-        headers=get_inertia_partial_reload_headers(article_url),
+        headers=get_inertia_partial_reload_headers(
+            article_url,
+            version=inertia_version,
+            xsrf_token=xsrf_token or None,
+        ),
         cookies=cookies,
         use_proxy=use_proxy,
     )
@@ -406,15 +443,17 @@ async def fetch_article_info_with_warmup(
     if "/login" in final_url:
         return None, f"详情页跳转到登录页，fc2ppvdb Cookie 未生效: {final_url}"
 
-    html_info = parse_fc2cmadb_html(response_text(response_article), base_url=base_url, number=number)
+    html_text = response_text(response_article)
+    inertia_version = extract_inertia_version(html_text)
+    html_info = parse_fc2cmadb_html(html_text, base_url=base_url, number=number)
     if html_info is not None:
-        # fc2cmadb: 尝试 Inertia partial reload 异步获取 actresses（登录态下有效）
         actresses, pr_error = await fetch_actresses_via_partial_reload(
             async_client,
             base_url=base_url,
             number=number,
             cookies=cookies,
             use_proxy=use_proxy,
+            inertia_version=inertia_version,
         )
         if actresses:
             html_info["actresses"] = actresses
