@@ -6,6 +6,11 @@
 ![Crawlers](https://img.shields.io/badge/Crawlers-42-brightgreen.svg)
 ![Architecture](https://img.shields.io/badge/Architecture-Async%20%2F%20Modular-blue.svg)
 
+<p align="right">
+  <img src="resources/Img/donate-qr.jpg" width="180" alt="赞赏码"><br>
+  <sub>如果你觉得不错可否赏我杯奶茶费</sub>
+</p>
+
 ## 简介
 
 MDCx 从网站抓取视频文件对应的元数据（标题、演员、封面、简介等），生成标准 .nfo 文件和规范命名的文件夹，供 Emby、Jellyfin、Kodi 等媒体服务器直接使用。支持 Windows、macOS、Linux。
@@ -406,12 +411,6 @@ uv run ruff check . --fix
 ### 贡献指南
 
 请看 [CONTRIBUTING.md](docs/CONTRIBUTING.md)。
-
-## 赞赏
-
-如果你觉得不错可否赏我杯奶茶费
-
-<img src="resources/Img/donate-qr.jpg" width="256" alt="赞赏码">
 
 ## 授权许可
 
