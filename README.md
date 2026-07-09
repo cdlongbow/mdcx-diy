@@ -407,10 +407,12 @@ uv run ruff check . --fix
 
 请看 [CONTRIBUTING.md](docs/CONTRIBUTING.md)。
 
-<p align="right">
-  <img src="resources/Img/donate-qr.jpg" width="180" alt="赞赏码"><br>
-  <sub>如果你觉得不错可否赏我杯奶茶费</sub>
-</p>
+<div align="right">
+
+<img src="resources/Img/donate-qr.jpg" width="150" alt="赞赏码"><br>
+如果你觉得不错可否赏我杯奶茶费
+
+</div>
 
 ## 授权许可
 
