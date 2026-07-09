@@ -240,6 +240,7 @@ uv run check
 - 自动检测 CF 挑战页（cf-chl、cdn-cgi 标记）
 - 双模式自动降级，可配置重试次数
 - 独立代理配置，不影响常规请求
+- 详细用法：[配置说明](docs/configuration.md#cloudflare-bypass-配置)
 
 **代理配置**
 - HTTP/HTTPS 代理
