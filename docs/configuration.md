@@ -362,20 +362,41 @@ use_proxy = use_proxy and self._is_proxy_host(host)
 
 部分网站用了 Cloudflare 防护，程序直接访问会被拦截。配置 CF Bypass 可以绕过。
 
-**你需要什么**
-
-一个旁路（bypass）服务的地址。可以自己搭建，也可以用社区公开服务。
-
 **配置项**
 
 | 配置项 | 默认值 | 说明 |
 |--------|--------|------|
 | `cf_bypass_url` | 空 | 旁路服务地址，如 `http://127.0.0.1:8000` |
 | `cf_bypass_proxy` | 空 | 旁路专用代理（可选），与常规代理独立 |
+| `cf_bypass_auto` | false | 启用内置 Bypass，自动启动本地旁路服务 |
+
+**两种方式**
+
+1. **外部服务（手动）**：搭一个旁路服务，填 `cf_bypass_url`。推荐 [CloudflareBypassForScraping](https://github.com/Hazard804/CloudflareBypassForScraping)：
+
+   ```bash
+   git clone https://github.com/Hazard804/CloudflareBypassForScraping.git
+   cd CloudflareBypassForScraping
+   pip install -r server_requirements.txt
+   python server.py
+   ```
+
+   然后在 MDCx 的 CF Bypass 地址填 `http://127.0.0.1:8000`。
+
+2. **内置 Bypass（零配置）**：勾选"启用内置 Bypass"，MDCx 自动在后台启动本地旁路服务，无需手动搭建。
+
+   **前置条件**（仅首次需要）：
+   ```bash
+   pip install cloakbrowser cf_bypasser uvicorn fastapi
+   ```
+   首次启动时会自动下载 Chromium（约 200MB，只需一次）。
 
 **在 MDCx 设置位置**
 
-打开 **设置 → 网络**，下拉到"CF Bypass"和"CF Bypass代理"两个输入框。
+打开 **设置 → 网络**，相关控件：
+- `CF Bypass 服务`：外部服务地址（留空则不用外部）
+- `CF Bypass 代理`：旁路专用代理，内外置共用
+- `启用内置 Bypass`：勾选后自动启动本地服务（地址为空时生效）
 
 **怎么知道生效了**
 
@@ -384,16 +405,8 @@ use_proxy = use_proxy and self._is_proxy_host(host)
 **常见问题**
 
 - **不配能用吗？** 能。大部分网站不会被 CF 拦，只有少数严格站点才需要。
-- **怎么搭旁路？** 推荐 [CloudflareBypassForScraping](https://github.com/Hazard804/CloudflareBypassForScraping)：
-
-  ```bash
-  git clone https://github.com/Hazard804/CloudflareBypassForScraping.git
-  cd CloudflareBypassForScraping
-  pip install -r server_requirements.txt
-  python server.py
-  ```
-  
-  然后在 MDCx 的 CF Bypass 地址填 `http://127.0.0.1:8000` 即可。
+- **内置和外部能同时开吗？** 不能。`cf_bypass_url` 有值时用外部，留空且勾选内置时用内置。
+- **内置 Bypass 需要什么依赖？** `cloakbrowser`、`cf_bypasser`、`uvicorn`、`fastapi`，首次使用自动下载 Chromium。
 
 ---
 
