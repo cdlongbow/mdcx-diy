@@ -358,9 +358,35 @@ def _is_proxy_host(self, host: str) -> bool:
 use_proxy = use_proxy and self._is_proxy_host(host)
 ```
 
----
+### Cloudflare Bypass 配置
 
-## 相关文档
+部分网站用了 Cloudflare 防护，程序直接访问会被拦截。配置 CF Bypass 可以绕过。
+
+**你需要什么**
+
+一个旁路（bypass）服务的地址。可以自己搭建，也可以用社区公开服务。
+
+**配置项**
+
+| 配置项 | 默认值 | 说明 |
+|--------|--------|------|
+| `cf_bypass_url` | 空 | 旁路服务地址，如 `http://127.0.0.1:8000` |
+| `cf_bypass_proxy` | 空 | 旁路专用代理（可选），与常规代理独立 |
+
+**在 MDCx 设置位置**
+
+打开 **设置 → 网络**，下拉到"CF Bypass"和"CF Bypass代理"两个输入框。
+
+**怎么知道生效了**
+
+主界面点"网络状态"，日志区会显示 `CF Bypass：已配置`。抓取时看到 `🛡️ [CF]` 日志前缀说明它正在工作。
+
+**常见问题**
+
+- **不配能用吗？** 能。大部分网站不会被 CF 拦，只有少数严格站点才需要。
+- **怎么搭旁路？** 搜索 `flaresolverr` docker 镜像，一行命令就能跑起来。
+
+---
 
 - [项目架构](architecture.md) - 项目整体架构
 - [核心模块](core-modules.md) - 核心功能模块详解

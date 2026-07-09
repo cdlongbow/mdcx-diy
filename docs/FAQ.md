@@ -171,6 +171,10 @@ brew install python@3.13
 
 **A**: 连接超时。检查网络、防火墙，或使用代理。
 
+### Q: 刮削时日志提示 Cloudflare 拦截（cf-chl、Just a moment）？
+
+**A**: 目标网站被 Cloudflare 防护。在"设置 → 网络"中配置 CF Bypass 地址即可绕过。详见 [配置说明](configuration.md#cloudflare-bypass-配置)。
+
 ### Q: 程序崩溃或没反应？
 
 **A**:
