@@ -60,10 +60,7 @@ class LocalBypassServer:
 
         if missing:
             self._dependency_ok = False
-            self._dependency_error = (
-                f"缺少依赖: {', '.join(missing)}\n"
-                f"请运行: pip install {' '.join(missing)}"
-            )
+            self._dependency_error = f"缺少依赖: {', '.join(missing)}\n请运行: pip install {' '.join(missing)}"
         else:
             self._dependency_ok = True
             self._dependency_error = ""
@@ -74,11 +71,10 @@ class LocalBypassServer:
     async def ensure_browser(self) -> tuple[bool, str]:
         try:
             import cloakbrowser as cb
+
             self._log("检查 Chromium 浏览器...")
             loop = asyncio.get_running_loop()
-            binary_path = await loop.run_in_executor(
-                None, lambda: cb.ensure_binary()
-            )
+            binary_path = await loop.run_in_executor(None, lambda: cb.ensure_binary())
             self._log(f"Chromium 就绪: {binary_path}")
             return True, ""
         except Exception as e:
@@ -109,19 +105,22 @@ class LocalBypassServer:
 
         try:
             self._process = await asyncio.create_subprocess_exec(
-                sys.executable, "-m", "uvicorn",
+                sys.executable,
+                "-m",
+                "uvicorn",
                 "cf_bypasser.server.app:create_app",
                 "--factory",
-                "--host", LOCAL_BYPASS_HOST,
-                "--port", str(self._port),
-                "--log-level", "warning",
+                "--host",
+                LOCAL_BYPASS_HOST,
+                "--port",
+                str(self._port),
+                "--log-level",
+                "warning",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
         except FileNotFoundError:
-            return False, (
-                "未找到 uvicorn，请安装: pip install uvicorn fastapi"
-            )
+            return False, ("未找到 uvicorn，请安装: pip install uvicorn fastapi")
         except Exception as e:
             return False, f"启动子进程失败: {e}"
 
@@ -136,6 +135,7 @@ class LocalBypassServer:
 
     async def _wait_ready(self, timeout: int = SERVER_START_TIMEOUT) -> tuple[bool, str]:
         import httpx
+
         deadline = time.monotonic() + timeout
         last_error = ""
         while time.monotonic() < deadline:
@@ -178,7 +178,7 @@ class LocalBypassServer:
             self._process.terminate()
             try:
                 await asyncio.wait_for(self._process.wait(), timeout=5)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 self._process.kill()
                 await asyncio.wait_for(self._process.wait(), timeout=3)
         except ProcessLookupError:
