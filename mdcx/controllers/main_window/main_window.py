@@ -1178,7 +1178,7 @@ class MyMAinWindow(QMainWindow):
         self._addTreeChild(status, show_data.show_name)
 
         if not show_data.data.title:
-            show_data.data.title = LogBuffer.error().get()
+            show_data.data.title = show_data.show_name
             show_data.data.number = real_number
         self.json_array[show_data.show_name] = show_data
         if not self._has_single_selected_result_item():
