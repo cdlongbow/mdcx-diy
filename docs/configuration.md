@@ -384,10 +384,21 @@ use_proxy = use_proxy and self._is_proxy_host(host)
 **常见问题**
 
 - **不配能用吗？** 能。大部分网站不会被 CF 拦，只有少数严格站点才需要。
-- **怎么搭旁路？** 推荐 [CloudflareBypassForScraping](https://github.com/sarperavci/CloudflareBypassForScraping)，Docker 一行启动：
+- **怎么搭旁路？** 推荐 [CloudflareBypassForScraping](https://github.com/sarperavci/CloudflareBypassForScraping)：
+  
+  **Docker（推荐）**：
   ```bash
   docker run -p 8000:8000 ghcr.io/sarperavci/cloudflarebypassforscraping:latest
   ```
+  
+  **Windows 直接运行**：
+  ```bash
+  # 安装
+  pip install cloudflarebypassforscraping
+  # 启动（首次会自动下载浏览器）
+  cfbypass
+  ```
+  
   然后在 MDCx 的 CF Bypass 地址填 `http://127.0.0.1:8000` 即可。
 
 ---
