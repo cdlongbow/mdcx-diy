@@ -393,10 +393,10 @@ use_proxy = use_proxy and self._is_proxy_host(host)
   
   **Windows 直接运行**：
   ```bash
-  # 安装
-  pip install cloudflarebypassforscraping
-  # 启动（首次会自动下载浏览器）
-  cfbypass
+  git clone https://github.com/sarperavci/CloudflareBypassForScraping.git
+  cd CloudflareBypassForScraping
+  pip install -r server_requirements.txt
+  python server.py
   ```
   
   然后在 MDCx 的 CF Bypass 地址填 `http://127.0.0.1:8000` 即可。
