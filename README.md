@@ -8,7 +8,7 @@
 
 <p align="center">
   <img src="resources/Img/donate-qr.jpg" width="180" alt="赞赏码"><br>
-  <sub>如果你觉得不错可否赏我杯奶茶费</sub>
+  <b>如果你觉得不错可否赏我杯奶茶费</b>
 </p>
 
 ## 简介
