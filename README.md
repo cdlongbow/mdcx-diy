@@ -6,7 +6,7 @@
 ![Crawlers](https://img.shields.io/badge/Sites-45+-brightgreen.svg)
 ![Architecture](https://img.shields.io/badge/Architecture-Async%20%2F%20Modular-blue.svg)
 
-<p align="center"><b>如果你觉得不错可否赏我杯奶茶费，谢谢！ 🌸</b></p>
+<p align="center"><b>如果你觉得不错可否赏我杯奶茶费，谢谢！ 😊</b></p>
 
 <table align="center">
   <tr>
