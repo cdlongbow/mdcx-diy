@@ -1,9 +1,9 @@
 # MDCx
 
-![python](https://img.shields.io/badge/Python-3.13-3776AB.svg?style=flat&logo=python&logoColor=white)
+![python](https://img.shields.io/badge/Python-3.13+-3776AB.svg?style=flat&logo=python&logoColor=white)
 ![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)
-![Crawlers](https://img.shields.io/badge/Crawlers-42-brightgreen.svg)
+![Crawlers](https://img.shields.io/badge/Sites-45+-brightgreen.svg)
 ![Architecture](https://img.shields.io/badge/Architecture-Async%20%2F%20Modular-blue.svg)
 
 <p align="center">
@@ -26,8 +26,8 @@ MDCx 从网站抓取视频文件对应的元数据（标题、演员、封面、
 ### 遇到问题先看这里
 
 - 运行日志：程序自动在日志目录生成
-- 配置文档：`docs/README.md`
-- 常见问题：`docs/FAQ.md`
+- 配置文档：[docs/README.md](docs/README.md)
+- 常见问题：[docs/FAQ.md](docs/FAQ.md)
 
 ### 开发者
 
@@ -44,8 +44,6 @@ uv run check
 
 首次运行会自动配置 Git hooks（`.githooks/`）。之后每次 `git push` 都会先自动运行自检。
 
-**新工作区首次使用**：运行 `python3 scripts/install_git_hooks.py` 或直接 `uv run check`。
-
 `uv run check` 依次执行：
 
 - `ruff format --check`
@@ -54,36 +52,37 @@ uv run check
 
 ### 核心特色
 
-- **42 个网站爬虫** - 有码、无码、FC2、国产、欧美
+- **45+ 网站爬虫** - 有码、无码、FC2、国产、欧美全覆盖
 - **智能番号识别** - 自动判断番号类型并分类处理
-- **标准 NFO 生成** - 符合 KODI/Emby/Jellyfin 规范
-- **图片处理** - 人脸裁剪、水印、高清封面、图片修复
-- **多语言翻译** - 5 个翻译引擎（Google、Baidu、DeepL、DeepLX、LLM）
-- **演员数据库管理** - Excel 数据库，TMDB 批量查询
-- **Emby/Jellyfin 深度集成** - 自动同步演员信息和图片
-- **异步并发架构** - asyncio + 渐进式任务调度
-- **灵活配置系统** - 字段优先级、Jinja2 命名模板
-- **丰富的工具集** - 字幕管理、缺失检测、海报裁剪等
+- **标准 NFO 生成** - 符合 KODI/Emby/Jellyfin 规范，30+ 元数据字段
+- **图片处理** - 人脸裁剪、水印、Amazon 高清封面、图片修复
+- **多语言翻译** - 6 个翻译引擎（Google、Bing、Baidu、DeepL、DeepLX、LLM）
+- **演员数据库管理** - Excel 数据库 + TMDB/Wikidata/Gfriends 多源补全
+- **Emby/Jellyfin 深度集成** - 自动同步演员信息、头像和元数据
+- **PyQt6 界面** - 现代化 GUI，支持界面缩放比例调节和暗色模式
+- **异步并发架构** - asyncio + 渐进式任务调度，处理大量文件不溢出
+- **灵活配置系统** - 字段级优先级、Jinja2 命名模板、代理按站点路由
 
 ### 技术亮点
 
 - **模块化设计** - 爬虫、核心、基础、工具层清晰分离
-- **浏览器指纹伪装** - curl-cffi 模拟真实浏览器
-- **令牌桶限流器** - 精准控制 API 请求频率
+- **浏览器指纹伪装** - 6 种 curl-cffi TLS 指纹（Chrome 124/131/136，Firefox 133/135），自动轮换
+- **Cloudflare Bypass** - 内置 Mirror + HTML 双模式绕过，支持外部 bypass 服务
+- **令牌桶限流器** - 精准控制 API 请求频率，自适应退避重试
 - **字段级优先级** - 每个字段可独立设置来源网站
-- **渐进式任务调度** - 处理大量文件时不会内存溢出
+- **连接池管理** - 域名级并发控制，Session 热更新，空闲自动回收
 
 ## 核心特性
 
 ### 智能抓取系统
 
-**42 个网站覆盖各类内容**
+**45+ 网站覆盖各类内容**
 
 | 类型 | 网站 |
 |-----|------|
-| **有码** | DMM、JavDB、JavBus、Jav321、MGStage、Prestige、Official、JavLibrary、MissAV、AVSOX、MMTV、MyWife、Getchu、GetchuDMM、Faleno、Fantastica、Dahlia、Giga、XCity、CableAV、FreeJavBT、Hscangku、AVBASE、Mdtv |
-| **无码** | Kin8、JavDB（无码分类）、airav_cc |
-| **FC2** | FC2、FC2Club、FC2Hub、FC2PPVDB |
+| **有码** | DMM、JavDB、JavBus、Jav321、MGStage、Prestige、Official、JavLibrary、MissAV、AVSOX、MMTV、MyWife、Getchu、GetchuDMM、Faleno、Fantastica、Dahlia、Giga、XCity、CableAV、FreeJavBT、Hscangku、AVBASE、Mdtv、Love6、LibreDMM |
+| **无码** | Kin8、JavDB（无码分类）、airav_cc、Caribbeancom、HEYZO、1Pondo、Pacopacomama、10Musume |
+| **FC2** | FC2、FC2Club、FC2Hub、FC2PPVDB（已适配 fc2cmadb.com） |
 | **国产** | HDOUBAN、CNMDB、MADOUQU、Lulubar、IQQTV、JavDay |
 | **欧美** | THEPORNDB |
 
@@ -130,12 +129,16 @@ uv run check
 
 ### 多语言翻译系统
 
-**5 个翻译引擎**
-- Google 翻译
-- 百度翻译
-- DeepL 翻译
-- DeepLX 翻译
-- LLM 翻译（支持自定义 API）
+**6 个翻译引擎**
+
+| 引擎 | 特点 |
+|------|------|
+| Google 翻译 | 免费免配置，自动爬取接口 |
+| Bing 翻译 | 免费免配置，自动爬取接口，国内网络友好 |
+| 百度翻译 | 需自行申请 API Key |
+| DeepL 翻译 | 需自行申请 API Key |
+| DeepLX 翻译 | 需配置自建 URL |
+| LLM 翻译 | 大模型翻译，支持自定义 API/Key/Model/Prompt |
 
 **翻译功能**
 - 字段级翻译配置
@@ -147,9 +150,9 @@ uv run check
 ### 灵活的命名系统
 
 **Jinja2 模板引擎**
-- 强大的模板语法
-- 丰富的变量支持（番号、标题、演员、标签、系列等）
-- 智能字符清理
+- 强大的模板语法，支持条件渲染
+- 丰富的变量（番号、标题、演员、标签、系列等）
+- 智能字符清理和截断
 - 三种命名目标（文件夹、文件、媒体库）
 
 **文件处理**
@@ -163,13 +166,11 @@ uv run check
 **Excel 格式数据库**
 - 字段：ID、日文名、中文名、繁体名、别名、信息链接、TMDB ID
 - 信息链接：相关网站链接（LibreDMM、JavDB、TMDB 链接等）
-- 导入导出
-- 格式化和清理
+- 导入导出、格式化和清理
 
 **TMDB 集成**
 - TMDB API 查询和批量获取（Excel 缓存避免重复查询）
-- 多语言信息获取
-- 令牌桶限流器（每秒 3.5 次请求，突发 10）
+- 令牌桶限流器（每秒 3.5 次请求）
 - 并发查询（并发数 3）
 - 基于日文名、中文名、繁体名和别名的反向缓存搜索
 - 名字变体归一化匹配
@@ -217,31 +218,48 @@ uv run check
 4. **演员数据库管理** - Excel 数据库维护
 5. **Wiki 工具** - 从维基百科获取信息
 
+### 界面特性
+
+- **PyQt6 原生界面** - 基于 Qt6，支持 Fusion 主题
+- **缩放比例调节** - 六档缩放比例（跟随系统/100%/125%/150%/175%/200%），解决高分屏兼容问题
+- **非整数倍缩放** - 支持 Window 高 DPI 非整数缩放策略
+- **暗色模式** - 内置暗色主题切换
+- **窗口拖拽缩放** - 最小 850x550，灵活调整
+
 ### 网络和反爬机制
 
 **HTTP 客户端**
-- httpx.AsyncClient - 主要 HTTP 客户端
-- curl_cffi.AsyncWebClient - 浏览器指纹伪装
-- SOCKS 代理支持
-- 连接池管理
+- `curl_cffi` AsyncSession - TLS 指纹模拟，6 种浏览器画像自动轮换
+- `httpx` - 同步检查更新
+- SOCKS/HTTP 代理支持
+- 三级连接池管理（HostPool → ConnectionPool → Session）
+
+**Cloudflare Bypass**
+- Mirror 模式：通过外部 bypass 服务代理请求
+- HTML 模式：调用 bypass 服务 `/html` 端点
+- 自动检测 CF 挑战页（cf-chl、cdn-cgi 标记）
+- 双模式自动降级，可配置重试次数
+- 独立代理配置，不影响常规请求
 
 **代理配置**
 - HTTP/HTTPS 代理
 - SOCKS5 代理
-- 走代理网站功能（仅指定网站走代理，其余直连，支持网站名如 `javdb` 和完整域名如 `amazon.co.jp`）
+- 走代理网站功能（仅指定网站走代理，其余直连）
+- CF Bypass 独立代理
 
 **反爬措施**
-- 浏览器指纹伪装
-- 自定义请求头
-- 失败自动重试
-- 超时处理
+- 浏览器指纹伪装（完整 sec-ch-ua、Accept-Language 等请求头）
+- 指纹按请求类型（document/api/asset）动态调整
+- 自适应域名限流（默认 8 req/s）
+- 失败自动退避重试（支持 403/429/500/502/503/504）
+- 指纹生命周期管理（定期自动轮换）
 
 ## 文档
 
 - [文档中心](docs/README.md) - 所有文档入口
 - [Code Wiki](docs/CODE_WIKI.md) - 完整技术文档
 - [功能特色](docs/FEATURES.md)
-- [完整功能列表](docs/COMPLETE_FEATURES.md) - 42 个网站爬虫和全部功能
+- [完整功能列表](docs/COMPLETE_FEATURES.md)
 - [使用场景](docs/SCENARIOS.md)
 - [开发指南](docs/DEVELOPMENT.md)
 - [FAQ](docs/FAQ.md)
@@ -256,10 +274,6 @@ uv run check
 - [TMDB 缓存系统](docs/tmdb-cache.md)
 - [PyQt6 迁移](docs/pyqt6-migration.md)
 - [爬虫迁移](docs/crawler-migration.md)
-- [代码审查检查清单](docs/CODE_REVIEW_CHECKLIST.md)
-- [代码审查指南](docs/CODE_REVIEW_GUIDE.md)
-- [代码审查标准](docs/CODE_REVIEW_STANDARDS.md)
-- [测试覆盖率摘要](docs/TEST_COVERAGE_SUMMARY.md)
 - [变更日志](docs/changelog.md)
 
 ## 快速开始
@@ -279,9 +293,6 @@ cd mdcx
 # 安装依赖（推荐使用 uv）
 uv sync --locked --all-extras --dev
 
-# 或使用 pip
-pip install -e .
-
 # 运行应用
 uv run python main.py
 ```
@@ -298,8 +309,8 @@ uv run python main.py
 #### 翻译配置
 
 1. 进入"设置" → "翻译"
-2. 选择翻译服务（Google、百度、DeepL、DeepLX、LLM）
-3. 配置 API 密钥（如果需要）
+2. 选择翻译服务（Google、Bing、Baidu、DeepL、DeepLX、LLM）
+3. 配置 API 密钥（如需要）
 4. 选择需要翻译的字段
 
 #### 命令行使用
@@ -322,8 +333,8 @@ uv run python -m mdcx.cmd.gen_enums
 
 ### 系统要求
 
-- Python 3.13+
-- Windows 10+ / macOS 10.15+ / Linux
+- Python 3.13.4+
+- Windows 10+ / macOS 10.15+ (x86_64/arm64) / Linux (x86_64)
 - 网络连接
 
 ### 故障排除
@@ -331,6 +342,10 @@ uv run python -m mdcx.cmd.gen_enums
 #### 网络问题
 
 在"设置" → "网络"中配置代理。参考错误提示排查。
+
+#### 界面太大或太小
+
+在"设置" → "界面外观" → "高分屏缩放"中调节缩放比例，保存后重启生效。
 
 #### NFO 不显示
 
@@ -369,17 +384,16 @@ uv run python -m mdcx.cmd.gen_enums
 
 ```
 mdcx/
-├── base/              # 基础功能模块
-├── cmd/               # 命令行工具
-├── config/            # 配置管理
-├── controllers/       # 控制器（业务逻辑）
-├── core/              # 核心功能（抓取、NFO 等）
-├── crawlers/          # 爬虫实现
+├── base/              # 基础功能模块（翻译、请求、同步桥接）
+├── cmd/               # 命令行工具（crawl、gen_enums）
+├── config/            # 配置管理（模型、枚举、管理器）
+├── controllers/       # 控制器（主窗口、设置、日志）
+├── core/              # 核心功能（抓取、NFO、命名、图片处理）
+├── crawlers/          # 爬虫实现（45+ 网站）
 ├── gen/               # 自动生成的枚举
-├── models/            # 数据模型
 ├── tools/             # 工具模块
-├── utils/             # 工具函数
-└── views/             # UI 视图
+├── utils/             # 工具函数（速率限制、日志）
+└── views/             # UI 视图（Qt Designer）
 ```
 
 ### 构建
@@ -398,7 +412,7 @@ uv run pytest tests/ --cov=mdcx --cov-report=html
 
 ### 代码规范
 
-项目用 `ruff` 做代码检查：
+项目用 `ruff` 做代码检查（行宽 120，启用 isort/pyupgrade/flake8 规则）：
 
 ```bash
 # 代码检查
