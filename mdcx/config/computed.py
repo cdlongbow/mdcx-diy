@@ -33,6 +33,7 @@ class Computed:
             timeout=config.timeout,
             cf_bypass_url=config.cf_bypass_url,
             cf_bypass_proxy=config.cf_bypass_proxy,
+            cf_bypass_auto=config.cf_bypass_auto,
             proxy_sites=config.proxy_sites.split(",") if config.proxy_sites else [],
             log_fn=signal.add_log,
         )

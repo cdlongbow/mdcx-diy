@@ -34,6 +34,11 @@ from .network_fingerprint import (
 )
 from .utils import collapse_inline_script_splits
 
+try:
+    from .cf_bypass import LocalBypassServer
+except ImportError:
+    LocalBypassServer = None
+
 
 class AsyncWebLimiters:
     def __init__(self):
@@ -308,6 +313,7 @@ class AsyncWebClient:
         timeout: float,
         cf_bypass_url: str = "",
         cf_bypass_proxy: str | None = None,
+        cf_bypass_auto: bool = False,
         proxy_sites: list[str] | None = None,
         log_fn: Callable[[str], None] | None = None,
         limiters: AsyncWebLimiters | None = None,
@@ -339,6 +345,10 @@ class AsyncWebClient:
         self.cf_bypass_url = cf_bypass_url.strip().rstrip("/")
         self.cf_bypass_proxy = (cf_bypass_proxy or "").strip()
         self._cf_bypass_enabled = bool(self.cf_bypass_url)
+        self._cf_bypass_auto = cf_bypass_auto
+        self._local_bypass_enabled = cf_bypass_auto and not self.cf_bypass_url
+        self._local_bypass_server: LocalBypassServer | None = None
+        self._local_bypass_start_lock = asyncio.Lock()
         self._cf_host_locks: dict[str, asyncio.Lock] = {}
         self._cf_force_refresh_locks: dict[str, asyncio.Lock] = {}
         self._cf_host_retry_semaphores: dict[str, asyncio.Semaphore] = {}
@@ -360,6 +370,42 @@ class AsyncWebClient:
         self._fingerprint_default_request_range = (120, 240)
         self._fingerprint_amazon_lifetime_range = (8 * 60.0, 18 * 60.0)
         self._fingerprint_amazon_request_range = (60, 140)
+
+    async def _ensure_local_bypass(self) -> bool:
+        if not self._local_bypass_enabled:
+            return False
+        if self._cf_bypass_enabled:
+            return True
+        if self._local_bypass_server and self._local_bypass_server.is_running:
+            self.cf_bypass_url = self._local_bypass_server.url
+            self._cf_bypass_enabled = True
+            return True
+
+        async with self._local_bypass_start_lock:
+            if self._cf_bypass_enabled:
+                return True
+            if self._local_bypass_server and self._local_bypass_server.is_running:
+                self.cf_bypass_url = self._local_bypass_server.url
+                self._cf_bypass_enabled = True
+                return True
+
+            if LocalBypassServer is None:
+                self._log("cf_bypass 模块不可用，内置 Bypass 无法启动")
+                self._local_bypass_enabled = False
+                return False
+
+            server = LocalBypassServer(log_fn=self._log)
+            ok, result = await server.start()
+            if ok:
+                self._local_bypass_server = server
+                self.cf_bypass_url = result
+                self._cf_bypass_enabled = True
+                self._log(f"本地 Bypass 服务已集成: {result}")
+                return True
+            else:
+                self._log(f"本地 Bypass 启动失败: {result}")
+                self._local_bypass_enabled = False
+                return False
 
     def _new_curl_session(self, fingerprint: BrowserFingerprint | None = None) -> AsyncSession:
         impersonate = (
@@ -465,6 +511,8 @@ class AsyncWebClient:
         self._close_requested = True
         self._closed = True
         await self._pool_manager.close()
+        if self._local_bypass_server:
+            await self._local_bypass_server.stop()
 
     async def reset_connections(self, reason: str, *, pool_key: str | None = None) -> None:
         """重建底层连接池，用于代理/节点不稳定后丢弃可能失效的连接。"""
@@ -1377,6 +1425,12 @@ class AsyncWebClient:
                             stream=stream,
                             allow_redirects=allow_redirects,
                         )
+
+                    if enable_cf_bypass and self._local_bypass_enabled and not self._cf_bypass_enabled:
+                        self._log_cf("触发内置 Bypass 服务启动", host)
+                        started = await self._ensure_local_bypass()
+                        if not started:
+                            self._log_cf("内置 Bypass 启动失败，跳过 bypass", host)
 
                     if enable_cf_bypass and self._cf_bypass_enabled and host and self._is_cf_challenge_response(resp):
                         self._log_cf(f"🛑 检测到 Cloudflare 挑战页: {method} {url}", host)

@@ -21278,6 +21278,22 @@
                             </property>
                           </widget>
                         </item>
+                        <item row="5" column="1">
+                          <widget class="QCheckBox" name="checkBox_cf_bypass_auto">
+                            <property name="sizePolicy">
+                              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                              </sizepolicy>
+                            </property>
+                            <property name="text">
+                              <string>启用内置 Bypass（自动启动本地服务，无需外部地址）</string>
+                            </property>
+                            <property name="toolTip">
+                              <string>勾选后无需配置上方外部地址，MDCx 自动在后台启动内置 Bypass 服务（需安装 cloakbrowser + cf_bypasser）</string>
+                            </property>
+                          </widget>
+                        </item>
                         <item row="6" column="0">
                           <widget class="QLabel" name="label_65">
                             <property name="sizePolicy">
