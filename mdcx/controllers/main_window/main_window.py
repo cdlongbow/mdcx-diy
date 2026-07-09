@@ -61,7 +61,6 @@ from mdcx.crawlers.fc2ppvdb import (
 from mdcx.image import PreviewImageLoader
 from mdcx.models.enums import FileMode
 from mdcx.models.flags import Flags
-from mdcx.models.log_buffer import LogBuffer
 from mdcx.models.types import CrawlersResult, FileInfo, OtherInfo, ShowData
 from mdcx.signals import signal_qt
 from mdcx.tools.actress_db import ActressDB
@@ -1178,7 +1177,7 @@ class MyMAinWindow(QMainWindow):
         self._addTreeChild(status, show_data.show_name)
 
         if not show_data.data.title:
-            show_data.data.title = LogBuffer.error().get()
+            show_data.data.title = show_data.show_name
             show_data.data.number = real_number
         self.json_array[show_data.show_name] = show_data
         if not self._has_single_selected_result_item():
