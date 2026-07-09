@@ -6,10 +6,15 @@
 ![Crawlers](https://img.shields.io/badge/Sites-45+-brightgreen.svg)
 ![Architecture](https://img.shields.io/badge/Architecture-Async%20%2F%20Modular-blue.svg)
 
-<p align="center">
-  <img src="resources/Img/donate-qr.jpg" width="180" alt="赞赏码"><br>
-  <b>如果你觉得不错可否赏我杯奶茶费</b>
-</p>
+<p align="center"><b>如果你觉得不错可否赏我杯奶茶费</b></p>
+
+<table align="center">
+  <tr>
+    <td align="center"><img src="resources/Img/donate-wechat.jpg" width="180" alt="微信"><br><sub>微信</sub></td>
+    <td width="40"></td>
+    <td align="center"><img src="resources/Img/donate-alipay.jpg" width="180" alt="支付宝"><br><sub>支付宝</sub></td>
+  </tr>
+</table>
 
 ## 简介
 
