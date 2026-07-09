@@ -384,7 +384,7 @@ use_proxy = use_proxy and self._is_proxy_host(host)
 **常见问题**
 
 - **不配能用吗？** 能。大部分网站不会被 CF 拦，只有少数严格站点才需要。
-- **怎么搭旁路？** 搜索 `flaresolverr` docker 镜像，一行命令就能跑起来。
+- **怎么搭旁路？** MDCx 需要兼容 mirror/html 协议的旁路服务。社区有公开可用地址或开源方案可自建。
 
 ---
 
