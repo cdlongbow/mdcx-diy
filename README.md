@@ -407,13 +407,6 @@ uv run ruff check . --fix
 
 请看 [CONTRIBUTING.md](docs/CONTRIBUTING.md)。
 
-<div align="right">
-
-<img src="resources/Img/donate-qr.jpg" width="150" alt="赞赏码"><br>
-如果你觉得不错可否赏我杯奶茶费
-
-</div>
-
 ## 授权许可
 
 本项目在 GPLv3 许可下发布。使用本项目代表你接受以下条款：
@@ -423,3 +416,12 @@ uv run ruff check . --fix
 * 使用本软件时请遵守当地法律法规
 * 法律及使用后果由使用者自己承担
 * 禁止将本软件用于商业用途
+
+<br>
+
+<div align="right">
+
+<img src="resources/Img/donate-qr.jpg" width="120" alt="赞赏码"><br>
+如果你觉得不错可否赏我杯奶茶费
+
+</div>
