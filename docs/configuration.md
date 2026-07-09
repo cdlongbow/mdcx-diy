@@ -385,13 +385,7 @@ use_proxy = use_proxy and self._is_proxy_host(host)
 
 - **不配能用吗？** 能。大部分网站不会被 CF 拦，只有少数严格站点才需要。
 - **怎么搭旁路？** 推荐 [CloudflareBypassForScraping](https://github.com/Hazard804/CloudflareBypassForScraping)：
-  
-  **Docker（推荐）**：
-  ```bash
-  docker run -p 8000:8000 ghcr.io/hazard804/cloudflarebypassforscraping:latest
-  ```
-  
-  **Windows 直接运行**：
+
   ```bash
   git clone https://github.com/Hazard804/CloudflareBypassForScraping.git
   cd CloudflareBypassForScraping
