@@ -20,7 +20,11 @@ from aiolimiter import AsyncLimiter
 from curl_cffi import AsyncSession, Response
 from curl_cffi.requests.exceptions import ConnectionError, RequestException, Timeout
 from curl_cffi.requests.session import HttpMethod
-from curl_cffi.requests.utils import not_set
+
+try:
+    from curl_cffi.requests.utils import not_set
+except ImportError:  # curl_cffi >= 0.12 renamed the sentinel to NOT_SET
+    from curl_cffi.requests.utils import NOT_SET as not_set
 from PIL import Image
 
 from .network_fingerprint import (
@@ -348,6 +352,7 @@ class AsyncWebClient:
         self._cf_bypass_auto = cf_bypass_auto
         self._local_bypass_enabled = cf_bypass_auto and not self.cf_bypass_url
         self._local_bypass_server: LocalBypassServer | None = None
+        self._local_bypass_prewarm_task: asyncio.Future | None = None
         self._local_bypass_start_lock = asyncio.Lock()
         self._cf_host_locks: dict[str, asyncio.Lock] = {}
         self._cf_force_refresh_locks: dict[str, asyncio.Lock] = {}
@@ -370,6 +375,20 @@ class AsyncWebClient:
         self._fingerprint_default_request_range = (120, 240)
         self._fingerprint_amazon_lifetime_range = (8 * 60.0, 18 * 60.0)
         self._fingerprint_amazon_request_range = (60, 140)
+
+    def _maybe_prewarm_local_bypass(self, host: str) -> None:
+        """#9: 非阻塞后台预热内置 Bypass 服务。
+
+        在请求一开始就触发(而非等到首个挑战页), 避免首个命中 Cloudflare 的请求
+        因等待服务启动 + 可能下载 Chromium 而被长时间阻塞。
+        """
+        if not self._local_bypass_enabled or self._cf_bypass_enabled:
+            return
+        task = self._local_bypass_prewarm_task
+        if task is not None and not task.done():
+            return
+        self._local_bypass_prewarm_task = asyncio.ensure_future(self._ensure_local_bypass())
+        self._log_cf("后台预热内置 Bypass 服务", host)
 
     async def _ensure_local_bypass(self) -> bool:
         if not self._local_bypass_enabled:
@@ -1070,18 +1089,18 @@ class AsyncWebClient:
             mirror_pool_key = HostPoolManager.key_for_url(mirror_url, None)
             try:
                 limiter = self.limiters.get("127.0.0.1")
-                await limiter.acquire()
-                response = await self._curl_request(
-                    method=current_method,
-                    url=mirror_url,
-                    proxy=None,
-                    headers=mirror_headers,
-                    data=current_data,
-                    json=current_json_data,
-                    timeout=timeout or self._cf_bypass_timeout,
-                    stream=False,
-                    allow_redirects=False,
-                )
+                async with limiter:
+                    response = await self._curl_request(
+                        method=current_method,
+                        url=mirror_url,
+                        proxy=None,
+                        headers=mirror_headers,
+                        data=current_data,
+                        json=current_json_data,
+                        timeout=timeout or self._cf_bypass_timeout,
+                        stream=False,
+                        allow_redirects=False,
+                    )
                 error = ""
             except Timeout:
                 response = None
@@ -1342,6 +1361,9 @@ class AsyncWebClient:
             u = httpx.URL(url)
             host = u.host or ""
 
+            # #9: 提前(非阻塞)预热内置 Bypass 服务, 避免首个命中挑战的请求被启动耗时阻塞
+            self._maybe_prewarm_local_bypass(host)
+
             # Check if this host should use proxy
             use_proxy = use_proxy and self._is_proxy_host(host)
             request_proxy = self.proxy if use_proxy else None
@@ -1388,14 +1410,29 @@ class AsyncWebClient:
                 )
                 pool_key = HostPoolManager.key_for_request(url, request_proxy, fingerprint)
                 try:
-                    await limiter.acquire()
                     req_headers = dict(prepared_headers)
                     req_cookies = self._merge_cookies(cookies)
                     host_retry_semaphore = None
                     if host and self._cf_host_challenge_hits.get(host, 0) > 0:
                         host_retry_semaphore = await self._get_cf_host_retry_semaphore(host)
-                    if host_retry_semaphore is not None:
-                        async with host_retry_semaphore:
+                    async with limiter:
+                        if host_retry_semaphore is not None:
+                            async with host_retry_semaphore:
+                                resp = await self._curl_request(
+                                    method=method,
+                                    url=url,
+                                    proxy=request_proxy,
+                                    fingerprint=fingerprint,
+                                    headers=req_headers,
+                                    cookies=req_cookies,
+                                    params=params,
+                                    data=data,
+                                    json=json_data,
+                                    timeout=timeout or not_set,
+                                    stream=stream,
+                                    allow_redirects=allow_redirects,
+                                )
+                        else:
                             resp = await self._curl_request(
                                 method=method,
                                 url=url,
@@ -1410,21 +1447,6 @@ class AsyncWebClient:
                                 stream=stream,
                                 allow_redirects=allow_redirects,
                             )
-                    else:
-                        resp = await self._curl_request(
-                            method=method,
-                            url=url,
-                            proxy=request_proxy,
-                            fingerprint=fingerprint,
-                            headers=req_headers,
-                            cookies=req_cookies,
-                            params=params,
-                            data=data,
-                            json=json_data,
-                            timeout=timeout or not_set,
-                            stream=stream,
-                            allow_redirects=allow_redirects,
-                        )
 
                     if enable_cf_bypass and self._local_bypass_enabled and not self._cf_bypass_enabled:
                         self._log_cf("触发内置 Bypass 服务启动", host)
