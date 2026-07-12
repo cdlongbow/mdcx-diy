@@ -521,6 +521,7 @@ class Website(Enum):
     MADOUQU = "madouqu"
     MDTV = "mdtv"
     MISSAV = "missav"
+    MISSAV_API = "missav_api"
     MGSTAGE = "mgstage"
     MMTV = "7mmtv"
     MYWIFE = "mywife"

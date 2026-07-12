@@ -3,7 +3,7 @@
 ![python](https://img.shields.io/badge/Python-3.13+-3776AB.svg?style=flat&logo=python&logoColor=white)
 ![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)
-![Crawlers](https://img.shields.io/badge/Sites-45+-brightgreen.svg)
+![Crawlers](https://img.shields.io/badge/Sites-40+-brightgreen.svg)
 ![Architecture](https://img.shields.io/badge/Architecture-Async%20%2F%20Modular-blue.svg)
 
 <p align="center"><b>如果你觉得不错可否赏我杯奶茶费，谢谢！ 😊</b></p>
@@ -57,7 +57,7 @@ uv run check
 
 ### 核心特色
 
-- **45+ 网站爬虫** - 有码、无码、FC2、国产、欧美全覆盖
+- **40+ 网站爬虫** - 有码、无码、FC2、国产、欧美全覆盖
 - **智能番号识别** - 自动判断番号类型并分类处理
 - **标准 NFO 生成** - 符合 KODI/Emby/Jellyfin 规范，30+ 元数据字段
 - **图片处理** - 人脸裁剪、水印、Amazon 高清封面、图片修复
@@ -72,7 +72,7 @@ uv run check
 
 - **模块化设计** - 爬虫、核心、基础、工具层清晰分离
 - **浏览器指纹伪装** - 6 种 curl-cffi TLS 指纹（Chrome 124/131/136，Firefox 133/135），自动轮换
-- **Cloudflare Bypass** - 内置 Mirror + HTML 双模式绕过，支持外部 bypass 服务
+- **Cloudflare Bypass** - 内置隐身 Chromium（cloakbrowser）自动绕过，无需 license key；同时支持 Mirror/HTML 模式与外部 bypass 服务（独立代理）
 - **令牌桶限流器** - 精准控制 API 请求频率，自适应退避重试
 - **字段级优先级** - 每个字段可独立设置来源网站
 - **连接池管理** - 域名级并发控制，Session 热更新，空闲自动回收
@@ -81,7 +81,7 @@ uv run check
 
 ### 智能抓取系统
 
-**45+ 网站覆盖各类内容**
+**40+ 网站覆盖各类内容**
 
 | 类型 | 网站 |
 |-----|------|
@@ -226,7 +226,7 @@ uv run check
 ### 界面特性
 
 - **PyQt6 原生界面** - 基于 Qt6，支持 Fusion 主题
-- **缩放比例调节** - 六档缩放比例（跟随系统/100%/125%/150%/175%/200%），解决高分屏兼容问题
+- **缩放比例调节** - 八档缩放比例（跟随系统/80%/90%/100%/125%/150%/175%/200%），解决高分屏兼容问题
 - **非整数倍缩放** - 支持 Window 高 DPI 非整数缩放策略
 - **暗色模式** - 内置暗色主题切换
 - **窗口拖拽缩放** - 最小 850x550，灵活调整
@@ -240,11 +240,11 @@ uv run check
 - 三级连接池管理（HostPool → ConnectionPool → Session）
 
 **Cloudflare Bypass**
-- Mirror 模式：通过外部 bypass 服务代理请求
-- HTML 模式：调用 bypass 服务 `/html` 端点
-- 自动检测 CF 挑战页（cf-chl、cdn-cgi 标记）
-- 双模式自动降级，可配置重试次数
-- 独立代理配置，不影响常规请求
+- 内置隐身 Chromium（cloakbrowser）自动绕过 Cloudflare 挑战页，无需 license key
+- 自动检测 CF 挑战页（cf-chl、cdn-cgi 标记）并自动 bypass
+- 同时支持 Mirror 模式（外部 bypass 服务代理请求）与 HTML 模式（调用 bypass 服务 `/html` 端点）
+- 支持外部 bypass 服务，可配置独立代理，不影响常规请求
+- 部分站点提供免 CF 的 API 数据（如 MissAV-API）
 - 详细用法：[配置说明](docs/configuration.md#cloudflare-bypass-配置)
 
 **代理配置**
@@ -395,7 +395,7 @@ mdcx/
 ├── config/            # 配置管理（模型、枚举、管理器）
 ├── controllers/       # 控制器（主窗口、设置、日志）
 ├── core/              # 核心功能（抓取、NFO、命名、图片处理）
-├── crawlers/          # 爬虫实现（45+ 网站）
+├── crawlers/          # 爬虫实现（40+ 网站）
 ├── gen/               # 自动生成的枚举
 ├── tools/             # 工具模块
 ├── utils/             # 工具函数（速率限制、日志）

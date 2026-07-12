@@ -57,6 +57,7 @@ from .madouqu import MadouquCrawler
 from .mdtv import MdtvCrawler
 from .mgstage import MgstageCrawler
 from .missav import MissavCrawler
+from .missav_api import MissavApiCrawler
 from .mmtv import MmtvCrawler
 from .mywife import MywifeCrawler
 from .official import OfficialCrawler
@@ -70,6 +71,7 @@ register_crawler(JavdbAPICrawler)
 register_crawler(javdbapi.JavdbApiCrawler)
 register_crawler(AvbaseCrawler)
 register_crawler(missav.MissavCrawler)
+register_crawler(MissavApiCrawler)
 register_crawler(FalenoCrawler)
 register_crawler(Jav321Crawler)
 register_crawler(CableavCrawler)
