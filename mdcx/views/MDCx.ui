@@ -12977,6 +12977,19 @@
                                 </property>
                               </widget>
                             </item>
+                            <item>
+                              <widget class="QCheckBox" name="checkBox_bing">
+                                <property name="minimumSize">
+                                  <size>
+                                    <width>93</width>
+                                    <height>30</height>
+                                  </size>
+                                </property>
+                                <property name="text">
+                                  <string>Bing</string>
+                                </property>
+                              </widget>
+                            </item>
                           </layout>
                         </item>
                         <item row="1" column="1">
@@ -20319,7 +20332,7 @@
                       <x>0</x>
                       <y>0</y>
                       <width>760</width>
-                      <height>1590</height>
+                      <height>1626</height>
                     </rect>
                   </property>
                   <widget class="QGroupBox" name="groupBox_10">
@@ -20660,7 +20673,7 @@
                           <x>20</x>
                           <y>30</y>
                           <width>661</width>
-                          <height>304</height>
+                          <height>340</height>
                         </rect>
                       </property>
                       <layout class="QGridLayout" name="gridLayout_9">
@@ -21157,8 +21170,8 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="2" column="0">
-                          <widget class="QLabel" name="label_cf_bypass">
+                        <item row="8" column="0">
+                          <widget class="QLabel" name="label_verify_ssl">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                 <horstretch>0</horstretch>
@@ -21168,7 +21181,7 @@
                             <property name="minimumSize">
                               <size>
                                 <width>130</width>
-                                <height>0</height>
+                                <height>30</height>
                               </size>
                             </property>
                             <property name="layoutDirection">
@@ -21178,38 +21191,23 @@
                               <enum>QFrame::NoFrame</enum>
                             </property>
                             <property name="text">
-                              <string>CF Bypass：</string>
+                              <string>HTTPS 证书校验：</string>
                             </property>
                             <property name="alignment">
                               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                             </property>
                           </widget>
                         </item>
-                        <item row="3" column="0">
-                          <widget class="QLabel" name="label_cf_bypass_proxy">
+                        <item row="8" column="1">
+                          <widget class="QCheckBox" name="checkBox_verify_ssl">
                             <property name="sizePolicy">
-                              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                                 <horstretch>0</horstretch>
                                 <verstretch>0</verstretch>
                               </sizepolicy>
                             </property>
-                            <property name="minimumSize">
-                              <size>
-                                <width>130</width>
-                                <height>0</height>
-                              </size>
-                            </property>
-                            <property name="layoutDirection">
-                              <enum>Qt::RightToLeft</enum>
-                            </property>
-                            <property name="frameShape">
-                              <enum>QFrame::NoFrame</enum>
-                            </property>
                             <property name="text">
-                              <string>CF Bypass代理：</string>
-                            </property>
-                            <property name="alignment">
-                              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                              <string>关闭以跳过 HTTPS 证书校验（仅调试/自签证书环境，生产环境请勿关闭）</string>
                             </property>
                           </widget>
                         </item>
@@ -21220,7 +21218,7 @@
                     <property name="geometry">
                       <rect>
                         <x>30</x>
-                        <y>1209</y>
+                        <y>1245</y>
                         <width>701</width>
                         <height>301</height>
                       </rect>
