@@ -456,10 +456,16 @@ class FileScraper:
         poster_priority_sites = poster_priority_config.site_prority
         poster_language = self.config.get_field_config(CrawlerResultFields.POSTER).language
 
-        # 需尽力收集的字段
-        for data in all_res.values():
-            # 记录所有来源的 thumb url 以便后续下载
-            if data.thumb:
+        # 按海报优先级确定性收集 thumb（与 poster_list 顺序保持一致），避免并发填充顺序不确定导致抖动
+        _seen_thumb_sources: set[str] = set()
+        for site in poster_priority_sites:
+            data = self._get_cached_site_result(all_res, site, poster_language)
+            if data and data.thumb:
+                reduced.thumb_list.append((data.source, data.thumb))
+                _seen_thumb_sources.add(data.source)
+        # 兜底：收集其余来源的 thumb（按来源确定性排序，确保不遗漏）
+        for data in sorted(all_res.values(), key=lambda d: d.source):
+            if data.thumb and data.source not in _seen_thumb_sources:
                 reduced.thumb_list.append((data.source, data.thumb))
 
         for site in poster_priority_sites:

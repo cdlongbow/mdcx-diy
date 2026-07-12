@@ -973,6 +973,19 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
         except Exception as e:
             _tmdb_log_line(f" ⚠️ [TMDB] {actor_name} 翻译补全失败: {e}")
 
+    async def _flush_wb() -> None:
+        """把批量预加载的工作簿落盘（翻译/链接补全的写操作都先攒在 _wb 内存里）。"""
+        if _wb is None:
+            return
+        try:
+            _ws = _wb.active
+            _format_db_worksheet(_ws)
+            _wb.save(_db_path)
+            _wb.close()
+            resources.reload_actor_db()
+        except Exception:
+            pass
+
     if need_translate:
         _tmdb_log_line(f" 🔄 [TMDB] 补全 {len(need_translate)} 个已有 tmdbid 演员的翻译")
         trans_semaphore = asyncio.Semaphore(3)
@@ -986,6 +999,7 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
 
     if not need_query:
         _tmdb_log_line("  ℹ️ [TMDB] 所有演员已在 actor_db 中匹配，无需 API 查询")
+        await _flush_wb()
         return result
 
     _tmdb_log_line(f" 🎬 [TMDB] 开始查询 {len(need_query)} 个演员的 TMDB ID: {[a[0] for a in need_query]}")
@@ -1082,16 +1096,8 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
         tasks = [asyncio.create_task(_fetch_and_update(name)) for name in missing_link]
         await asyncio.gather(*tasks)
 
-    # Flush batched workbook writes
-    if _wb is not None:
-        try:
-            _ws = _wb.active
-            _format_db_worksheet(_ws)
-            _wb.save(_db_path)
-            _wb.close()
-            resources.reload_actor_db()
-        except Exception:
-            pass
+    # Flush batched workbook writes (翻译/链接补全都先攒在 _wb 内存里)
+    await _flush_wb()
 
     flush_tmdb_query_cache()
     return result
