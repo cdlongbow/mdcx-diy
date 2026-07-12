@@ -92,7 +92,7 @@
 
 **10. 网络设置**
 
-- `use_proxy`：代理类型（no/http/socks5）
+- `use_proxy`：是否使用代理（bool，默认 False）
 - `proxy`：代理地址
 - `proxy_sites`：走代理的网站列表
 - `cf_bypass_*`：Cloudflare Bypass 配置
@@ -122,7 +122,7 @@
 
 ### `Website`
 
-支持的网站枚举，共 36 个站点。
+支持的网站枚举，实际以动态注册的爬虫为准（当前 43 个站点，网站下拉框由已注册爬虫动态生成）。
 
 ### `FixedScrapingType`
 
@@ -182,15 +182,17 @@
 
 | 配置项 | 类型 | 默认值 | 说明 |
 |--------|------|--------|------|
-| `use_proxy` | bool | `true` | 是否使用代理 |
-| `proxy` | str | `"http://127.0.0.1:7890"` | 代理地址 |
+| `use_proxy` | bool | `false` | 是否使用代理 |
+| `proxy` | str | `"http://127.0.0.1:7890"` | 代理地址（URL 协议决定类型：http/https/socks5） |
 
 **配置示例**
 
+代理在「设置 → 网络」中配置，类型由代理地址的协议决定（http / https / socks5）：
+
 ```json
 {
-  "use_proxy": "socks5",
-  "proxy": "socks5://127.0.0.1:1080"
+  "use_proxy": true,
+  "proxy": "http://127.0.0.1:7890"
 }
 ```
 

@@ -726,7 +726,7 @@ def save_config(self: "MyMAinWindow"):
     manager.config.window_title = "hide" if self.Ui.checkBox_hide_window_title.isChecked() else "show"
 
     scale_index = self.Ui.comboBox_ui_scale.currentIndex()
-    scale_values = {0: 0.0, 1: 1.0, 2: 1.25, 3: 1.5, 4: 1.75, 5: 2.0}
+    scale_values = {0: 0.0, 1: 0.8, 2: 0.9, 3: 1.0, 4: 1.25, 5: 1.5, 6: 1.75, 7: 2.0}
     manager.config.ui_scale_factor = scale_values.get(scale_index, 0.0)
 
     # endregion

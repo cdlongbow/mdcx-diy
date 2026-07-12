@@ -1071,14 +1071,18 @@ def load_config(self: "MyMAinWindow"):
         scale_factor: float = manager.config.ui_scale_factor
         scale_index = 0
         if scale_factor >= 1.95:
-            scale_index = 5
+            scale_index = 7
         elif scale_factor >= 1.70:
-            scale_index = 4
+            scale_index = 6
         elif scale_factor >= 1.45:
-            scale_index = 3
+            scale_index = 5
         elif scale_factor >= 1.20:
+            scale_index = 4
+        elif scale_factor >= 0.98:
+            scale_index = 3
+        elif scale_factor >= 0.88:
             scale_index = 2
-        elif scale_factor >= 0.95:
+        elif scale_factor >= 0.78:
             scale_index = 1
         self.Ui.comboBox_ui_scale.setCurrentIndex(scale_index)
 

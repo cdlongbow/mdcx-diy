@@ -664,7 +664,7 @@ class Config(BaseModel):
         ge=0.0,
         le=3.0,
         title="界面缩放比例",
-        description="0.0=跟随系统，1.0=100%，1.25=125%...",
+        description="0.0=跟随系统，0.8=80%，0.9=90%，1.0=100%，1.25=125%...",
     )
     switch_on: list[Switch] = Field(
         default_factory=lambda: [
