@@ -801,6 +801,7 @@
   "proxy": "http://127.0.0.1:7890",
   "cf_bypass_url": "",
   "cf_bypass_proxy": "",
+  "verify_ssl": true,
   "timeout": 10,
   "retry": 3,
   "theporndb_api_token": "",

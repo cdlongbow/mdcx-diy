@@ -34,6 +34,7 @@ class Computed:
             cf_bypass_url=config.cf_bypass_url,
             cf_bypass_proxy=config.cf_bypass_proxy,
             cf_bypass_auto=config.cf_bypass_auto,
+            verify_ssl=config.verify_ssl,
             proxy_sites=config.proxy_sites.split(",") if config.proxy_sites else [],
             log_fn=signal.add_log,
         )

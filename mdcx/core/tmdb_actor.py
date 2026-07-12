@@ -983,8 +983,9 @@ async def fetch_actor_tmdb_ids(actors: list[str], client: Any) -> dict[str, int]
             _wb.save(_db_path)
             _wb.close()
             resources.reload_actor_db()
-        except Exception:
-            pass
+        except Exception as e:
+            # 落盘失败绝不能静默吞掉: 否则翻译/链接补全结果会静默全丢且用户无感知
+            _tmdb_log_line(f" ❌ [TMDB] 演员库落盘失败，翻译/链接补全可能未保存: {e}")
 
     if need_translate:
         _tmdb_log_line(f" 🔄 [TMDB] 补全 {len(need_translate)} 个已有 tmdbid 演员的翻译")

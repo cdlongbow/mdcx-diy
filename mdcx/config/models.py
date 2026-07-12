@@ -635,6 +635,7 @@ class Config(BaseModel):
     cf_bypass_url: str = Field(default="", title="Cloudflare Bypass地址")
     cf_bypass_proxy: str = Field(default="", title="Cloudflare Bypass代理地址")
     cf_bypass_auto: bool = Field(default=False, title="启用内置CF Bypass")
+    verify_ssl: bool = Field(default=True, title="HTTPS证书校验（关闭仅用于自签名代理/MITM调试）")
     timeout: int = Field(default=10, title="超时")
     retry: int = Field(default=3, title="重试")
     theporndb_api_token: str = Field(default="", title="Theporndb API令牌")

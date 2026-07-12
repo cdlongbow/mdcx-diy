@@ -318,6 +318,7 @@ class AsyncWebClient:
         cf_bypass_url: str = "",
         cf_bypass_proxy: str | None = None,
         cf_bypass_auto: bool = False,
+        verify_ssl: bool = True,
         proxy_sites: list[str] | None = None,
         log_fn: Callable[[str], None] | None = None,
         limiters: AsyncWebLimiters | None = None,
@@ -327,9 +328,10 @@ class AsyncWebClient:
         self.timeout = timeout
         self.proxy_sites = [s.strip() for s in (proxy_sites or []) if s.strip()]
         self.max_clients = 100
+        self.verify_ssl = verify_ssl
         self._session_kwargs = {
             "max_clients": self.max_clients,
-            "verify": False,
+            "verify": self.verify_ssl,
             "max_redirects": 20,
             "timeout": timeout,
         }

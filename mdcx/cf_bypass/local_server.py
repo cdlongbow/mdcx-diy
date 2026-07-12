@@ -103,8 +103,10 @@ class LocalBypassServer:
                     os.path.join(meipass, "chromium", "chrome.exe"),
                     os.path.join(meipass, "chromium", "chrome-win64", "chrome.exe"),
                     os.path.join(meipass, "chromium", "chrome-linux", "chrome"),
-                    os.path.join(meipass, "chromium", "chrome-macos", "Chrome"),
-                    os.path.join(meipass, "chromium", "chrome-macos", "chrome"),
+                    # macOS: build.py 把 stealth Chromium 的 MacOS 目录拷入 chrome-macos/,
+                    # 故二进制直接位于 chrome-macos/Chromium; 同时兜底 Chromium.app 完整包路径
+                    os.path.join(meipass, "chromium", "chrome-macos", "Chromium"),
+                    os.path.join(meipass, "chromium", "chrome-macos", "Chromium.app", "Contents", "MacOS", "Chromium"),
                 ]
                 for cand in candidates:
                     if cand and os.path.isfile(cand):

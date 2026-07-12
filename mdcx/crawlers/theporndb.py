@@ -253,7 +253,7 @@ class TheporndbCrawler(BaseCrawler):
                     hash_search, error = await self.async_client.get_json(hash_url, headers=headers)
                     if hash_search is None:
                         if "HTTP 401" in str(error):
-                            raise CrawlerException(f"请检查 API Token 是否正确: {manager.config.theporndb_api_token}")
+                            raise CrawlerException("ThePornDB 返回 401，请检查 API Token 是否正确（设置-网络中填写）")
                         ctx.debug(f"Hash 请求失败，继续文件名搜索: {error}")
                         hash_search = {}
                     hash_data = hash_search.get("data")
@@ -274,7 +274,7 @@ class TheporndbCrawler(BaseCrawler):
                 res_search, error = await self.async_client.get_json(last_search_url, headers=headers)
                 if res_search is None:
                     if "HTTP 401" in str(error):
-                        raise CrawlerException(f"请检查 API Token 是否正确: {manager.config.theporndb_api_token}")
+                        raise CrawlerException("ThePornDB 返回 401，请检查 API Token 是否正确（设置-网络中填写）")
                     raise CrawlerException(f"请求错误: {error}")
 
                 real_url = get_real_url(res_search, file_path, series_ex, date, kind)
@@ -288,7 +288,7 @@ class TheporndbCrawler(BaseCrawler):
         res_real, error = await self.async_client.get_json(real_url, headers=headers)
         if res_real is None:
             if "HTTP 401" in str(error):
-                raise CrawlerException(f"请检查 API Token 是否正确: {manager.config.theporndb_api_token}")
+                raise CrawlerException("ThePornDB 返回 401，请检查 API Token 是否正确（设置-网络中填写）")
             raise CrawlerException(f"请求错误: {error}")
 
         real_data = res_real.get("data")

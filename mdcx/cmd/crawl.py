@@ -102,6 +102,7 @@ def _crawl(sites: list[Website], input: CrawlerInput, output: str | None, proxy:
         cf_bypass_url=manager.config.cf_bypass_url,
         cf_bypass_proxy=manager.config.cf_bypass_proxy,
         cf_bypass_auto=manager.config.cf_bypass_auto,
+        verify_ssl=manager.config.verify_ssl,
         log_fn=lambda msg: print(f"[dim][AsyncWebClient] {msg}[/dim]"),
     )
 
@@ -234,6 +235,7 @@ async def _fetch_async(
         cf_bypass_url=manager.config.cf_bypass_url,
         cf_bypass_proxy=manager.config.cf_bypass_proxy,
         cf_bypass_auto=manager.config.cf_bypass_auto,
+        verify_ssl=manager.config.verify_ssl,
         log_fn=lambda msg: console.print(f"[dim][AsyncWebClient] {msg}[/dim]"),
     )
 
