@@ -22,13 +22,13 @@ dependencies = [
     "beautifulsoup4==4.13.4",
     "curl-cffi==0.11.4",
     "httpx[socks]>=0.28.1",
-    "lxml>=5.2.0",
+    "lxml>=6.1.0",  # GHSA-vfmq-68hx-4jfw (CVE-2026-41066) XXE 修复; 需用 defusedxml 解析不可信 XML
     "openai==1.91.0",
     "oshash==0.1.1",
     "parsel>=1.10.0",
-    "pillow==11.3.0",
+    "pillow>=12.2.0",  # GHSA-pwv6-vv43-88gr / whj4-6x5x-4v2j / cfh3-3jmp-rvhc / r73j-pqj5-w3x7 等 12 条告警; 处理不可信封面/缩略图
     "ping3==4.0.4",
-    "pydantic-settings>=2.10.1",
+    "pydantic-settings>=2.14.2",  # GHSA-4xgf-cpjx-pc3j 符号链接越权读 secrets
     "pyqt6==6.11.0",
     "zhconv==1.4.3",
     "opencv-contrib-python-headless==4.13.0.92",
@@ -61,7 +61,7 @@ dev = [
     # 构建期用于下载并随包打入 CF Bypass 所需的 Chromium (CI 中通过 PLAYWRIGHT_BROWSERS_PATH 指定缓存位置)
     "playwright>=1.40.0",
     "pyright>=1.1.400",
-    "pytest>=8.4.1",
+    "pytest>=9.0.3",  # GHSA-6w46-j5rx-g56g tmpdir 处理漏洞 (dev)
     "pytest-asyncio>=1.1.0",
     "pytest-cov>=6.2.1",
     "rich>=14.1.0",
