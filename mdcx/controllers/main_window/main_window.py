@@ -47,7 +47,7 @@ from mdcx.config.enums import NfoInclude, Switch, Website
 from mdcx.config.extend import deal_url, get_movie_path_setting, parse_media_paths
 from mdcx.config.manager import manager
 from mdcx.config.resources import resources
-from mdcx.consts import GITHUB_ISSUES_URL, GITHUB_RELEASES_URL, IS_WINDOWS, LOCAL_VERSION
+from mdcx.consts import GITHUB_ISSUES_URL, GITHUB_RELEASES_URL, IS_WINDOWS, LOCAL_VERSION, VERSION_NAME
 from mdcx.core.naming import NameRenderOptions, NamingTarget, render_name
 from mdcx.core.network_check import run_network_check
 from mdcx.core.nfo import write_nfo
@@ -149,7 +149,8 @@ class MyMAinWindow(QMainWindow):
         super().__init__(parent)
 
         # region 初始化需要的变量
-        self.localversion = LOCAL_VERSION  # 当前版本号
+        self.localversion = LOCAL_VERSION  # 当前版本号(数值, 用于版本比较)
+        self.version_display = f"{VERSION_NAME} ({LOCAL_VERSION})"  # 展示用: v2.0.0 (220260712)
         self.new_version = "\n🔍 点击检查最新版本"  # 有版本更新时在左下角显示的新版本信息
         self.show_data: ShowData | None = None  # 当前树状图选中文件的数据
         self.img_path = None  # 当前树状图选中文件的图片地址
@@ -906,7 +907,7 @@ class MyMAinWindow(QMainWindow):
             signal_qt.show_log_text(traceback.format_exc())
 
     def _show_version_thread(self):
-        version_info = f"基于 MDC-GUI 修改 当前版本: {self.localversion}"
+        version_info = f"基于 MDC-GUI 修改 当前版本: {self.version_display}"
         download_link = ""
         latest_version = check_version()
         if latest_version:
@@ -914,10 +915,10 @@ class MyMAinWindow(QMainWindow):
                 self.new_version = f"\n🍉 有新版本了！（{latest_version}）"
                 signal_qt.show_scrape_info()
                 self.Ui.label_show_version.setCursor(Qt.CursorShape.OpenHandCursor)  # 设置鼠标形状为十字形
-                version_info = f'基于 MDC-GUI 修改 · 当前版本: {self.localversion} （ <font color="red" >最新版本是: {latest_version}，请及时更新！🚀 </font>）'
+                version_info = f'基于 MDC-GUI 修改 · 当前版本: {self.version_display} （ <font color="red" >最新版本是: {latest_version}，请及时更新！🚀 </font>）'
                 download_link = f' ⬇️ <a href="{GITHUB_RELEASES_URL}">下载新版本</a>'
             else:
-                version_info = f'基于 MDC-GUI 修改 · 当前版本: {self.localversion} （ <font color="green">你使用的是最新版本！🎉 </font>）'
+                version_info = f'基于 MDC-GUI 修改 · 当前版本: {self.version_display} （ <font color="green">你使用的是最新版本！🎉 </font>）'
 
         feedback = f' 💌 问题反馈: <a href="{GITHUB_ISSUES_URL}">GitHub Issues</a>'
 

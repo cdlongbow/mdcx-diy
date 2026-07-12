@@ -28,7 +28,7 @@ from mdcx.config.enums import (
 from mdcx.config.extend import get_movie_path_setting
 from mdcx.config.manager import manager
 from mdcx.config.resources import resources
-from mdcx.consts import GITHUB_ISSUES_URL, IS_WINDOWS
+from mdcx.consts import GITHUB_ISSUES_URL, IS_WINDOWS, LOCAL_VERSION, VERSION_NAME
 from mdcx.gen.field_enums import CrawlerResultFields
 from mdcx.models.flags import Flags
 from mdcx.signals import signal_qt
@@ -1128,7 +1128,7 @@ def load_config(self: "MyMAinWindow"):
                 f"📂 刮削目录：{movie_path_text} \n "
                 f"💠 刮削模式：{Flags.main_mode_text} · {scrape_like_text} \n "
                 f"🖥️ 系统信息：{platform.platform()} \n "
-                f"🐰 软件版本：{self.localversion} \n"
+                f"🐰 软件版本：{VERSION_NAME} ({LOCAL_VERSION}) \n"
             )
         except Exception:
             signal_qt.show_traceback_log(traceback.format_exc())

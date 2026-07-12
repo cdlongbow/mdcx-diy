@@ -35,6 +35,7 @@ from mdcx.config.models import SiteConfig, str_to_list
 from mdcx.gen.field_enums import CrawlerResultFields
 from mdcx.models.flags import Flags
 from mdcx.signals import signal_qt
+from mdcx.consts import LOCAL_VERSION, VERSION_NAME
 from mdcx.tools.actress_db import ActressDB
 
 from .bind_utils import get_checkbox, get_checkboxes, get_radio_buttons
@@ -770,7 +771,7 @@ def save_config(self: "MyMAinWindow"):
             f"📂 刮削目录：{movie_path_text} \n "
             f"💠 刮削模式：{Flags.main_mode_text} · {scrape_like_text} \n "
             f"🖥️ 系统信息：{platform.platform()} \n "
-            f"🐰 软件版本：{self.localversion} \n"
+            f"🐰 软件版本：{VERSION_NAME} ({LOCAL_VERSION}) \n"
         )
     except Exception:
         signal_qt.show_traceback_log(traceback.format_exc())

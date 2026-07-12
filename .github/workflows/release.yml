@@ -12,8 +12,9 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Tag"
-        required: true
+        description: "Tag（留空则自动取 consts.py 的 LOCAL_VERSION，必须为纯数字；也可手动填写）"
+        required: false
+        default: ""
       prerelease:
         description: "是否作为预发布（pre-release）"
         required: false
@@ -63,6 +64,21 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
+      - name: Resolve release tag
+        id: release-tag
+        shell: bash
+        run: |
+          tag="${{ github.event.inputs.tag }}"
+          # 手动触发且留空 → 自动取 consts.py 的 LOCAL_VERSION（纯数字，供 check_version 的 int(tag) 用）
+          if [ -z "$tag" ]; then
+            tag=$(grep -oE 'LOCAL_VERSION[[:space:]]*=[[:space:]]*[0-9]+' mdcx/consts.py | grep -oE '[0-9]+')
+          fi
+          # push tag 触发时兜底用 ref_name
+          if [ -z "$tag" ]; then
+            tag="${{ github.ref_name }}"
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
       - name: "Set up Python"
         uses: actions/setup-python@v5
         with:
@@ -96,11 +112,7 @@ jobs:
       - name: Build macOS app - macOS
         if: ${{ matrix.build == 'macos' }}
         run: |
-          version="${{ github.ref_name }}"
-          # 如果是手动触发，则使用输入的tag
-          if [ -n "${{ github.event.inputs.tag }}" ]; then
-            version="${{ github.event.inputs.tag }}"
-          fi
+          version="${{ steps.release-tag.outputs.tag }}"
           uv run scripts/build.py --create-dmg --version "$version" --debug
 
       - name: Build Windows app - Windows
@@ -138,21 +150,20 @@ jobs:
           fi
           echo "prerelease=$prerelease" >> $GITHUB_OUTPUT
 
-      - name: Resolve release tag
-        id: release-tag
+      - name: Resolve release name
+        id: release-name
         shell: bash
         run: |
-          tag="${{ github.ref_name }}"
-          if [ -n "${{ github.event.inputs.tag }}" ]; then
-            tag="${{ github.event.inputs.tag }}"
-          fi
-          echo "tag=$tag" >> $GITHUB_OUTPUT
+          version_name=$(grep -oE 'VERSION_NAME[[:space:]]*=[[:space:]]*"[^"]+"' mdcx/consts.py | grep -oE '"[^"]+"' | tr -d '"')
+          tag="${{ steps.release-tag.outputs.tag }}"
+          echo "name=${version_name} (${tag})" >> "$GITHUB_OUTPUT"
 
       - name: Create Release - macOS
         uses: svenstaro/upload-release-action@v2
         if: ${{ matrix.build == 'macos' }}
         with:
           overwrite: true
+          release_name: ${{ steps.release-name.outputs.name }}
           asset_name: MDCx-${{ steps.release-tag.outputs.tag }}-${{ matrix.build }}-${{ matrix.arch }}-${{ github.sha }}.dmg
           file: dist/MDCx.dmg
           prerelease: ${{ steps.release-type.outputs.prerelease }}
@@ -199,6 +210,7 @@ jobs:
         if: ${{ matrix.build == 'windows' }}
         with:
           overwrite: true
+          release_name: ${{ steps.release-name.outputs.name }}
           asset_name: MDCx-${{ steps.release-tag.outputs.tag }}-${{ matrix.build }}-${{ matrix.arch }}-${{ github.sha }}.exe
           file: dist/MDCx.exe
           prerelease: ${{ steps.release-type.outputs.prerelease }}
