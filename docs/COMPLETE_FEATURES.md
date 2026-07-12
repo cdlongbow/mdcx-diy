@@ -82,13 +82,14 @@
 | `xcity` | XCity | XCity 信息站 |
 | `libredmm` | LibreDMM | LibreDMM 开源项目 |
 
-### 无码类 (3 个)
+### 无码类 (4 个)
 
 | 网站爬虫 | 网站名称 | 说明 |
 |---------|---------|------|
 | `avsox` | AVSoX | AVSoX 信息站 |
 | `kin8` | KIN8 | KIN8 无码 |
 | `javdb_app` | JavDB APP | JavDB 移动端 API |
+| `missav_api` | MissAV-API | MissAV 免防护墙抓取通道：直连 Recombee 推荐 API 取元数据、fourhoi 图床取封面，全程免 CF、不走代理更稳定；Recombee 搜索接口不含演员，演员字段留空 |
 
 ### FC2 类 (5 个)
 
@@ -128,7 +129,7 @@
 | `mdtv` | MDTV | MDTV |
 | `avbase_new` | AVBase | AVBase |
 
-**总计：43 个网站爬虫**
+**总计：44 个网站爬虫**
 
 ---
 
@@ -1089,7 +1090,7 @@ results = await asyncio.gather(*tasks)
 ---
 
 **功能统计**
-- 🌐 43 个网站爬虫
+- 🌐 44 个网站爬虫
 - 📝 30+ NFO 字段
 - 🌐 6 大翻译引擎
 - 🎭 8 大功能模块
