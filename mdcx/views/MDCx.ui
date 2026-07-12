@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <ui version="4.0">
   <class>MDCx</class>
   <widget class="QMainWindow" name="MDCx">
@@ -1258,22 +1258,22 @@
               <bool>true</bool>
             </property>
             <property name="html">
-              <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-                &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+              <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"&gt;
+                &lt;html&gt;&lt;head&gt;&lt;meta name="qrichtext" content="1" /&gt;&lt;style type="text/css"&gt;
                 p, li { white-space: pre-wrap; }
-                &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt;&quot;&gt; &lt;/span&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt;&quot;&gt; &lt;/span&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt;&quot;&gt; &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                &lt;/style&gt;&lt;/head&gt;&lt;body style=" font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;"&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-family:'Microsoft YaHei UI'; font-size:9pt;"&gt; &lt;/span&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-family:'Microsoft YaHei UI'; font-size:9pt;"&gt; &lt;/span&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-family:'Microsoft YaHei UI'; font-size:9pt;"&gt; &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="textInteractionFlags">
               <set>Qt::TextBrowserInteraction</set>
@@ -1323,22 +1323,22 @@
               <bool>true</bool>
             </property>
             <property name="html">
-              <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-                &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+              <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"&gt;
+                &lt;html&gt;&lt;head&gt;&lt;meta name="qrichtext" content="1" /&gt;&lt;style type="text/css"&gt;
                 p, li { white-space: pre-wrap; }
-                &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt;&quot;&gt; &lt;/span&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt;&quot;&gt; &lt;/span&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt;&quot;&gt; &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                &lt;/style&gt;&lt;/head&gt;&lt;body style=" font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;"&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-family:'Microsoft YaHei UI'; font-size:9pt;"&gt; &lt;/span&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-family:'Microsoft YaHei UI'; font-size:9pt;"&gt; &lt;/span&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-family:'Microsoft YaHei UI'; font-size:9pt;"&gt; &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="textInteractionFlags">
               <set>Qt::TextBrowserInteraction</set>
@@ -1427,22 +1427,22 @@
               <bool>true</bool>
             </property>
             <property name="html">
-              <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-                &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+              <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"&gt;
+                &lt;html&gt;&lt;head&gt;&lt;meta name="qrichtext" content="1" /&gt;&lt;style type="text/css"&gt;
                 p, li { white-space: pre-wrap; }
-                &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt;&quot;&gt; &lt;/span&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt;&quot;&gt; &lt;/span&gt; &lt;/p&gt;
-                &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt;&quot;&gt; &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                &lt;/style&gt;&lt;/head&gt;&lt;body style=" font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;"&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-family:'Microsoft YaHei UI'; font-size:9pt;"&gt; &lt;/span&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-family:'Microsoft YaHei UI'; font-size:9pt;"&gt; &lt;/span&gt; &lt;/p&gt;
+                &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-family:'Microsoft YaHei UI'; font-size:9pt;"&gt; &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="textInteractionFlags">
               <set>Qt::TextBrowserInteraction</set>
@@ -1734,7 +1734,7 @@
                   </rect>
                 </property>
                 <property name="styleSheet">
-                  <string notr="true">font:&quot;Courier&quot;;</string>
+                  <string notr="true">font:"Courier";</string>
                 </property>
                 <property name="title">
                   <string>裁剪图片（将某个图片裁剪为封面图大小，支持加水印）</string>
@@ -2452,7 +2452,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -2538,7 +2538,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -2762,7 +2762,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -2857,7 +2857,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -3071,7 +3071,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -3148,7 +3148,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -3336,7 +3336,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -3443,7 +3443,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -3553,7 +3553,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -3682,7 +3682,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -3805,7 +3805,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -3856,7 +3856,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -4067,7 +4067,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -4114,7 +4114,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -4563,7 +4563,7 @@
                                       </size>
                                     </property>
                                     <property name="text">
-                                      <string>本地之前刮削失败的文件和没有nfo的文件，重新刮削（按更新模式规则）</string>
+                                      <string>本地没有nfo的文件，重新刮削（按正常模式规则）</string>
                                     </property>
                                   </widget>
                                 </item>
@@ -5332,7 +5332,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -5418,7 +5418,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -5500,7 +5500,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -5652,7 +5652,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
                                   </string>
@@ -5706,7 +5706,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -5911,7 +5911,7 @@
                       </rect>
                     </property>
                     <property name="styleSheet">
-                      <string notr="true">font:&quot;Courier&quot;;</string>
+                      <string notr="true">font:"Courier";</string>
                     </property>
                     <property name="title">
                       <string>多线程刮削</string>
@@ -5922,7 +5922,7 @@
                           <x>50</x>
                           <y>30</y>
                           <width>631</width>
-                        <height>260</height>
+                          <height>181</height>
                         </rect>
                       </property>
                       <layout class="QGridLayout" name="gridLayout_15">
@@ -6695,7 +6695,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -6773,7 +6773,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -6899,7 +6899,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -6921,7 +6921,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -7081,7 +7081,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -7156,7 +7156,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -7347,7 +7347,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -7397,7 +7397,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -7419,7 +7419,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -7441,7 +7441,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -7519,7 +7519,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -7541,7 +7541,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -7619,7 +7619,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -7725,7 +7725,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -7747,7 +7747,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -7769,7 +7769,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -7819,7 +7819,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -7925,7 +7925,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -7975,7 +7975,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -7997,7 +7997,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -8047,7 +8047,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -8097,7 +8097,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -8203,7 +8203,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -8225,7 +8225,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -8247,7 +8247,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -8760,7 +8760,7 @@
                       <x>0</x>
                       <y>0</y>
                       <width>760</width>
-                    <height>1640</height>
+                      <height>1640</height>
                     </rect>
                   </property>
                   <widget class="QGroupBox" name="groupBox_24">
@@ -8841,7 +8841,7 @@
                           <x>60</x>
                           <y>210</y>
                           <width>621</width>
-                        <height>238</height>
+                          <height>238</height>
                         </rect>
                       </property>
                       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -9227,7 +9227,7 @@
                       <property name="geometry">
                         <rect>
                           <x>60</x>
-                        <y>440</y>
+                          <y>440</y>
                           <width>621</width>
                           <height>41</height>
                         </rect>
@@ -9394,7 +9394,7 @@
                       </rect>
                     </property>
                     <property name="styleSheet">
-                      <string notr="true">font:&quot;Courier&quot;;</string>
+                      <string notr="true">font:"Courier";</string>
                     </property>
                     <property name="title">
                       <string>创建主题视频</string>
@@ -9543,7 +9543,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -9812,7 +9812,7 @@
                       </rect>
                     </property>
                     <property name="styleSheet">
-                      <string notr="true">font:&quot;Courier&quot;;</string>
+                      <string notr="true">font:"Courier";</string>
                     </property>
                     <property name="title">
                       <string>显示剧照</string>
@@ -9954,7 +9954,7 @@
                       </rect>
                     </property>
                     <property name="styleSheet">
-                      <string notr="true">font:&quot;Courier&quot;;</string>
+                      <string notr="true">font:"Courier";</string>
                     </property>
                     <property name="title">
                       <string>视频命名规则</string>
@@ -9978,7 +9978,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -9994,7 +9994,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -10073,7 +10073,7 @@
                               <string>测试</string>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -10221,7 +10221,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -10287,7 +10287,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 8px;
 </string>
@@ -10786,7 +10786,7 @@
                       </rect>
                     </property>
                     <property name="styleSheet">
-                      <string notr="true">font:&quot;Courier&quot;;</string>
+                      <string notr="true">font:"Courier";</string>
                     </property>
                     <property name="title">
                       <string>长度命名规则</string>
@@ -10807,7 +10807,7 @@
                         </size>
                       </property>
                       <property name="styleSheet">
-                        <string notr="true"> font: &quot;Courier&quot;;
+                        <string notr="true"> font: "Courier";
                           border: 1px solid rgba(0,0,0, 50);
                           border-radius: 15px;
 </string>
@@ -11007,7 +11007,7 @@
                         <string>测试</string>
                       </property>
                       <property name="styleSheet">
-                        <string notr="true"> font: &quot;Courier&quot;;
+                        <string notr="true"> font: "Courier";
                           border: 1px solid rgba(0,0,0, 50);
                           border-radius: 15px;
 </string>
@@ -11029,7 +11029,7 @@
                         </size>
                       </property>
                       <property name="styleSheet">
-                        <string notr="true"> font: &quot;Courier&quot;;
+                        <string notr="true"> font: "Courier";
                           border: 1px solid rgba(0,0,0, 50);
                           border-radius: 15px;
 </string>
@@ -11051,7 +11051,7 @@
                         </size>
                       </property>
                       <property name="styleSheet">
-                        <string notr="true"> font: &quot;Courier&quot;;
+                        <string notr="true"> font: "Courier";
                           border: 1px solid rgba(0,0,0, 50);
                           border-radius: 15px;
 </string>
@@ -11250,7 +11250,7 @@
                         </size>
                       </property>
                       <property name="styleSheet">
-                        <string notr="true"> font: &quot;Courier&quot;;
+                        <string notr="true"> font: "Courier";
                           border: 1px solid rgba(0,0,0, 50);
                           border-radius: 15px;
 </string>
@@ -11398,7 +11398,7 @@
                         </size>
                       </property>
                       <property name="styleSheet">
-                        <string notr="true"> font: &quot;Courier&quot;;
+                        <string notr="true"> font: "Courier";
                           border: 1px solid rgba(0,0,0, 50);
                           border-radius: 15px;
 </string>
@@ -11451,7 +11451,7 @@
                         </size>
                       </property>
                       <property name="styleSheet">
-                        <string notr="true"> font: &quot;Courier&quot;;
+                        <string notr="true"> font: "Courier";
                           border: 1px solid rgba(0,0,0, 50);
                           border-radius: 15px;
 </string>
@@ -11663,7 +11663,7 @@
                         </size>
                       </property>
                       <property name="styleSheet">
-                        <string notr="true"> font: &quot;Courier&quot;;
+                        <string notr="true"> font: "Courier";
                           border: 1px solid rgba(0,0,0, 50);
                           border-radius: 15px;
 </string>
@@ -12092,7 +12092,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -12184,7 +12184,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -12241,7 +12241,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -12743,9 +12743,9 @@
                         <string>&lt;p&gt;1）Emby 支持多版本显示（类似选集），
                           需要：&lt;/p&gt;&lt;p&gt;视频文件名的开头部分必须包含视频目录名。（比如：SSIS-111/SSIS-111-4K.mp4）
                           &lt;/p&gt;&lt;p&gt;查看规则：&lt;a
-                          href=&quot;https://support.emby.media/support/solutions/articles/44001159102-movie-naming&quot;&gt;&lt;span
-                          style=&quot; text-decoration: underline;
-                          color:#094fd1;&quot;&gt;https://support.emby.media/support/solutions/articles/44001159102-movie-naming&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;2）分集视频默认会显示为附加视频，如果要以多版本样式显示，分集命名规则还需要选择「-1」&lt;/p&gt;</string>
+                          href="https://support.emby.media/support/solutions/articles/44001159102-movie-naming"&gt;&lt;span
+                          style=" text-decoration: underline;
+                          color:#094fd1;"&gt;https://support.emby.media/support/solutions/articles/44001159102-movie-naming&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;2）分集视频默认会显示为附加视频，如果要以多版本样式显示，分集命名规则还需要选择「-1」&lt;/p&gt;</string>
                       </property>
                       <property name="alignment">
                         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -12845,7 +12845,7 @@
                       <x>0</x>
                       <y>0</y>
                       <width>760</width>
-                      <height>2630</height>
+                      <height>2750</height>
                     </rect>
                   </property>
                   <widget class="QGroupBox" name="groupBox_trans">
@@ -13023,7 +13023,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -13073,7 +13073,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -13183,7 +13183,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -13247,7 +13247,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -13279,7 +13279,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -13313,7 +13313,7 @@
                             <property name="styleSheet">
                               <string notr="true"> border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 1px;
-                                font: &quot;Courier&quot;;</string>
+                                font: "Courier";</string>
                             </property>
                           </widget>
                         </item>
@@ -13344,7 +13344,7 @@
                             <property name="styleSheet">
                               <string notr="true"> border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 1px;
-                                font: &quot;Courier&quot;;</string>
+                                font: "Courier";</string>
                             </property>
                           </widget>
                         </item>
@@ -13863,7 +13863,7 @@
                         <x>30</x>
                         <y>1261</y>
                         <width>701</width>
-                        <height>420</height>
+                        <height>520</height>
                       </rect>
                     </property>
                     <property name="minimumSize">
@@ -13887,7 +13887,7 @@
                           <x>20</x>
                           <y>30</y>
                           <width>661</width>
-                          <height>381</height>
+                          <height>481</height>
                         </rect>
                       </property>
                       <layout class="QGridLayout" name="gridLayout_50">
@@ -14038,7 +14038,7 @@
                     <property name="geometry">
                       <rect>
                         <x>30</x>
-                        <y>1701</y>
+                        <y>1801</y>
                         <width>701</width>
                         <height>151</height>
                       </rect>
@@ -14111,7 +14111,7 @@
                               <string notr="true">color: rgb(8, 128, 128);</string>
                             </property>
                             <property name="text">
-                               <string>映射表文件名：info_database.xlsx。作用和演员映射表类似，说明可参考演员映射表。</string>
+                              <string>映射表文件名：info_database.xlsx。作用和演员映射表类似，说明可参考演员映射表。</string>
                             </property>
                             <property name="alignment">
                               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -14185,7 +14185,7 @@
                     <property name="geometry">
                       <rect>
                         <x>30</x>
-                        <y>1872</y>
+                        <y>1972</y>
                         <width>701</width>
                         <height>151</height>
                       </rect>
@@ -14280,7 +14280,7 @@
                               <string notr="true">color: rgb(8, 128, 128);</string>
                             </property>
                             <property name="text">
-                               <string>映射表文件名：info_database.xlsx。作用和演员映射表类似，说明可参考演员映射表。</string>
+                              <string>映射表文件名：info_database.xlsx。作用和演员映射表类似，说明可参考演员映射表。</string>
                             </property>
                             <property name="alignment">
                               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -14332,7 +14332,7 @@
                     <property name="geometry">
                       <rect>
                         <x>30</x>
-                        <y>2043</y>
+                        <y>2143</y>
                         <width>701</width>
                         <height>151</height>
                       </rect>
@@ -14427,7 +14427,7 @@
                               <string notr="true">color: rgb(8, 128, 128);</string>
                             </property>
                             <property name="text">
-                               <string>映射表文件名：info_database.xlsx。作用和演员映射表类似，说明可参考演员映射表。</string>
+                              <string>映射表文件名：info_database.xlsx。作用和演员映射表类似，说明可参考演员映射表。</string>
                             </property>
                             <property name="alignment">
                               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -14479,7 +14479,7 @@
                     <property name="geometry">
                       <rect>
                         <x>30</x>
-                        <y>2214</y>
+                        <y>2314</y>
                         <width>701</width>
                         <height>151</height>
                       </rect>
@@ -14574,7 +14574,7 @@
                               <string notr="true">color: rgb(8, 128, 128);</string>
                             </property>
                             <property name="text">
-                               <string>映射表文件名：info_database.xlsx。作用和演员映射表类似，说明可参考演员映射表。</string>
+                              <string>映射表文件名：info_database.xlsx。作用和演员映射表类似，说明可参考演员映射表。</string>
                             </property>
                             <property name="alignment">
                               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -14626,7 +14626,7 @@
                     <property name="geometry">
                       <rect>
                         <x>30</x>
-                        <y>2385</y>
+                        <y>2485</y>
                         <width>701</width>
                         <height>151</height>
                       </rect>
@@ -14721,7 +14721,7 @@
                               <string notr="true">color: rgb(8, 128, 128);</string>
                             </property>
                             <property name="text">
-                               <string>映射表文件名：info_database.xlsx。作用和演员映射表类似，说明可参考演员映射表。</string>
+                              <string>映射表文件名：info_database.xlsx。作用和演员映射表类似，说明可参考演员映射表。</string>
                             </property>
                             <property name="alignment">
                               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -14819,7 +14819,7 @@
                       </rect>
                     </property>
                     <property name="styleSheet">
-                      <string notr="true">font:&quot;Courier&quot;;</string>
+                      <string notr="true">font:"Courier";</string>
                     </property>
                     <property name="title">
                       <string>中文字幕字符规则</string>
@@ -14843,7 +14843,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -14884,7 +14884,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -15049,7 +15049,7 @@
                       </rect>
                     </property>
                     <property name="styleSheet">
-                      <string notr="true">font:&quot;Courier&quot;;</string>
+                      <string notr="true">font:"Courier";</string>
                     </property>
                     <property name="title">
                       <string>添加外挂字幕</string>
@@ -15247,7 +15247,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -15424,7 +15424,7 @@
                       </rect>
                     </property>
                     <property name="styleSheet">
-                      <string notr="true">font:&quot;Courier&quot;;</string>
+                      <string notr="true">font:"Courier";</string>
                     </property>
                     <property name="title">
                       <string>自定义水印样式</string>
@@ -15532,7 +15532,7 @@
                       </rect>
                     </property>
                     <property name="styleSheet">
-                      <string notr="true">font:&quot;Courier&quot;;</string>
+                      <string notr="true">font:"Courier";</string>
                     </property>
                     <property name="title">
                       <string>水印设置</string>
@@ -16071,7 +16071,7 @@
                       </rect>
                     </property>
                     <property name="styleSheet">
-                      <string notr="true">font:&quot;Courier&quot;;</string>
+                      <string notr="true">font:"Courier";</string>
                     </property>
                     <property name="title">
                       <string>不固定位置</string>
@@ -16204,7 +16204,7 @@
                       </rect>
                     </property>
                     <property name="styleSheet">
-                      <string notr="true">font:&quot;Courier&quot;;</string>
+                      <string notr="true">font:"Courier";</string>
                     </property>
                     <property name="title">
                       <string>固定不同位置</string>
@@ -16571,7 +16571,7 @@
                       </rect>
                     </property>
                     <property name="styleSheet">
-                      <string notr="true">font:&quot;Courier&quot;;</string>
+                      <string notr="true">font:"Courier";</string>
                     </property>
                     <property name="title">
                       <string>固定一个位置</string>
@@ -16792,23 +16792,22 @@
                                 </property>
                               </widget>
                             </item>
-                             <item>
-                               <widget class="QCheckBox" name="checkBox_nfo_all_actor">
-                                 <property name="text">
-                                   <string>写入男女演员（不勾选，则仅写入女演员）</string>
-                                 </property>
-                               </widget>
-                             </item>
-                             <item>
-                               <widget class="QCheckBox" name="checkBox_nfo_actor_tmdbid">
-                                 <property name="text">
-                                   <string>为演员写入 TMDB ID（需配置 TMDB API）</string>
-                                 </property>
-                               </widget>
-                             </item>
-                           </layout>
+                            <item>
+                              <widget class="QCheckBox" name="checkBox_nfo_all_actor">
+                                <property name="text">
+                                  <string>写入男女演员（不勾选，则仅写入女演员）</string>
+                                </property>
+                              </widget>
+                            </item>
+                            <item>
+                              <widget class="QCheckBox" name="checkBox_nfo_actor_tmdbid">
+                                <property name="text">
+                                  <string>为演员写入 TMDB ID（需配置 TMDB API）</string>
+                                </property>
+                              </widget>
+                            </item>
+                          </layout>
                         </item>
-
                         <item row="9" column="0">
                           <widget class="QLabel" name="label_391">
                             <property name="sizePolicy">
@@ -16922,7 +16921,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -17296,7 +17295,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -17353,7 +17352,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -17786,7 +17785,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -18265,7 +18264,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -18347,7 +18346,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -18565,7 +18564,7 @@
                       </rect>
                     </property>
                     <property name="styleSheet">
-                      <string notr="true">font:&quot;Courier&quot;;</string>
+                      <string notr="true">font:"Courier";</string>
                     </property>
                     <property name="title">
                       <string>Emby/Jellyfin 设置</string>
@@ -18595,7 +18594,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -18775,7 +18774,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -18928,7 +18927,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -19137,11 +19136,11 @@
                         <rect>
                           <x>20</x>
                           <y>60</y>
-                       <width>661</width>
-                       <height>266</height>
-                     </rect>
-                   </property>
-                   <layout class="QGridLayout" name="gridLayout">
+                          <width>661</width>
+                          <height>301</height>
+                        </rect>
+                      </property>
+                      <layout class="QGridLayout" name="gridLayout">
                         <item row="6" column="1">
                           <widget class="QLabel" name="label_77">
                             <property name="sizePolicy">
@@ -19189,7 +19188,7 @@
                             </property>
                           </widget>
                         </item>
-                         <item row="8" column="0">
+                        <item row="8" column="0">
                           <widget class="QLabel" name="label_101">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -19290,14 +19289,14 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
                             </property>
-                           </widget>
-                         </item>
-                         <item row="0" column="1">
+                          </widget>
+                        </item>
+                        <item row="0" column="1">
                           <layout class="QHBoxLayout" name="horizontalLayout_95">
                             <item>
                               <widget class="QRadioButton" name="radioButton_actor_photo_net">
@@ -19368,51 +19367,51 @@
                             </item>
                           </layout>
                         </item>
-                         <item row="8" column="1">
-                           <layout class="QHBoxLayout" name="horizontalLayout_96">
-                             <item>
-                               <widget class="QLineEdit" name="lineEdit_actor_photo_folder">
-                                 <property name="sizePolicy">
-                                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                                     <horstretch>0</horstretch>
-                                     <verstretch>0</verstretch>
-                                   </sizepolicy>
-                                 </property>
-                                 <property name="minimumSize">
-                                   <size>
-                                     <width>300</width>
-                                     <height>30</height>
-                                   </size>
-                                 </property>
-                                 <property name="styleSheet">
-                                   <string notr="true"> font: &quot;Courier&quot;;
+                        <item row="8" column="1">
+                          <layout class="QHBoxLayout" name="horizontalLayout_96">
+                            <item>
+                              <widget class="QLineEdit" name="lineEdit_actor_photo_folder">
+                                <property name="sizePolicy">
+                                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                  </sizepolicy>
+                                </property>
+                                <property name="minimumSize">
+                                  <size>
+                                    <width>300</width>
+                                    <height>30</height>
+                                  </size>
+                                </property>
+                                <property name="styleSheet">
+                                  <string notr="true"> font: "Courier";
                                      border: 1px solid rgba(0,0,0, 50);
                                      border-radius: 15px;
 </string>
-                                 </property>
-                               </widget>
-                             </item>
-                             <item>
-                               <widget class="QPushButton" name="pushButton_select_actor_photo_folder">
-                                 <property name="sizePolicy">
-                                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                                     <horstretch>0</horstretch>
-                                     <verstretch>0</verstretch>
-                                   </sizepolicy>
-                                 </property>
-                                 <property name="minimumSize">
-                                   <size>
-                                     <width>110</width>
-                                     <height>40</height>
-                                   </size>
-                                 </property>
-                                 <property name="text">
-                                   <string>选择目录</string>
-                                 </property>
-                               </widget>
-                             </item>
-                           </layout>
-                         </item>
+                                </property>
+                              </widget>
+                            </item>
+                            <item>
+                              <widget class="QPushButton" name="pushButton_select_actor_photo_folder">
+                                <property name="sizePolicy">
+                                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                  </sizepolicy>
+                                </property>
+                                <property name="minimumSize">
+                                  <size>
+                                    <width>110</width>
+                                    <height>40</height>
+                                  </size>
+                                </property>
+                                <property name="text">
+                                  <string>选择目录</string>
+                                </property>
+                              </widget>
+                            </item>
+                          </layout>
+                        </item>
                         <item row="1" column="0">
                           <widget class="QLabel" name="label_303">
                             <property name="sizePolicy">
@@ -19502,7 +19501,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -19560,9 +19559,9 @@
                             </item>
                           </layout>
                         </item>
-                       </layout>
-                     </widget>
-                     <zorder>pushButton_add_actor_pic</zorder>
+                      </layout>
+                    </widget>
+                    <zorder>pushButton_add_actor_pic</zorder>
                     <zorder>label_297</zorder>
                     <zorder>checkBox_actor_photo_auto</zorder>
                     <zorder>layoutWidget_8</zorder>
@@ -19723,7 +19722,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true">font: &quot;Courier&quot;;
+                                  <string notr="true">font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
                                   </string>
@@ -19999,7 +19998,7 @@
                         <string notr="true">color: rgb(8, 128, 128);</string>
                       </property>
                       <property name="text">
-                         <string>使用minnano-av和维基百科补全Emby/Jellyfin演员信息，包括:生日、身高、三围、出道时间和作品等。</string>
+                        <string>使用minnano-av和维基百科补全Emby/Jellyfin演员信息，包括:生日、身高、三围、出道时间和作品等。</string>
                       </property>
                       <property name="wordWrap">
                         <bool>true</bool>
@@ -20339,13 +20338,13 @@
                     <property name="geometry">
                       <rect>
                         <x>30</x>
-                        <y>320</y>
+                        <y>356</y>
                         <width>701</width>
                         <height>531</height>
                       </rect>
                     </property>
                     <property name="styleSheet">
-                      <string notr="true">font:&quot;Courier&quot;;</string>
+                      <string notr="true">font:"Courier";</string>
                     </property>
                     <property name="title">
                       <string>Cookie设置</string>
@@ -20409,7 +20408,7 @@
                             <property name="styleSheet">
                               <string notr="true"> border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 1px;
-                                font: &quot;Courier&quot;;</string>
+                                font: "Courier";</string>
                             </property>
                             <property name="placeholderText">
                               <string>刮削FC2需要填写</string>
@@ -20510,7 +20509,7 @@
                             <property name="styleSheet">
                               <string notr="true"> border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 1px;
-                                font: &quot;Courier&quot;;</string>
+                                font: "Courier";</string>
                             </property>
                             <property name="placeholderText">
                               <string>美国节点需要填写，其他节点一般不需要填写，除非提示需要填写。</string>
@@ -20658,11 +20657,11 @@
                         <x>30</x>
                         <y>20</y>
                         <width>701</width>
-                        <height>411</height>
+                        <height>357</height>
                       </rect>
                     </property>
                     <property name="styleSheet">
-                      <string notr="true">font:&quot;Courier&quot;;</string>
+                      <string notr="true">font:"Courier";</string>
                     </property>
                     <property name="title">
                       <string>网络设置</string>
@@ -20909,7 +20908,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -20933,9 +20932,9 @@
                             <property name="layoutDirection">
                               <enum>Qt::RightToLeft</enum>
                             </property>
-                             <property name="text">
-                               <string>不使用代理：</string>
-                             </property>
+                            <property name="text">
+                              <string>使用代理：</string>
+                            </property>
                             <property name="alignment">
                               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                             </property>
@@ -20989,7 +20988,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -21019,7 +21018,7 @@
                               <enum>Qt::RightToLeft</enum>
                             </property>
                             <property name="text">
-                              <string>CF Bypass 服务：</string>
+                              <string>CF Bypass：</string>
                             </property>
                             <property name="alignment">
                               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -21041,7 +21040,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -21069,7 +21068,7 @@
                               <enum>Qt::RightToLeft</enum>
                             </property>
                             <property name="text">
-                              <string>CF Bypass 代理：</string>
+                              <string>CF Bypass代理：</string>
                             </property>
                             <property name="alignment">
                               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -21091,7 +21090,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -21207,7 +21206,7 @@
                               </sizepolicy>
                             </property>
                             <property name="text">
-                              <string>关闭以跳过 HTTPS 证书校验（仅调试/自签证书环境，生产环境请勿关闭）</string>
+                              <string>启用 HTTPS 证书校验（自签名代理 / MITM 调试时关闭）</string>
                             </property>
                           </widget>
                         </item>
@@ -21224,7 +21223,7 @@
                       </rect>
                     </property>
                     <property name="styleSheet">
-                      <string notr="true">font:&quot;Courier&quot;;</string>
+                      <string notr="true">font:"Courier";</string>
                     </property>
                     <property name="title">
                       <string>网站设置</string>
@@ -21313,7 +21312,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -21332,7 +21331,7 @@
                               <string notr="true">color: rgb(8, 128, 128);</string>
                             </property>
                             <property name="text">
-                              <string>&lt;p&gt;可在下方设置选定网站的配置。&lt;span style=&quot; color:#d9001f;&quot;&gt;切换网站前需先保存，否则不会生效&lt;/span&gt;&lt;/p&gt;&lt;p&gt;注意：当前并非所有网站均支持这些配置，某些设置可能无效&lt;/p&gt;</string>
+                              <string>&lt;p&gt;可在下方设置选定网站的配置。&lt;span style=" color:#d9001f;"&gt;切换网站前需先保存，否则不会生效&lt;/span&gt;&lt;/p&gt;&lt;p&gt;注意：当前并非所有网站均支持这些配置，某些设置可能无效&lt;/p&gt;</string>
                             </property>
                             <property name="openExternalLinks">
                               <bool>true</bool>
@@ -21405,17 +21404,17 @@
                       </layout>
                     </widget>
                   </widget>
-                   <widget class="QGroupBox" name="groupBox_14">
-                     <property name="geometry">
-                       <rect>
-                         <x>30</x>
-                         <y>870</y>
-                         <width>701</width>
-                          <height>320</height>
-                       </rect>
+                  <widget class="QGroupBox" name="groupBox_14">
+                    <property name="geometry">
+                      <rect>
+                        <x>30</x>
+                        <y>906</y>
+                        <width>701</width>
+                        <height>320</height>
+                      </rect>
                     </property>
                     <property name="styleSheet">
-                      <string notr="true">font:&quot;Courier&quot;;</string>
+                      <string notr="true">font:"Courier";</string>
                     </property>
                     <property name="title">
                       <string>API Token</string>
@@ -21426,7 +21425,7 @@
                           <x>20</x>
                           <y>30</y>
                           <width>661</width>
-                           <height>220</height>
+                          <height>130</height>
                         </rect>
                       </property>
                       <layout class="QGridLayout" name="gridLayout_65">
@@ -21470,7 +21469,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -21517,7 +21516,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -21567,7 +21566,7 @@
                               </size>
                             </property>
                             <property name="styleSheet">
-                              <string notr="true"> font: &quot;Courier&quot;;
+                              <string notr="true"> font: "Courier";
                                 border: 1px solid rgba(0,0,0, 50);
                                 border-radius: 15px;
 </string>
@@ -21587,9 +21586,9 @@
                             </property>
                             <property name="text">
                               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a
-                                href=&quot;https://theporndb.net/&quot;&gt;&lt;span style=&quot;
+                                href="https://theporndb.net/"&gt;&lt;span style="
                                 text-decoration: underline;
-                                color:#094fd1;&quot;&gt;https://theporndb.net/&lt;/span&gt;&lt;/a&gt;
+                                color:#094fd1;"&gt;https://theporndb.net/&lt;/span&gt;&lt;/a&gt;
                                 注册登录后，点头像 - API Tokens - CREATE。复制生成的 API Token
                                 填入此处。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                             </property>
@@ -21659,8 +21658,8 @@
                             </item>
                           </layout>
                         </item>
-                       </layout>
-                     </widget>
+                      </layout>
+                    </widget>
                   </widget>
                 </widget>
               </widget>
@@ -22192,7 +22191,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -22318,7 +22317,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -22587,7 +22586,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -22634,7 +22633,7 @@
                                   </size>
                                 </property>
                                 <property name="styleSheet">
-                                  <string notr="true"> font: &quot;Courier&quot;;
+                                  <string notr="true"> font: "Courier";
                                     border: 1px solid rgba(0,0,0, 50);
                                     border-radius: 15px;
 </string>
@@ -23060,22 +23059,22 @@
                 <bool>false</bool>
               </property>
               <property name="html">
-                <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-                  &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+                <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"&gt;
+                  &lt;html&gt;&lt;head&gt;&lt;meta name="qrichtext" content="1" /&gt;&lt;style type="text/css"&gt;
                   p, li { white-space: pre-wrap; }
-                  &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-                  &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                  &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                  &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                  &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                  &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                  &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                  &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                  &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                  &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                  &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt;&quot;&gt; &lt;/span&gt; &lt;/p&gt;
-                  &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt;&quot;&gt; &lt;/span&gt; &lt;/p&gt;
-                  &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt;&quot;&gt; &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  &lt;/style&gt;&lt;/head&gt;&lt;body style=" font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;"&gt;
+                  &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                  &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                  &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                  &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                  &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                  &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                  &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                  &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                  &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                  &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-family:'Microsoft YaHei UI'; font-size:9pt;"&gt; &lt;/span&gt; &lt;/p&gt;
+                  &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-family:'Microsoft YaHei UI'; font-size:9pt;"&gt; &lt;/span&gt; &lt;/p&gt;
+                  &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-family:'Microsoft YaHei UI'; font-size:9pt;"&gt; &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="overwriteMode">
                 <bool>false</bool>
@@ -23204,22 +23203,22 @@
                 <bool>false</bool>
               </property>
               <property name="html">
-                <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-                  &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+                <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"&gt;
+                  &lt;html&gt;&lt;head&gt;&lt;meta name="qrichtext" content="1" /&gt;&lt;style type="text/css"&gt;
                   p, li { white-space: pre-wrap; }
-                  &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-                  &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                  &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                  &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                  &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                  &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                  &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                  &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                  &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                  &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
-                  &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt;&quot;&gt; &lt;/span&gt; &lt;/p&gt;
-                  &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt;&quot;&gt; &lt;/span&gt; &lt;/p&gt;
-                  &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt;&quot;&gt; &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  &lt;/style&gt;&lt;/head&gt;&lt;body style=" font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;"&gt;
+                  &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                  &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                  &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                  &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                  &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                  &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                  &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                  &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                  &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt; &lt;/p&gt;
+                  &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-family:'Microsoft YaHei UI'; font-size:9pt;"&gt; &lt;/span&gt; &lt;/p&gt;
+                  &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-family:'Microsoft YaHei UI'; font-size:9pt;"&gt; &lt;/span&gt; &lt;/p&gt;
+                  &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-family:'Microsoft YaHei UI'; font-size:9pt;"&gt; &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="overwriteMode">
                 <bool>false</bool>
@@ -23297,19 +23296,19 @@
               <string notr="true" />
             </property>
             <property name="html">
-              <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+              <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name="qrichtext" content="1" /&gt;&lt;style type="text/css"&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot;font-family:'Microsoft YaHei UI',PingFang SC,sans-serif; font-size:10pt;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style="font-family:'Microsoft YaHei UI',PingFang SC,sans-serif; font-size:10pt;"&gt;
 &lt;h3&gt;MDCx 使用说明&lt;/h3&gt;
 &lt;p&gt;MDCx 是一款本地视频元数据刮削工具：从各大网站抓取影片的标题、演员、封面、简介等信息，生成标准 .nfo 文件与规范命名的文件夹，供 Emby、Jellyfin、Kodi、Plex 等媒体服务器直接使用。支持 Windows / macOS / Linux。&lt;/p&gt;
 
 &lt;h4&gt;一、快速开始&lt;/h4&gt;
 &lt;ol&gt;
-&lt;li&gt;&lt;b&gt;设置媒体路径&lt;/b&gt;：设置 → 通用，配置&quot;成功输出目录&quot;&quot;失败输出目录&quot;和&quot;视频源目录&quot;。&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;设置媒体路径&lt;/b&gt;：设置 → 通用，配置"成功输出目录""失败输出目录"和"视频源目录"。&lt;/li&gt;
 &lt;li&gt;&lt;b&gt;选择刮削网站&lt;/b&gt;：设置 → 刮削，为不同类型（有码 / 无码 / FC2 / 国产 / 欧美）分别选择数据源网站。&lt;/li&gt;
 &lt;li&gt;&lt;b&gt;选择下载项&lt;/b&gt;：设置 → 下载，勾选需要下载的元数据、图片与字幕。&lt;/li&gt;
-&lt;li&gt;&lt;b&gt;开始刮削&lt;/b&gt;：主界面点击&quot;扫描&quot;选择文件 / 文件夹，再点击&quot;开始&quot;。建议先用 1~3 个文件测试效果。&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;开始刮削&lt;/b&gt;：主界面点击"扫描"选择文件 / 文件夹，再点击"开始"。建议先用 1~3 个文件测试效果。&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;h4&gt;二、刮削模式&lt;/h4&gt;
@@ -23341,10 +23340,10 @@ p, li { white-space: pre-wrap; }
 &lt;/ul&gt;
 
 &lt;h4&gt;五、Cloudflare 绕过（CF Bypass）&lt;/h4&gt;
-&lt;p&gt;MDCx 内置 Cloudflare 绕过能力：遇到受 Cloudflare 保护的站点会自动尝试绕过，&lt;b&gt;无需额外配置或密钥&lt;/b&gt;。也可在&quot;设置 → 网络&quot;中配置独立的 CF Bypass 代理。部分站点已提供免 CF 的数据接口（如 MissAV-API），优先选用可获得更稳定的抓取。&lt;/p&gt;
+&lt;p&gt;MDCx 内置 Cloudflare 绕过能力：遇到受 Cloudflare 保护的站点会自动尝试绕过，&lt;b&gt;无需额外配置或密钥&lt;/b&gt;。也可在"设置 → 网络"中配置独立的 CF Bypass 代理。部分站点已提供免 CF 的数据接口（如 MissAV-API），优先选用可获得更稳定的抓取。&lt;/p&gt;
 
 &lt;h4&gt;六、代理设置&lt;/h4&gt;
-&lt;p&gt;在&quot;设置 → 网络&quot;中配置：&lt;/p&gt;
+&lt;p&gt;在"设置 → 网络"中配置：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;b&gt;启用代理&lt;/b&gt;：开启后填写 HTTP / HTTPS 或 SOCKS5 代理地址（如 http://127.0.0.1:7890）。&lt;/li&gt;
 &lt;li&gt;&lt;b&gt;走代理网站&lt;/b&gt;：仅指定域名走代理，其余直连，例如 amazon.co.jp,dmm.co.jp。&lt;/li&gt;
@@ -23386,7 +23385,7 @@ p, li { white-space: pre-wrap; }
 &lt;li&gt;常见问题：docs/FAQ.md&lt;/li&gt;
 &lt;li&gt;问题反馈：GitHub Issues；交流：Telegram 群&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p style=&quot;color:#888888;&quot;&gt;MDCx 由 cdlongbow 基于开源社区项目（Movie_Data_Capture / AVDC / MDCx  lineage）持续维护，仅供学习与技术交流。&lt;/p&gt;
+&lt;p style="color:#888888;"&gt;MDCx 由 cdlongbow 基于开源社区项目（Movie_Data_Capture / AVDC / MDCx  lineage）持续维护，仅供学习与技术交流。&lt;/p&gt;
 &lt;/body&gt;&lt;/html&gt;</string>
             </property>
           </widget>
@@ -23757,7 +23756,7 @@ p, li { white-space: pre-wrap; }
             </property>
             <property name="styleSheet">
               <string notr="true">QPushButton{
-                font: 900 14pt &quot;Tahoma&quot;;
+                font: 900 14pt "Tahoma";
                 color:#F14C4C;
                 background:#F14C4C;
                 border-radius:8px;
@@ -23813,7 +23812,7 @@ p, li { white-space: pre-wrap; }
             </property>
             <property name="styleSheet">
               <string notr="true">QPushButton{
-                font: 900 14pt &quot;Tahoma&quot;;
+                font: 900 14pt "Tahoma";
                 color:#FFBC3C;
                 background:#FFBC3C;
                 border-radius:8px;
