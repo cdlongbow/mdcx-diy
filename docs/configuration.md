@@ -387,11 +387,11 @@ use_proxy = use_proxy and self._is_proxy_host(host)
 
 2. **内置 Bypass（零配置）**：勾选"启用内置 Bypass"，MDCx 自动在后台启动本地旁路服务，无需手动搭建。
 
-   **前置条件**（仅首次需要）：
+   **前置条件**（从源码运行时需要，仅首次）：
    ```bash
    pip install cloakbrowser cf_bypasser uvicorn fastapi
    ```
-   首次启动时会自动下载 Chromium（约 200MB，只需一次）。
+   首次启动时会自动下载 Chromium（约 200MB，只需一次）。**如果你用的是打包好的安装包，浏览器已经随包自带，无需这一步，装完即用。**
 
 **在 MDCx 设置位置**
 
@@ -408,7 +408,7 @@ use_proxy = use_proxy and self._is_proxy_host(host)
 
 - **不配能用吗？** 能。大部分网站不会被 CF 拦，只有少数严格站点才需要。
 - **内置和外部能同时开吗？** 不能。`cf_bypass_url` 有值时用外部，留空且勾选内置时用内置。
-- **内置 Bypass 需要什么依赖？** `cloakbrowser`、`cf_bypasser`、`uvicorn`、`fastapi`，首次使用自动下载 Chromium。
+- **内置 Bypass 需要什么依赖？** 从源码运行时需安装 `cloakbrowser`、`cf_bypasser`、`uvicorn`、`fastapi`，首次启动会下载 Chromium（约 200MB）；用打包好的安装包则无需安装依赖，浏览器已内置，开箱即用。
 
 ---
 
