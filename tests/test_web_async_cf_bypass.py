@@ -725,6 +725,13 @@ async def test_request_acquires_limiter_for_each_attempt(monkeypatch):
             nonlocal acquire_count
             acquire_count += 1
 
+        async def __aenter__(self):
+            await self.acquire()
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            return None
+
     class FakeLimiters:
         def get(self, key):
             return FakeLimiter()

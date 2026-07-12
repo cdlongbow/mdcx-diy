@@ -1,7 +1,7 @@
-import asyncio
 from types import SimpleNamespace
 
 import pytest
+from aiolimiter import AsyncLimiter
 
 import mdcx.network_fingerprint as network_fingerprint
 import mdcx.web_async as web_async
@@ -19,7 +19,7 @@ async def test_request_merges_fingerprint_and_keeps_explicit_accept(monkeypatch:
         return SimpleNamespace(status_code=200, headers={}, content=b"", url=kwargs["url"])
 
     monkeypatch.setattr(client, "_curl_request", fake_curl_request)
-    monkeypatch.setattr(client.limiters, "get", lambda key: SimpleNamespace(acquire=lambda: asyncio.sleep(0)))
+    monkeypatch.setattr(client.limiters, "get", lambda key: AsyncLimiter(1000, 1))
 
     response, error = await client.request(
         "GET",
@@ -47,7 +47,7 @@ async def test_range_download_keeps_range_and_skips_document_headers(monkeypatch
         return SimpleNamespace(status_code=206, headers={}, content=b"abc", url=kwargs["url"])
 
     monkeypatch.setattr(client, "_curl_request", fake_curl_request)
-    monkeypatch.setattr(client.limiters, "get", lambda key: SimpleNamespace(acquire=lambda: asyncio.sleep(0)))
+    monkeypatch.setattr(client.limiters, "get", lambda key: AsyncLimiter(1000, 1))
 
     response, error = await client.request(
         "GET",
@@ -77,7 +77,7 @@ async def test_cf_bypass_disabled_target_request_still_uses_fingerprint(monkeypa
         return SimpleNamespace(status_code=200, headers={}, content=b"", url=kwargs["url"])
 
     monkeypatch.setattr(client, "_curl_request", fake_curl_request)
-    monkeypatch.setattr(client.limiters, "get", lambda key: SimpleNamespace(acquire=lambda: asyncio.sleep(0)))
+    monkeypatch.setattr(client.limiters, "get", lambda key: AsyncLimiter(1000, 1))
 
     response, error = await client.request(
         "GET",
@@ -102,7 +102,7 @@ async def test_cf_bypass_service_url_skips_fingerprint(monkeypatch: pytest.Monke
         return SimpleNamespace(status_code=200, headers={}, content=b"ok", url=kwargs["url"])
 
     monkeypatch.setattr(client, "_curl_request", fake_curl_request)
-    monkeypatch.setattr(client.limiters, "get", lambda key: SimpleNamespace(acquire=lambda: asyncio.sleep(0)))
+    monkeypatch.setattr(client.limiters, "get", lambda key: AsyncLimiter(1000, 1))
 
     response, error = await client.request("GET", "http://127.0.0.1:8000/html", enable_cf_bypass=False)
 
@@ -124,7 +124,7 @@ async def test_same_host_reuses_fingerprint_until_reset(monkeypatch: pytest.Monk
         return SimpleNamespace(status_code=200, headers={}, content=b"", url=kwargs["url"])
 
     monkeypatch.setattr(client, "_curl_request", fake_curl_request)
-    monkeypatch.setattr(client.limiters, "get", lambda key: SimpleNamespace(acquire=lambda: asyncio.sleep(0)))
+    monkeypatch.setattr(client.limiters, "get", lambda key: AsyncLimiter(1000, 1))
 
     response1, error1 = await client.request("GET", "https://example.test/a")
     response2, error2 = await client.request("GET", "https://example.test/b")
@@ -170,7 +170,7 @@ async def test_retryable_http_status_switches_fingerprint(monkeypatch: pytest.Mo
     monkeypatch.setattr(web_async, "select_fingerprint", fake_select_fingerprint)
     monkeypatch.setattr(client, "_curl_request", fake_curl_request)
     monkeypatch.setattr(client, "_calc_retry_sleep_seconds", lambda attempt, *, after_cf_bypass=False: 0)
-    monkeypatch.setattr(client.limiters, "get", lambda key: SimpleNamespace(acquire=lambda: asyncio.sleep(0)))
+    monkeypatch.setattr(client.limiters, "get", lambda key: AsyncLimiter(1000, 1))
 
     response, error = await client.request("GET", "https://example.test/rate-limited")
 
@@ -222,7 +222,7 @@ async def test_expired_fingerprint_state_switches_profile_for_new_document_reque
     monkeypatch.setattr(web_async, "select_fingerprint", fake_select_fingerprint)
     monkeypatch.setattr(web_async.time, "monotonic", fake_monotonic)
     monkeypatch.setattr(client, "_curl_request", fake_curl_request)
-    monkeypatch.setattr(client.limiters, "get", lambda key: SimpleNamespace(acquire=lambda: asyncio.sleep(0)))
+    monkeypatch.setattr(client.limiters, "get", lambda key: AsyncLimiter(1000, 1))
 
     response1, error1 = await client.request("GET", "https://example.test/a")
     response2, error2 = await client.request("GET", "https://example.test/b")
@@ -277,7 +277,7 @@ async def test_download_request_does_not_rotate_expired_fingerprint_state(monkey
     monkeypatch.setattr(web_async, "select_fingerprint", fake_select_fingerprint)
     monkeypatch.setattr(web_async.time, "monotonic", fake_monotonic)
     monkeypatch.setattr(client, "_curl_request", fake_curl_request)
-    monkeypatch.setattr(client.limiters, "get", lambda key: SimpleNamespace(acquire=lambda: asyncio.sleep(0)))
+    monkeypatch.setattr(client.limiters, "get", lambda key: AsyncLimiter(1000, 1))
 
     response1, error1 = await client.request("GET", "https://media.example.test/video.mp4", stream=True)
     response2, error2 = await client.request("GET", "https://media.example.test/video.mp4", stream=True)
@@ -322,7 +322,7 @@ async def test_request_count_limit_switches_fingerprint(monkeypatch: pytest.Monk
 
     monkeypatch.setattr(web_async, "select_fingerprint", fake_select_fingerprint)
     monkeypatch.setattr(client, "_curl_request", fake_curl_request)
-    monkeypatch.setattr(client.limiters, "get", lambda key: SimpleNamespace(acquire=lambda: asyncio.sleep(0)))
+    monkeypatch.setattr(client.limiters, "get", lambda key: AsyncLimiter(1000, 1))
 
     response1, error1 = await client.request("GET", "https://example.test/a")
     response2, error2 = await client.request("GET", "https://example.test/b")

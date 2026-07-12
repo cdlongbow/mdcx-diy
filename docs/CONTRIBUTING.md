@@ -9,9 +9,9 @@
 ### 克隆代码并安装依赖
 
 ```bash
-git clone https://github.com/sqzw-x/mdcx.git
+git clone https://github.com/cdlongbow/mdcx.git
 cd mdcx
-uv sync --all-extras --dev
+uv sync --dev
 uv run pre-commit install
 uv pip install -e .
 ```
@@ -54,7 +54,7 @@ mdcx
 ├── controllers          # Qt UI 控制器
 │   └── main_window
 ├── core                 # 核心功能（刮削、翻译、NFO、Amazon、命名）
-├── crawlers             # 各网站爬虫（42+ 个站点）
+├── crawlers             # 各网站爬虫（40+ 个站点）
 ├── gen                  # 自动生成的枚举
 ├── models               # 数据模型
 ├── tools                # 工具模块（演员数据库、Emby、字幕）

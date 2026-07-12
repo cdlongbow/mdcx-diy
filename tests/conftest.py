@@ -4,6 +4,11 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from mdcx.config.enums import Language
+from mdcx.config.models import Config
+
+# 生产 Config 的默认实例，用作 _DummyConfig 缺失字段的透明回退来源，
+# 避免桩缺字段（枚举列表 / 复杂默认值等）导致测试在访问 config.xxx 时报 AttributeError。
+_REAL_CONFIG = Config()
 
 
 class _DummySignal:
@@ -13,6 +18,7 @@ class _DummySignal:
 
 class _DummySignals:
     def __init__(self):
+        self.stop = False
         self.log_text = _DummySignal()
         self.scrape_info = _DummySignal()
         self.net_info = _DummySignal()
@@ -61,7 +67,7 @@ class _DummyConfig:
         self.naming_media = "number title"
         self.update_titletemplate = "number title"
         self.nfo_include_new = []
-        self.actor_no_name = "佚名"
+        self.actor_no_name = "未知演员"
         self.read_mode = []
         self.nfo_tag_series = "series"
         self.nfo_tagline = "release"
@@ -73,18 +79,72 @@ class _DummyConfig:
         self.website = ""
         self.tmdb_api_key = ""
         self.tmdb_api_base = ""
+        self.server_type = "emby"
+        self.folder_name_max = 60
+        self.media_path = "./media"
+        self.api_key = ""
+        self.emby_url = ""
+        self.user_id = ""
+        self.extrafanart_folder = "extrafanart_copy"
+        self.failed_output_folder = "failed"
+        self.folders = ["JAV_output", "examples"]
+        self.scrape_softlink_path = False
+        self.softlink_path = "softlink"
+        self.success_output_folder = "JAV_output"
+
+    def __getattr__(self, name):
+        # 桩上未显式设置的字段，透明回退到生产 Config 默认值。
+        # 这样无论哪个测试访问 config.<任意字段>，都不会因桩缺字段而报 AttributeError。
+        try:
+            return getattr(_REAL_CONFIG, name)
+        except AttributeError:
+            raise AttributeError(f"_DummyConfig object has no attribute {name!r}")
 
     def get_field_config(self, _field):
         return SimpleNamespace(language=Language.JP, translate=False)
+
+
+class _DummyAsyncClient:
+    async def get_json(self, *args, **kwargs):
+        raise NotImplementedError("Tests should monkeypatch async_client.get_json")
+
+    async def post_content(self, *args, **kwargs):
+        raise NotImplementedError("Tests should monkeypatch async_client.post_content")
+
+    async def request(self, *args, **kwargs):
+        raise NotImplementedError("Tests should monkeypatch async_client.request")
+
+
+class _DummyComputed:
+    def __init__(self):
+        self.async_client = _DummyAsyncClient()
+
+    def retain(self):
+        return None
+
+    def release(self):
+        return None
+
+
+class _DummyComputedLease:
+    def __init__(self, computed):
+        self._computed = computed
+
+    async def __aenter__(self):
+        return self._computed
+
+    async def __aexit__(self, *exc):
+        return None
 
 
 class _DummyManager:
     def __init__(self):
         self.config = _DummyConfig()
         self.data_folder = Path("/tmp/mdcx-tests")
+        self.computed = _DummyComputed()
 
     def acquire_computed(self):
-        raise RuntimeError("Tests should not acquire computed clients")
+        return _DummyComputedLease(self.computed)
 
 
 class _DummyResources:
