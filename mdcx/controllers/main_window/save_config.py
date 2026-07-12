@@ -628,6 +628,7 @@ def save_config(self: "MyMAinWindow"):
     manager.config.cf_bypass_url = self.Ui.lineEdit_cf_bypass_url.text().strip()  # Cloudflare bypass 地址
     manager.config.cf_bypass_proxy = self.Ui.lineEdit_cf_bypass_proxy.text().strip()  # Cloudflare bypass 独立代理
     manager.config.cf_bypass_auto = self.Ui.checkBox_cf_bypass_auto.isChecked()  # 内置 CF Bypass
+    manager.config.verify_ssl = self.Ui.checkBox_verify_ssl.isChecked()  # HTTPS 证书校验
     manager.config.proxy_sites = self.Ui.lineEdit_no_proxy_sites.text().strip()  # 使用代理的网站
     manager.config.timeout = self.Ui.horizontalSlider_timeout.value()  # 超时时间
     manager.config.retry = self.Ui.horizontalSlider_retry.value()  # 重试次数
