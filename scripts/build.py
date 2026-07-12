@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 import platform
 import re
 import shutil
@@ -79,6 +80,7 @@ class BuildManager:
                 self.app_version = get_version_from_config()
 
             self._check_environment()
+            self._prepare_chromium()
             self._cleanup()
             dist = Path("dist")
             if dist.exists():
@@ -134,11 +136,89 @@ class BuildManager:
             if not Path(file_path).exists():
                 raise BuildError(f"文件检查失败: {file_path}")
 
+    def _prepare_chromium(self):
+        """为 CF Bypass 准备随附的 Chromium。
+
+        仅使用 cloakbrowser 的 **stealth** Chromium(CloakHQ 打过补丁, 过 Cloudflare 必需)。
+        CloakBrowser **免费档(无 CLOAKBROWSER_LICENSE_KEY)即可拿到过 CF 的 stealth 二进制**,
+        Pro 档(需 license key)仅为可选升级。不再降级到普通 Chromium(非 stealth 过不了 CF, 无价值)。
+        冻结(onefile)模式下 local_server 无法运行时下载 Chromium(国内网络常因
+        gh-proxy 证书失败), 因此构建时把 Chromium 复制到 ./chromium, 由 PyInstaller 的
+        --add-data 一并打入包内。
+        """
+        chromium_dir = Path("chromium")
+        if chromium_dir.exists() and (any(chromium_dir.rglob("chrome.exe")) or any(chromium_dir.rglob("chrome"))):
+            logger.info("✅ 已存在 ./chromium, 跳过准备")
+            return
+
+        ok = self._prepare_stealth_chromium(chromium_dir)
+        if not ok:
+            raise RuntimeError(
+                "❌ 无法获取 cloakbrowser stealth Chromium, 构建中止。\n"
+                "   请先 `pip install cloakbrowser` 并确保能下载 stealth 二进制\n"
+                "   (构建环境可设 CLOAKBROWSER_DOWNLOAD_URL 镜像加速; 可选配置\n"
+                "   CLOAKBROWSER_LICENSE_KEY 升级 Pro 档)。"
+            )
+
+    def _prepare_stealth_chromium(self, chromium_dir: Path) -> bool:
+        """通过 cloakbrowser 获取过 Cloudflare 的 **stealth** Chromium。
+
+        CloakBrowser 免费档(ensure_binary() 无参)即可拿到过 CF 的 stealth 二进制,
+        **无需 CLOAKBROWSER_LICENSE_KEY**。仅当该环境变量存在时, 才下载 Pro 档作为可选升级。
+        与运行期 local_server.py 一致, 这里也走国内镜像下载。
+        成功则把二进制目录复制到 ./chromium/<platform>/, 返回 True; 否则返回 False。
+        """
+        try:
+            import cloakbrowser as cb
+        except ImportError:
+            logger.warning("cloakbrowser 未安装, 无法获取 stealth Chromium (请先 `pip install cloakbrowser`)")
+            return False
+
+        # 与运行期 local_server.py 一致: 走国内镜像下载免费 stealth 二进制, 避免直连 github 失败
+        os.environ.setdefault(
+            "CLOAKBROWSER_DOWNLOAD_URL",
+            "https://v6.gh-proxy.com/https://github.com/CloakHQ/cloakbrowser/releases/download",
+        )
+
+        license_key = os.environ.get("CLOAKBROWSER_LICENSE_KEY")
+        try:
+            if license_key:
+                logger.info("检测到 CLOAKBROWSER_LICENSE_KEY, 尝试下载 Pro 档(可选升级) ...")
+                try:
+                    binary = cb.ensure_binary(license_key)
+                except TypeError:
+                    binary = cb.ensure_binary(license_key, "stable")
+            else:
+                logger.info("获取 cloakbrowser stealth Chromium (免费档, 无需 license key) ...")
+                binary = cb.ensure_binary()
+            if not binary or not os.path.isfile(binary):
+                logger.warning(f"cloakbrowser 返回的二进制无效: {binary}")
+                return False
+            src_dir = Path(binary).resolve().parent
+        except Exception as e:
+            logger.warning(f"获取 stealth Chromium 失败: {e}")
+            return False
+
+        # 目标布局需与 local_server.py 的 CLOAKBROWSER_BINARY_PATH 候选一致
+        platform_sub = {"Windows": "chrome-win64", "Linux": "chrome-linux", "Darwin": "chrome-macos"}.get(
+            self.os, "chrome-win64"
+        )
+        dest = chromium_dir / platform_sub
+        dest.mkdir(parents=True, exist_ok=True)
+        logger.info(f"\t复制 stealth Chromium: {src_dir} -> {dest}")
+        shutil.copytree(src_dir, dest, dirs_exist_ok=True)
+        logger.info("✅ stealth Chromium 已准备, 将随包打入")
+        return True
+
+    # 注: 已移除 Playwright 普通 Chromium 降级方案 —— 非 stealth 构建过不了 Cloudflare, 保留只会增加误导。
+
     def _generate_spec(self):
         """生成.spec文件"""
         logger.info("生成 .spec 文件...")
         cmd = [
-            "pyi-makespec",
+            sys.executable,
+            "-m",
+            "PyInstaller.utils.cliutils.makespec",
             "--name",
             self.app_name,
             "--noupx",
@@ -164,6 +244,26 @@ class BuildManager:
             "zhconv",
             "--collect-all",
             "curl_cffi",
+            # CF Bypass 服务依赖: 必须随包收集, 否则打包后的 exe 无法启动 bypass 服务
+            "--collect-all",
+            "cf_bypasser",
+            "--collect-all",
+            "cloakbrowser",
+            # cf_bypasser 依赖 pyvirtualdisplay(虚拟显示/Xvfb), 冻结模式(Linux/macOS)缺它会导入失败
+            "--collect-all",
+            "pyvirtualdisplay",
+            "--collect-all",
+            "easyprocess",
+            "--collect-all",
+            "uvicorn",
+            "--collect-all",
+            "fastapi",
+            "--collect-all",
+            "starlette",
+            "--collect-all",
+            "pydantic",
+            # 随附 Chromium (由 _prepare_chromium 复制到 ./chromium)
+            *(["--add-data", "chromium:chromium"] if Path("chromium").exists() else []),
             *[item for module in EXCLUDED_MODULES for item in ("--exclude-module", module)],
         ]
         self._run_command(cmd, "✅ 生成 .spec 文件", "spec 文件生成失败")
@@ -208,7 +308,7 @@ class BuildManager:
         logger.info("开始构建应用...")
         build_start = time.time()
 
-        cmd = ["pyinstaller", f"{self.app_name}.spec", "-y"]
+        cmd = [sys.executable, "-m", "PyInstaller", f"{self.app_name}.spec", "-y"]
         self._run_command(cmd, error_msg="pyinstaller 构建失败")
         build_duration = time.time() - build_start
 

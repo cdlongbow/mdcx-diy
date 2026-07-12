@@ -35,6 +35,12 @@ dependencies = [
     "jinja2>=3.1.6",
     "openpyxl>=3.1.0",
     "defusedxml>=0.7.1",
+    # --- CF Bypass 服务依赖 (release 打包时必须随包装入) ---
+    # cf_bypasser 不在 PyPI, 用上游 git 依赖并固定 commit 以保证 CI 可复现。
+    "cloakbrowser",
+    "uvicorn>=0.15.0",
+    "fastapi>=0.68.0",
+    "CloudflareBypassForScraping @ git+https://github.com/Hazard804/CloudflareBypassForScraping.git@2f440849d9cf79fbf4b549fac5bbebd42adb17ea",
 ]
 
 [project.scripts]
@@ -52,6 +58,8 @@ dev = [
     "opencv-contrib-python-headless>=4.13.0.92",
     "pre-commit>=4.2.0",
     "pyinstaller>=6.14.2",
+    # 构建期用于下载并随包打入 CF Bypass 所需的 Chromium (CI 中通过 PLAYWRIGHT_BROWSERS_PATH 指定缓存位置)
+    "playwright>=1.40.0",
     "pyright>=1.1.400",
     "pytest>=8.4.1",
     "pytest-asyncio>=1.1.0",

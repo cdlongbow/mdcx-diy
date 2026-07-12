@@ -115,9 +115,11 @@ uv run pytest tests/crawlers
 
 - `dmm`
 - `javdb`
+- `javdb_app`
 - `javdbapi`
 - `avbase`
 - `missav`
+- `missav_api`
 - `faleno`
 - `jav321`
 - `cableav`
@@ -148,8 +150,8 @@ uv run pytest tests/crawlers
 - `iqqtv`
 - `airav_cc`
 - `getchu`
-- `getchu_dl`
 - `getchu_dmm`
+- `libredmm`
 - `mywife`
 - `javlibrary`
 - `official`

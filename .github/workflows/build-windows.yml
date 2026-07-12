@@ -6,7 +6,6 @@ on:
 jobs:
   build-windows:
     runs-on: windows-2025
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,6 +28,16 @@ jobs:
             uv lock
             uv sync --all-extras --dev
           fi
+
+      - name: Cache cloakbrowser stealth Chromium
+        # 缓存 ./chromium, 命中后 build.py 直接跳过 ~562MB 下载(见 scripts/build.py 的跳过逻辑)
+        # 版本更新时把末尾的 v1 改为 v2 即可强制刷新缓存
+        uses: actions/cache@v4
+        with:
+          path: chromium
+          key: ${{ runner.os }}-cloakbrowser-chromium-v1
+          restore-keys: |
+            ${{ runner.os }}-cloakbrowser-chromium-
 
       - name: Build Windows EXE
         env:

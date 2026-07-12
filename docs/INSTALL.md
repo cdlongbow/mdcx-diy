@@ -37,13 +37,13 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 
 3. **下载项目代码**
 ```powershell
-git clone https://github.com/sqzw-x/mdcx.git
+git clone https://github.com/cdlongbow/mdcx.git
 cd mdcx
 ```
 
 4. **安装依赖**
 ```powershell
-uv sync --all-extras --dev
+uv sync --dev
 uv pip install -e .
 ```
 
@@ -73,13 +73,13 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 3. **下载项目代码**
 ```bash
-git clone https://github.com/sqzw-x/mdcx.git
+git clone https://github.com/cdlongbow/mdcx.git
 cd mdcx
 ```
 
 4. **安装依赖**
 ```bash
-uv sync --all-extras --dev
+uv sync --dev
 uv pip install -e .
 ```
 
@@ -104,13 +104,13 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 3. **下载项目代码**
 ```bash
-git clone https://github.com/sqzw-x/mdcx.git
+git clone https://github.com/cdlongbow/mdcx.git
 cd mdcx
 ```
 
 4. **安装依赖**
 ```bash
-uv sync --all-extras --dev
+uv sync --dev
 uv pip install -e .
 ```
 
@@ -162,7 +162,7 @@ sudo yum install libxcb-xinerama0 libxcb-cursor0
 
 ```bash
 git pull origin main
-uv sync --all-extras --dev
+uv sync --dev
 ```
 
 ## 下一步

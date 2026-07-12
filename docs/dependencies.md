@@ -27,6 +27,10 @@
 | `ping3` | ==4.0.4 | 网络延迟测试 |
 | `zhconv` | ==1.4.3 | 简体繁体中文互转 |
 | `openai` | ==1.91.0 | 调用 LLM 做翻译 |
+| `cloakbrowser` | - | CF Bypass 内置隐身 Chromium，自动绕过 Cloudflare（无需 license key，随发布包打入） |
+| `uvicorn` | >=0.15.0 | CF Bypass 本地服务（ASGI 服务器） |
+| `fastapi` | >=0.68.0 | CF Bypass 本地服务（HTTP 接口） |
+| `CloudflareBypassForScraping` | git | Cloudflare Challenge 绕过（git 依赖，固定 commit 以保证可复现） |
 
 ## 开发依赖
 

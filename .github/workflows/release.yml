@@ -83,6 +83,16 @@ jobs:
             uv sync --all-extras --dev
           fi
 
+      - name: Cache cloakbrowser stealth Chromium
+        # 缓存 ./chromium, 命中后 build.py 直接跳过 ~562MB 下载(见 scripts/build.py 的跳过逻辑)
+        # runner.os 自动区分 macOS/Windows, 各平台独立缓存; 版本更新时把末尾的 v1 改为 v2 强制刷新
+        uses: actions/cache@v4
+        with:
+          path: chromium
+          key: ${{ runner.os }}-cloakbrowser-chromium-v1
+          restore-keys: |
+            ${{ runner.os }}-cloakbrowser-chromium-
+
       - name: Build macOS app - macOS
         if: ${{ matrix.build == 'macos' }}
         run: |
