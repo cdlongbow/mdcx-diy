@@ -189,9 +189,9 @@ def open_file_thread(p: Path, is_dir: bool) -> None:
         if is_dir:
             # os.system(f'explorer /select,"{file_path}"')  pyinstall打包后打开文件时会闪现cmd窗口。
             # file_path路径必须转换为windows样式，并且加上引号（不加引号，文件名过长会截断）。select,后面不能有空格
-            subprocess.Popen(f'explorer /select,"{p}"')
+            subprocess.Popen(["explorer", f"/select,{p}"])
         else:
-            subprocess.Popen(f'explorer "{p}"')
+            subprocess.Popen(["explorer", str(p)])
     elif IS_MAC:
         if is_dir:
             if p.is_symlink():

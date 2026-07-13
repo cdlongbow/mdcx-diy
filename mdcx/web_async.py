@@ -1670,6 +1670,7 @@ class AsyncWebClient:
         cookies: dict[str, str] | None = None,
         use_proxy: bool = True,
         retry_count: int | None = None,
+        enable_cf_bypass: bool = True,
     ) -> tuple[Any | None, str]:
         """POST 请求, 返回响应JSON数据"""
         response, error = await self.request(
@@ -1681,6 +1682,7 @@ class AsyncWebClient:
             cookies=cookies,
             use_proxy=use_proxy,
             retry_count=retry_count,
+            enable_cf_bypass=enable_cf_bypass,
         )
         if error or response is None:
             return None, error
@@ -1700,6 +1702,7 @@ class AsyncWebClient:
         cookies: dict[str, str] | None = None,
         use_proxy: bool = True,
         retry_count: int | None = None,
+        enable_cf_bypass: bool = True,
     ) -> tuple[bytes | None, str]:
         """POST请求, 返回二进制响应"""
         response, error = await self.request(
@@ -1711,6 +1714,7 @@ class AsyncWebClient:
             cookies=cookies,
             use_proxy=use_proxy,
             retry_count=retry_count,
+            enable_cf_bypass=enable_cf_bypass,
         )
         if error or response is None:
             return None, error

@@ -174,12 +174,6 @@ class BuildManager:
             logger.warning("cloakbrowser 未安装, 无法获取 stealth Chromium (请先 `pip install cloakbrowser`)")
             return False
 
-        # 与运行期 local_server.py 一致: 走国内镜像下载免费 stealth 二进制, 避免直连 github 失败
-        os.environ.setdefault(
-            "CLOAKBROWSER_DOWNLOAD_URL",
-            "https://v6.gh-proxy.com/https://github.com/CloakHQ/cloakbrowser/releases/download",
-        )
-
         license_key = os.environ.get("CLOAKBROWSER_LICENSE_KEY")
         try:
             if license_key:
@@ -189,6 +183,13 @@ class BuildManager:
                 except TypeError:
                     binary = cb.ensure_binary(license_key, "stable")
             else:
+                # 仅免费档走国内镜像下载, 避免直连 github 失败;
+                # 注意: 不能在 Pro 分支前设置 CLOAKBROWSER_DOWNLOAD_URL, 否则
+                # ensure_binary(license_key) 会被强制退化为免费档 (见 P1-7)。
+                os.environ.setdefault(
+                    "CLOAKBROWSER_DOWNLOAD_URL",
+                    "https://v6.gh-proxy.com/https://github.com/CloakHQ/cloakbrowser/releases/download",
+                )
                 logger.info("获取 cloakbrowser stealth Chromium (免费档, 无需 license key) ...")
                 binary = cb.ensure_binary()
             if not binary or not os.path.isfile(binary):

@@ -464,7 +464,7 @@ class FileScraper:
                 reduced.thumb_list.append((data.source, data.thumb))
                 _seen_thumb_sources.add(data.source)
         # 兜底：收集其余来源的 thumb（按来源确定性排序，确保不遗漏）
-        for data in sorted(all_res.values(), key=lambda d: d.source):
+        for data in sorted(all_res.values(), key=lambda d: d.source or ""):
             if data.thumb and data.source not in _seen_thumb_sources:
                 reduced.thumb_list.append((data.source, data.thumb))
 

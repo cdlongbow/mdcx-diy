@@ -103,6 +103,7 @@ class MissavApiCrawler(BaseCrawler):
             json_data=body,
             headers={"Accept": "application/json", "Content-Type": "application/json"},
             use_proxy=False,  # Recombee 不挂 CF, 直连绕开代理更稳定
+            enable_cf_bypass=False,  # Recombee 无 CF 挑战, 显式关闭避免无谓预热本地 bypass 服务
         )
         if error or not json_data:
             ctx.debug(f"[MISSAV-API] Recombee 请求失败: {error}")
