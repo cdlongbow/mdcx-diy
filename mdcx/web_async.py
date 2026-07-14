@@ -354,6 +354,7 @@ class AsyncWebClient:
         self._cf_bypass_auto = cf_bypass_auto
         self._local_bypass_enabled = cf_bypass_auto and not self.cf_bypass_url
         self._local_bypass_server: LocalBypassServer | None = None
+        self._bypass_token = ""  # 仅本地内置 bypass 服务鉴权用, 远程用户配置的服务不鉴权
         self._local_bypass_prewarm_task: asyncio.Future | None = None
         self._local_bypass_start_lock = asyncio.Lock()
         self._cf_host_locks: dict[str, asyncio.Lock] = {}
@@ -399,6 +400,7 @@ class AsyncWebClient:
             return True
         if self._local_bypass_server and self._local_bypass_server.is_running:
             self.cf_bypass_url = self._local_bypass_server.url
+            self._bypass_token = self._local_bypass_server.token
             self._cf_bypass_enabled = True
             return True
 
@@ -407,6 +409,7 @@ class AsyncWebClient:
                 return True
             if self._local_bypass_server and self._local_bypass_server.is_running:
                 self.cf_bypass_url = self._local_bypass_server.url
+                self._bypass_token = self._local_bypass_server.token
                 self._cf_bypass_enabled = True
                 return True
 
@@ -420,6 +423,7 @@ class AsyncWebClient:
             if ok:
                 self._local_bypass_server = server
                 self.cf_bypass_url = result
+                self._bypass_token = server.token
                 self._cf_bypass_enabled = True
                 self._log(f"本地 Bypass 服务已集成: {result}")
                 return True
@@ -856,6 +860,9 @@ class AsyncWebClient:
         mirror_url = f"{self.cf_bypass_url}{path}"
         if split_result.query:
             mirror_url = f"{mirror_url}?{split_result.query}"
+        if self._bypass_token:
+            sep = "&" if split_result.query else "?"
+            mirror_url = f"{mirror_url}{sep}token={self._bypass_token}"
         return mirror_url
 
     def _is_dmm_image_url(self, url: str) -> bool:
@@ -1171,6 +1178,8 @@ class AsyncWebClient:
             return None, "未配置 bypass 地址"
 
         params: dict[str, Any] = {"url": target_url}
+        if self._bypass_token:
+            params["token"] = self._bypass_token
         bypass_proxy = self._resolve_cf_bypass_proxy(use_proxy=use_proxy)
         if bypass_proxy:
             params["proxy"] = bypass_proxy

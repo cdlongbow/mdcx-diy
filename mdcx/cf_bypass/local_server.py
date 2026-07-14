@@ -1,12 +1,16 @@
 import asyncio
 import atexit
+import ipaddress
+import json
 import logging
 import os
+import secrets
 import socket
 import sys
 import threading
 import time
 from collections.abc import Callable
+from urllib.parse import parse_qs, urlparse
 
 from mdcx.consts import IS_PYINSTALLER
 
@@ -15,6 +19,98 @@ LOCAL_BYPASS_HOST = "127.0.0.1"
 SERVER_START_TIMEOUT = 60
 HEALTH_CHECK_INTERVAL = 0.5
 BROWSER_DOWNLOAD_TIMEOUT = 300
+
+# 本地 bypass 服务的一次性鉴权 token 通过该环境变量传递给(子进程或进程内)的 ASGI 应用
+BYPASS_TOKEN_ENV = "MDCX_BYPASS_TOKEN"
+
+# 这些端点接受 ?url= 参数, 需做 SSRF 防护(禁止回源到环回/私网/链路本地地址)
+_URL_PARAM_ENDPOINTS = ("/cookies", "/solve", "/html", "/mirror")
+
+
+def _is_safe_target(url: str) -> bool:
+    """SSRF 防护: 仅允许 http/https, 且解析后的 IP 不能是环回/私网/链路本地/保留/多播地址。"""
+    try:
+        parsed = urlparse(url)
+    except Exception:
+        return False
+    if parsed.scheme not in ("http", "https"):
+        return False
+    host = parsed.hostname
+    if not host:
+        return False
+    try:
+        infos = socket.getaddrinfo(host, None)
+    except Exception:
+        return False
+    for info in infos:
+        ip = info[4][0]
+        try:
+            addr = ipaddress.ip_address(ip)
+        except ValueError:
+            continue
+        if addr.is_loopback or addr.is_private or addr.is_link_local or addr.is_reserved or addr.is_multicast:
+            return False
+    return True
+
+
+async def _send_json(send, status: int, payload: dict) -> None:
+    body = json.dumps(payload).encode("utf-8")
+    await send(
+        {
+            "type": "http.response.start",
+            "status": status,
+            "headers": [(b"content-type", b"application/json")],
+        }
+    )
+    await send({"type": "http.response.body", "body": body})
+
+
+def create_protected_app():
+    """包裹 cf_bypasser 的 create_app, 增加一次性 token 鉴权与 SSRF 防护。
+
+    不修改外部依赖 cf_bypasser 的源码, 仅在其外层套一层 ASGI 中间件; token 取自
+    BYPASS_TOKEN_ENV 环境变量(由 LocalBypassServer.start 生成并写入)。
+    """
+    from cf_bypasser.server.app import create_app
+
+    app = create_app()
+    expected_token = os.environ.get(BYPASS_TOKEN_ENV, "")
+
+    async def middleware(scope, receive, send):
+        if scope["type"] != "http":
+            await app(scope, receive, send)
+            return
+
+        # 0) 未配置 token 时直接拒绝(失败闭合), 避免空 token 被 compare_digest 误判通过
+        if not expected_token:
+            await _send_json(send, 401, {"error": "unauthorized"})
+            return
+
+        # 1) token 校验: Authorization: Bearer <tok> 或 ?token=<tok>
+        headers = {k.lower(): v for k, v in scope.get("headers", [])}
+        auth = headers.get(b"authorization", b"").decode("latin-1")
+        token_ok = False
+        if auth.startswith("Bearer "):
+            token_ok = secrets.compare_digest(auth[7:].strip(), expected_token)
+        if not token_ok:
+            qs = parse_qs(scope.get("query_string", b"").decode("latin-1"))
+            token_ok = secrets.compare_digest(qs.get("token", [""])[0], expected_token)
+        if not token_ok:
+            await _send_json(send, 401, {"error": "unauthorized"})
+            return
+
+        # 2) SSRF 防护: 检查 ?url= 参数
+        path = scope.get("path", "")
+        if any(path.startswith(p) for p in _URL_PARAM_ENDPOINTS):
+            qs = parse_qs(scope.get("query_string", b"").decode("latin-1"))
+            target = qs.get("url", [""])[0]
+            if target and not _is_safe_target(target):
+                await _send_json(send, 400, {"error": "unsafe target url"})
+                return
+
+        await app(scope, receive, send)
+
+    return middleware
 
 
 def _find_free_port() -> int:
@@ -33,6 +129,7 @@ class LocalBypassServer:
         self._url: str = ""
         self._started = False
         self._closing = False
+        self._token = ""
         self._log_fn = log_fn or (lambda msg: logger.info(msg))
         self._dependency_checked = False
         self._dependency_ok = False
@@ -44,6 +141,10 @@ class LocalBypassServer:
     @property
     def url(self) -> str:
         return self._url
+
+    @property
+    def token(self) -> str:
+        return self._token
 
     @property
     def is_running(self) -> bool:
@@ -143,6 +244,10 @@ class LocalBypassServer:
         self._port = _find_free_port()
         self._url = f"http://{LOCAL_BYPASS_HOST}:{self._port}"
 
+        # 生成一次性鉴权 token, 通过环境变量交给(子进程或进程内)的 ASGI 应用
+        self._token = secrets.token_hex(16)
+        os.environ[BYPASS_TOKEN_ENV] = self._token
+
         os.environ.setdefault("CLOAKBROWSER_AUTO_UPDATE", "false")
         os.environ.setdefault(
             "CLOAKBROWSER_DOWNLOAD_URL",
@@ -171,7 +276,7 @@ class LocalBypassServer:
                 sys.executable,
                 "-m",
                 "uvicorn",
-                "cf_bypasser.server.app:create_app",
+                "mdcx.cf_bypass.local_server:create_protected_app",
                 "--factory",
                 "--host",
                 LOCAL_BYPASS_HOST,
@@ -215,13 +320,13 @@ class LocalBypassServer:
     async def _start_in_process(self) -> tuple[bool, str]:
         try:
             import uvicorn
-            from cf_bypasser.server.app import create_app
+            from mdcx.cf_bypass.local_server import create_protected_app
         except Exception as e:
             return False, f"无法导入 bypass 服务依赖: {e}"
 
         try:
             config = uvicorn.Config(
-                create_app(),
+                create_protected_app(),
                 host=LOCAL_BYPASS_HOST,
                 port=self._port,
                 log_level="warning",
@@ -263,6 +368,7 @@ class LocalBypassServer:
                 async with httpx.AsyncClient() as client:
                     resp = await client.get(
                         f"{self._url}/cache/stats",
+                        headers={"Authorization": f"Bearer {self._token}"} if self._token else {},
                         timeout=5,
                     )
                     if resp.status_code == 200:

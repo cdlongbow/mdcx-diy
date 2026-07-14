@@ -58,7 +58,7 @@ async def _get_actor_detail(actor: dict) -> tuple[dict | None, str]:
         return actor, ""
 
     _, actor_person, _, _, _, _ = _generate_server_url(actor)
-    headers = _build_jellyfin_headers() if _is_jellyfin_server() else None
+    headers = _build_jellyfin_headers()
     async with manager.acquire_computed() as computed:
         return await computed.async_client.get_json(actor_person, headers=headers, use_proxy=False)
 
@@ -87,18 +87,14 @@ async def update_emby_actor_photo() -> None:
 async def _get_emby_actor_list() -> list[dict]:
     _raise_if_stop_requested()
     base_url = str(manager.config.emby_url).rstrip("/")
-    headers = None
+    # Emby/Jellyfin 统一用 Authorization 头携带 api_key 鉴权, 避免密钥暴露到 URL(及访问日志/调试日志)
+    headers = _build_jellyfin_headers()
     # 获取 emby 的演员列表
     if "emby" == manager.config.server_type:
         server_name = "Emby"
-        url = base_url + "/emby/Persons?api_key=" + manager.config.api_key
-        # http://192.168.5.191:8096/emby/Persons?api_key=your_api_key
-        # http://192.168.5.191:8096/emby/Persons/梦乃爱华?api_key=your_api_key
-        if manager.config.user_id:
-            url += f"&userid={manager.config.user_id}"
+        url = _append_query(base_url + "/emby/Persons", {"userId": manager.config.user_id})
     else:
         server_name = "Jellyfin"
-        headers = _build_jellyfin_headers()
         url = _append_query(
             base_url + "/Persons",
             {
@@ -137,8 +133,7 @@ async def _upload_actor_photo(url: str, pic_path: Path) -> tuple[bool, str]:
         # Emby/Jellyfin 头像上传接口都要求使用 base64 编码后的图片内容。
         content = base64.b64encode(content)
         header = {"Content-Type": "image/jpeg" if pic_path.suffix in (".jpg", ".jpeg") else "image/png"}
-        if _is_jellyfin_server():
-            header = _build_jellyfin_headers(header)
+        header = _build_jellyfin_headers(header)
         async with manager.acquire_computed() as computed:
             r, err = await computed.async_client.post_content(url=url, data=content, headers=header, use_proxy=False)
         return r is not None, err
@@ -150,18 +145,17 @@ async def _upload_actor_photo(url: str, pic_path: Path) -> tuple[bool, str]:
 def _generate_server_url(actor_js: dict) -> tuple[str, str, str, str, str, str]:
     server_type = manager.config.server_type
     emby_url = str(manager.config.emby_url).rstrip("/")
-    api_key = manager.config.api_key
     actor_name = quote(actor_js["Name"], safe="")
     actor_id = actor_js["Id"]
     server_id = actor_js.get("ServerId", "")
 
     if "emby" == server_type:
         actor_homepage = f"{emby_url}/web/index.html#!/item?id={actor_id}&serverId={server_id}"
-        actor_person = f"{emby_url}/emby/Persons/{actor_name}?api_key={api_key}"
-        pic_url = f"{emby_url}/emby/Items/{actor_id}/Images/Primary?api_key={api_key}"
-        backdrop_url = f"{emby_url}/emby/Items/{actor_id}/Images/Backdrop?api_key={api_key}"
-        backdrop_url_0 = f"{emby_url}/emby/Items/{actor_id}/Images/Backdrop/0?api_key={api_key}"
-        update_url = f"{emby_url}/emby/Items/{actor_id}?api_key={api_key}"
+        actor_person = f"{emby_url}/emby/Persons/{actor_name}"
+        pic_url = f"{emby_url}/emby/Items/{actor_id}/Images/Primary"
+        backdrop_url = f"{emby_url}/emby/Items/{actor_id}/Images/Backdrop"
+        backdrop_url_0 = f"{emby_url}/emby/Items/{actor_id}/Images/Backdrop/0"
+        update_url = f"{emby_url}/emby/Items/{actor_id}"
     else:
         actor_homepage = f"{emby_url}/web/index.html#!/details?id={actor_id}&serverId={server_id}"
         actor_person = _append_query(f"{emby_url}/Persons/{actor_name}", {"userId": manager.config.user_id})
@@ -537,7 +531,7 @@ async def _update_emby_actor_photo_execute(actor_list: list[dict], gfriends_acto
         # 清理旧图片（backdrop可以多张，不清理会一直累积）
         if actor_backdrop_imagetages:
             for _ in range(len(actor_backdrop_imagetages)):
-                headers = _build_jellyfin_headers() if _is_jellyfin_server() else None
+                headers = _build_jellyfin_headers()
                 async with manager.acquire_computed() as computed:
                     await computed.async_client.request("DELETE", backdrop_url_0, headers=headers, use_proxy=False)
 

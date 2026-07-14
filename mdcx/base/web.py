@@ -818,8 +818,9 @@ async def download_file_with_filepath(url: str, file_path: Path, folder_new_path
         async with manager.acquire_computed() as computed:
             if await computed.async_client.download(url, file_path):
                 return True
-    except Exception:
-        pass
+    except Exception as e:
+        LogBuffer.log().write(f"\n 🥺 Download failed! {url}\n    原因: {type(e).__name__}: {e}")
+        return False
     LogBuffer.log().write(f"\n 🥺 Download failed! {url}")
     return False
 
@@ -855,11 +856,9 @@ async def download_content_with_filepath(url: str, file_path: Path, folder_new_p
         finally:
             img.close()
         return True
-    except Exception:
-        pass
-
-    LogBuffer.log().write(f"\n 🥺 Download failed! {url}")
-    return False
+    except Exception as e:
+        LogBuffer.log().write(f"\n 🥺 Download failed! {url}\n    原因: {type(e).__name__}: {e}")
+        return False
 
 
 async def download_dmm_extrafanart_with_filepath(url: str, file_path: Path, folder_new_path: Path) -> bool:
@@ -905,11 +904,9 @@ async def download_dmm_extrafanart_with_filepath(url: str, file_path: Path, fold
         finally:
             img.close()
         return True
-    except Exception:
-        pass
-
-    LogBuffer.log().write(f"\n 🥺 Download failed! {url}")
-    return False
+    except Exception as e:
+        LogBuffer.log().write(f"\n 🥺 Download failed! {url}\n    原因: {type(e).__name__}: {e}")
+        return False
 
 
 async def download_extrafanart_task(task: tuple[str, Path, Path, str]) -> bool:

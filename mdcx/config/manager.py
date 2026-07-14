@@ -88,8 +88,33 @@ class ConfigManager:
             return
         executor.submit(old_computed.close_when_idle())
 
+    @staticmethod
+    def _write_config_text(path: Path, text: str) -> None:
+        """写入配置文件并尽量收紧权限, 降低敏感字段(如 API Token)被同机其它用户/进程读取的风险。
+
+        - POSIX: chmod 0o600 (仅属主读写)
+        - Windows: best-effort 用 icacls 去除继承并仅授予当前用户读写; 任何失败均吞掉, 不影响主流程
+        """
+        path.write_text(text, encoding="UTF-8")
+        try:
+            if os.name == "posix":
+                os.chmod(path, 0o600)
+            elif os.name == "nt":
+                import subprocess
+
+                username = os.environ.get("USERNAME", "")
+                if username:
+                    subprocess.run(
+                        ["icacls", str(path), "/inheritance:r", "/grant:r", f"{username}:(R,W)"],
+                        check=False,
+                        capture_output=True,
+                        timeout=10,
+                    )
+        except Exception:
+            pass
+
     def save(self):
-        self._path.write_text(self.config.model_dump_json(indent=2), encoding="UTF-8")
+        self._write_config_text(self._path, self.config.model_dump_json(indent=2))
 
     def reset(self):
         """写入默认配置"""
@@ -98,11 +123,11 @@ class ConfigManager:
             try:
                 template = json.loads(template_path.read_text(encoding="UTF-8"))
                 Config.update(template)
-                self._path.write_text(Config.model_validate(template).model_dump_json(indent=2), encoding="UTF-8")
+                self._write_config_text(self._path, Config.model_validate(template).model_dump_json(indent=2))
                 return
             except Exception:
                 pass
-        self._path.write_text(Config().model_dump_json(indent=2), encoding="UTF-8")
+        self._write_config_text(self._path, Config().model_dump_json(indent=2))
 
     @staticmethod
     def _get_default_template_path() -> Path:

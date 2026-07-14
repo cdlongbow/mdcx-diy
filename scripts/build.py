@@ -9,6 +9,7 @@ import sys
 import time
 from contextlib import suppress
 from pathlib import Path
+from urllib.parse import urlparse
 
 from rich.console import Console
 from rich.logging import RichHandler
@@ -39,6 +40,36 @@ EXCLUDED_MODULES = [
 
 
 class BuildError(Exception): ...
+
+
+# 允许作为 Chromium 下载源的受信主机白名单, 防止 CLOAKBROWSER_DOWNLOAD_URL 被环境注入恶意镜像造成供应链投毒
+TRUSTED_DOWNLOAD_HOSTS = frozenset(
+    {
+        "github.com",  # 官方发布源
+        "objects.githubusercontent.com",  # GitHub Release 资产 CDN
+        "v6.gh-proxy.com",  # 项目默认使用的国内镜像(仅转发 github 官方资源)
+    }
+)
+
+
+def sanitize_download_url() -> None:
+    """校验 CLOAKBROWSER_DOWNLOAD_URL 主机是否在受信白名单内。
+
+    该变量可由环境注入, 若指向恶意镜像会构成供应链投毒。
+    仅允许 https 且 host 在白名单; 否则清除该变量, 让 cloakbrowser 回退到官方 GitHub 源。
+    """
+    url = os.environ.get("CLOAKBROWSER_DOWNLOAD_URL")
+    if not url:
+        return
+    try:
+        parsed = urlparse(url)
+        if parsed.scheme != "https":
+            raise ValueError("非 https 协议")
+        if parsed.hostname not in TRUSTED_DOWNLOAD_HOSTS:
+            raise ValueError(f"不受信主机: {parsed.hostname}")
+    except Exception as e:
+        logger.warning(f"CLOAKBROWSER_DOWNLOAD_URL 不在受信白名单, 已忽略并回退官方源: {e}")
+        os.environ.pop("CLOAKBROWSER_DOWNLOAD_URL", None)
 
 
 def get_version_from_config() -> str:
@@ -173,6 +204,9 @@ class BuildManager:
         except ImportError:
             logger.warning("cloakbrowser 未安装, 无法获取 stealth Chromium (请先 `pip install cloakbrowser`)")
             return False
+
+        # 白名单校验下载源, 防止 CLOAKBROWSER_DOWNLOAD_URL 被注入恶意镜像投毒
+        sanitize_download_url()
 
         license_key = os.environ.get("CLOAKBROWSER_LICENSE_KEY")
         try:
