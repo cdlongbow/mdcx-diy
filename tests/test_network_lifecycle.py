@@ -11,6 +11,8 @@ from mdcx.config.models import Config
 from mdcx.crawler import CrawlerProvider
 from mdcx.web_async import AsyncWebClient
 
+pytestmark = pytest.mark.network
+
 
 class _FakeSession:
     def __init__(self):

@@ -2,6 +2,10 @@ import pytest
 
 from mdcx.config.models import Website
 
+# 爬虫测试默认针对线上站点做真实抓取，按 P2 测试质量专项要求统一标记为
+# integration，使 CI 默认 `-m "not network and not integration"` 跳过它们。
+pytestmark = pytest.mark.integration
+
 
 def pytest_addoption(parser: pytest.Parser):
     """添加自定义命令行参数"""

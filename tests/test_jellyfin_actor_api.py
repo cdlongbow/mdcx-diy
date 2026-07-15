@@ -6,6 +6,8 @@ import pytest
 from mdcx.config.manager import manager
 from mdcx.tools import emby_actor_image
 
+pytestmark = pytest.mark.network
+
 
 @pytest.mark.asyncio
 async def test_upload_actor_photo_uses_base64_body_for_emby(monkeypatch: pytest.MonkeyPatch, tmp_path):

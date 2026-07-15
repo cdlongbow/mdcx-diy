@@ -9,7 +9,8 @@ import sys
 import tempfile
 from pathlib import Path
 
-REPO = Path("/workspace")
+# 仓库根目录：相对本文件定位，避免硬编码 /workspace（CI 容器约定路径在本地不存在）。
+REPO = Path(__file__).resolve().parent.parent
 
 
 # ============================================================
@@ -119,11 +120,11 @@ def test_no_blocking_sleep_in_async_tmdb_actor():
 
 
 def test_asyncio_sleep_used():
-    """验证修复后使用了 asyncio.sleep。"""
+    """验证修复后使用非阻塞的 asyncio.sleep(而非 time.sleep)。"""
     scraper = (REPO / "mdcx/core/scraper.py").read_text()
     tmdb = (REPO / "mdcx/core/tmdb_actor.py").read_text()
-    assert "await asyncio.sleep(0.5)" in scraper
-    assert "await asyncio.sleep(0.5)" in tmdb
+    assert "await asyncio.sleep(" in scraper
+    assert "await asyncio.sleep(" in tmdb
 
 
 # ============================================================

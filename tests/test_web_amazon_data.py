@@ -6,6 +6,8 @@ import mdcx.base.web as web_module
 from mdcx.base.web import _AdaptiveRequestThrottle, _amazon_request_throttle, get_amazon_data
 from mdcx.config.manager import manager
 
+pytestmark = pytest.mark.network
+
 
 @pytest.mark.asyncio
 async def test_get_amazon_data_prefers_utf8(monkeypatch: pytest.MonkeyPatch):

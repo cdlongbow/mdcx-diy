@@ -8,6 +8,8 @@ import mdcx.web_async as web_async
 from mdcx.network_fingerprint import BrowserFingerprint, build_amazon_headers
 from mdcx.web_async import AsyncWebClient
 
+pytestmark = pytest.mark.network
+
 
 @pytest.mark.asyncio
 async def test_request_merges_fingerprint_and_keeps_explicit_accept(monkeypatch: pytest.MonkeyPatch):

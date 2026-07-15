@@ -142,26 +142,27 @@
     "ignore_size"
   ],
   "keep_files": [
-    "poster",
-    "thumb",
-    "fanart"
+    "trailer",
+    "theme_videos"
   ],
   "download_hd_pics": [
     "amazon"
   ],
   "amazon_skip_poster_size_precheck": false,
-  "amazon_strict_pic_verify": true,
+  "amazon_strict_pic_verify": false,
   "scrape_like": "info",
   "field_priority_try_all_images": false,
   "website_single": "javbus",
   "website_youma": [
-    "javdbapi",
-    "libredmm",
-    "javdb_app",
+    "mgstage",
+    "official",
+    "missav",
     "javbus",
-    "xcity",
-    "iqqtv",
-    "airav_cc"
+    "javdbapi",
+    "jav321",
+    "dmm",
+    "avbase",
+    "javdb_app"
   ],
   "website_wuma": [
     "missav",

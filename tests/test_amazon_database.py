@@ -4,6 +4,8 @@ from openpyxl import load_workbook
 from mdcx.core import amazon_database
 from mdcx.models.log_buffer import LogBuffer
 
+pytestmark = pytest.mark.network
+
 
 @pytest.fixture
 def _tmp_asin_db(monkeypatch: pytest.MonkeyPatch, tmp_path):

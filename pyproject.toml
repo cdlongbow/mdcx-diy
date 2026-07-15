@@ -70,6 +70,14 @@ dev = [
     "types-lxml>=2025.3.30",
 ]
 
+[tool.pytest.ini_options]
+# P2 测试质量专项：声明自定义 marker，使 CI 可用 `-m "not network and not integration"`
+# 跑通单元子集，真实网络/线上站点测试默认跳过。
+markers = [
+    "network: 需要真实网络访问的测试（CI 默认跳过）",
+    "integration: 针对线上外部站点/服务的集成测试（CI 默认跳过）",
+]
+
 [tool.uv]
 package = true
 required-environments = [

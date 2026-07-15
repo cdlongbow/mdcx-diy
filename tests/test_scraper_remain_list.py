@@ -45,7 +45,7 @@ async def test_run_uses_copied_remain_list(monkeypatch: pytest.MonkeyPatch):
 
     monkeypatch.setattr(scraper_module.Scraper, "_run_tasks_with_limit", fake_run_tasks_with_limit)
     monkeypatch.setattr(scraper_module, "save_success_list", fake_save_success_list)
-    monkeypatch.setattr(scraper_module, "_clean_empty_fodlers", fake_clean_empty_folders)
+    monkeypatch.setattr(scraper_module, "_clean_empty_folders", fake_clean_empty_folders)
     monkeypatch.setattr(scraper_module, "get_movie_path_setting", fake_get_movie_path_setting)
     monkeypatch.setattr(scraper_module.manager.config, "thread_number", 4)
     monkeypatch.setattr(scraper_module.manager.config, "thread_time", 0)

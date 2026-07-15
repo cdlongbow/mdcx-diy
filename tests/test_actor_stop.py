@@ -87,7 +87,7 @@ async def test_update_emby_actor_photo_execute_uploads_primary_and_backdrop(monk
     pic_path.write_bytes(b"test")
     backdrop_path = tmp_path / "actor-big.jpg"
     backdrop_path.write_bytes(b"test")
-    uploads: list[tuple[str, str]] = []
+    uploads: list[tuple[str, dict]] = []
 
     async def fake_get_graphis_pic(actor_name: str):
         return None, None, ""
@@ -98,17 +98,19 @@ async def test_update_emby_actor_photo_execute_uploads_primary_and_backdrop(monk
     def fake_cut_pic(path):
         return None
 
-    async def fake_upload(url: str, path):
-        uploads.append((url, path.name))
+    # 直接 mock 底层 post_content, 从而能验证 Authorization 头(而非绕过它的 _upload_actor_photo)。
+    async def fake_post_content(url: str, data=None, headers=None, **kwargs):
+        uploads.append((url, dict(headers or {})))
         return True, ""
 
     monkeypatch.setattr(manager.config, "server_type", "emby")
     monkeypatch.setattr(manager.config, "emby_on", [])
+    monkeypatch.setattr(manager.config, "api_key", "test-token")
     monkeypatch.setattr(emby_actor_image.signal, "show_log_text", logs.append)
     monkeypatch.setattr(emby_actor_image, "_get_graphis_pic", fake_get_graphis_pic)
     monkeypatch.setattr(emby_actor_image, "fix_pic_async", fake_fix_pic_async)
     monkeypatch.setattr(emby_actor_image, "cut_pic", fake_cut_pic)
-    monkeypatch.setattr(emby_actor_image, "_upload_actor_photo", fake_upload)
+    monkeypatch.setattr(manager.computed.async_client, "post_content", fake_post_content)
 
     await emby_actor_image._update_emby_actor_photo_execute(
         [{"Name": "演员甲", "Id": "1", "ServerId": "server-1", "ImageTags": {}, "BackdropImageTags": []}],
@@ -116,9 +118,15 @@ async def test_update_emby_actor_photo_execute_uploads_primary_and_backdrop(monk
     )
 
     api_key = manager.config.api_key
+    expected_auth = f'MediaBrowser Token="{api_key}"'
 
+    # P1-5: api_key 不再出现在 URL 中, 改为通过 Authorization 头携带, 避免泄露到访问/调试日志。
     assert len(uploads) == 2
-    assert uploads[0][0].endswith(f"/emby/Items/1/Images/Primary?api_key={api_key}")
-    assert uploads[0][1] == "actor.jpg"
-    assert uploads[1][0].endswith(f"/emby/Items/1/Images/Backdrop?api_key={api_key}")
-    assert uploads[1][1] == "actor-big.jpg"
+    primary_url, primary_headers = uploads[0]
+    backdrop_url, backdrop_headers = uploads[1]
+    assert primary_url.endswith("/emby/Items/1/Images/Primary")
+    assert "?api_key=" not in primary_url
+    assert backdrop_url.endswith("/emby/Items/1/Images/Backdrop")
+    assert "?api_key=" not in backdrop_url
+    assert primary_headers.get("Authorization") == expected_auth
+    assert backdrop_headers.get("Authorization") == expected_auth

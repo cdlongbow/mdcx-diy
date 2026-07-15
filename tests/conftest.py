@@ -114,10 +114,44 @@ class _DummyAsyncClient:
     async def request(self, *args, **kwargs):
         raise NotImplementedError("Tests should monkeypatch async_client.request")
 
+    async def _close_response(self, response=None):
+        # 真实 AsyncWebClient 的辅助方法（关闭响应），测试无需 mock，提供 no-op。
+        return None
+
+    def __getattr__(self, name):
+        # 桩上未显式实现的方法（如 get_text / _close_response 等）：
+        # 返回一个协程桩，使得 monkeypatch.setattr(async_client, name, ...) 能定位到属性，
+        # 而测试若忘记打桩就直接调用时，以清晰的 NotImplementedError 失败（而非 AttributeError）。
+        if name.startswith("__") and name.endswith("__"):
+            raise AttributeError(name)
+
+        async def _stub(*args, **kwargs):
+            raise NotImplementedError(f"Tests should monkeypatch async_client.{name}")
+
+        return _stub
+
+
+class _DummyLLMClient:
+    async def ask(self, *args, **kwargs):
+        raise NotImplementedError("Tests should monkeypatch llm_client.ask")
+
+    def __getattr__(self, name):
+        if name.startswith("__") and name.endswith("__"):
+            raise AttributeError(name)
+
+        async def _stub(*args, **kwargs):
+            raise NotImplementedError(f"Tests should monkeypatch llm_client.{name}")
+
+        return _stub
+
 
 class _DummyComputed:
     def __init__(self):
         self.async_client = _DummyAsyncClient()
+        self.llm_client = _DummyLLMClient()
+        # get_file_info_v2 等会从 manager.computed.escape_string_list 读取，
+        # 桩需提供该属性，否则解析番号时会抛 AttributeError 被吞成空番号。
+        self.escape_string_list: list[str] = []
 
     def retain(self):
         return None
