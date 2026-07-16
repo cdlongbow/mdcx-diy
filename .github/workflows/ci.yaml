@@ -20,6 +20,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install system dependencies
+        run: sudo apt-get update -y && sudo apt-get install -y libglib2.0-0 libegl1 libgl1 libfontconfig1
+
       - name: Set up uv
         uses: astral-sh/setup-uv@v6
 
@@ -41,4 +44,4 @@ jobs:
         run: uv run mypy mdcx/
 
       - name: Run pytest
-        run: uv run pytest tests/ -v --tb=short -m "not network"
+        run: uv run pytest tests/ --tb=short -m "not network"
