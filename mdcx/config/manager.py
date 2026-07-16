@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import os.path
 import sys
@@ -11,6 +12,8 @@ from ..utils import executor
 from .computed import Computed
 from .models import Config
 from .v1 import ConfigV1, load_v1
+
+logger = logging.getLogger(__name__)
 
 
 class ConfigManager:
@@ -48,7 +51,13 @@ class ConfigManager:
             self._replace_config(config)
             return errors
         except Exception as e:
-            self._replace_config(Config())
+            # 校验失败时不再静默回退到默认配置(会丢失用户配置),
+            # 而是保留内存中已加载的旧配置(若存在), 仅记录错误并返回报错信息。
+            old_config = getattr(self, "config", None)
+            if old_config is None:
+                self._replace_config(Config())
+            else:
+                logger.error("配置文件 %s 验证失败, 继续使用旧配置: %s", self._path, e)
             msg = f" 配置文件 {self._path} 验证失败. 错误信息: \n{str(e)}"
             return msg.splitlines()
 

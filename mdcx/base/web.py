@@ -715,7 +715,10 @@ def check_version() -> int | None:
             "User-Agent": "mdcx-update-check",
             "X-GitHub-Api-Version": "2022-11-28",
         }
-        timeout = max(float(manager.config.timeout), 5.0)
+        try:
+            timeout = max(float(manager.config.timeout), 5.0)
+        except (TypeError, ValueError):
+            timeout = 5.0
         configured_proxy = manager.config.proxy.strip() if manager.config.use_proxy and manager.config.proxy else ""
         request_proxies = [configured_proxy] if configured_proxy else []
         request_proxies.append("")

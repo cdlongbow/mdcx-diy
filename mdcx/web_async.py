@@ -44,6 +44,14 @@ except ImportError:
     LocalBypassServer = None
 
 
+def _safe_float(value: object, default: float) -> float:
+    """安全地把外部来源的值转 float, 解析失败(非数字/None)时回退 default, 避免抛异常。"""
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
 class AsyncWebLimiters:
     def __init__(self):
         self.limiters: dict[str, AsyncLimiter] = {
@@ -508,9 +516,9 @@ class AsyncWebClient:
 
     def _request_timeout_seconds(self, timeout: float | httpx.Timeout | None) -> float | None:
         if timeout is None or timeout is not_set:
-            return float(self.timeout) + 5.0
+            return _safe_float(self.timeout, 30.0) + 5.0
         if isinstance(timeout, (int, float)):
-            return float(timeout) + 5.0
+            return _safe_float(timeout, 30.0) + 5.0
         return None
 
     async def _is_idle(self) -> bool:

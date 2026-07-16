@@ -77,6 +77,14 @@ jobs:
           if [ -z "$tag" ]; then
             tag="${{ github.ref_name }}"
           fi
+
+          # P2-4: tag 必须是纯数字(供 check_version 的 int(tag_name) 使用),
+          # 非数字(如 v2.0.0)会导致自动更新永久失效。手动填错直接报错退出, 避免建出破坏性 release。
+          if ! [[ "$tag" =~ ^[0-9]+$ ]]; then
+            echo "::error::Release tag 必须是纯数字 YYYYMMDD（供 check_version 的 int(tag) 使用）, 当前为 '$tag'。请检查 mdcx/consts.py 的 LOCAL_VERSION 或手动输入。"
+            exit 1
+          fi
+
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
       - name: "Set up Python"
@@ -155,6 +163,10 @@ jobs:
         shell: bash
         run: |
           version_name=$(grep -oE 'VERSION_NAME[[:space:]]*=[[:space:]]*"[^"]+"' mdcx/consts.py | grep -oE '"[^"]+"' | tr -d '"')
+          # P2-5: VERSION_NAME 提取失败时兜底, 避免标题变成 " (tag)"
+          if [ -z "$version_name" ]; then
+            version_name="MDCx"
+          fi
           tag="${{ steps.release-tag.outputs.tag }}"
           echo "name=${version_name} (${tag})" >> "$GITHUB_OUTPUT"
 
