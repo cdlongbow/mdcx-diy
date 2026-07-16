@@ -41,4 +41,4 @@ jobs:
         run: uv run mypy mdcx/
 
       - name: Run pytest
-        run: uv run pytest tests/ --ignore=tests/core/test_web_amazon.py --ignore=tests/test_build.py --tb=short -m "not network"
+        run: uv run pytest tests/ --tb=short -m "not network"
