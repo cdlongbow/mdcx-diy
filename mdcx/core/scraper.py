@@ -284,9 +284,9 @@ class Scraper:
 
         # auto run after scrape
         if EmbyAction.ACTOR_PHOTO_AUTO in manager.config.emby_on:
-            await update_emby_actor_photo()
+            await update_emby_actor_photo(manage_button_state=False)
         if manager.config.actor_photo_kodi_auto:
-            await creat_kodi_actors(True)
+            await creat_kodi_actors(True, manage_button_state=False)
 
         signal.reset_buttons_status.emit()
         if len(Flags.again_dic):
