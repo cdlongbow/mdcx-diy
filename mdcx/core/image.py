@@ -18,7 +18,6 @@ from ..models.types import CrawlersResult, FileInfo, OtherInfo
 from ..signals import signal
 from ..utils import executor, get_used_time
 from ..utils.file import check_pic_async, copy_file_sync, delete_file_sync
-from .face_crop import get_face_crop_left
 from .mosaic import has_leak_mark, has_umr_mark, has_uncensored_mark, is_censored_mosaic
 
 YOUMA_RIGHT_CROP_TYPES = {FixedScrapingType.YOUMA}
@@ -30,6 +29,12 @@ FACE_FALLBACK_CROP_TYPES = {
     FixedScrapingType.SUREN,
     FixedScrapingType.AUTO,
 }
+
+
+def get_face_crop_left(image, crop_width, log_fn=None) -> int | None:
+    from .face_crop import get_face_crop_left as detect_face_crop_left
+
+    return detect_face_crop_left(image, crop_width, log_fn=log_fn)
 
 
 async def add_mark(json_data: OtherInfo, file_info: FileInfo, mosaic: str):

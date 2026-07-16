@@ -13,7 +13,7 @@ from mdcx.consts import IS_DOCKER, IS_MAC, IS_NFC, IS_PYINSTALLER, IS_WINDOWS, M
 from mdcx.controllers.main_window.main_window import MyMAinWindow
 from mdcx.controllers.main_window.style import apply_application_palette
 from mdcx.core.tmdb_actor import flush_tmdb_query_cache
-from mdcx.utils.video import VIDEO_BACKEND
+from mdcx.utils.video import get_video_backend
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -42,7 +42,7 @@ def show_constants():
         "IS_DOCKER": IS_DOCKER,
         "IS_NFC": IS_NFC,
         "IS_PYINSTALLER": IS_PYINSTALLER,
-        "VIDEO_BACKEND": VIDEO_BACKEND,
+        "VIDEO_BACKEND": get_video_backend(),
     }
     print("Run time constants:")
     for key, value in constants.items():

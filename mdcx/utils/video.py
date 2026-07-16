@@ -4,13 +4,25 @@ import shutil
 import subprocess
 from pathlib import Path
 
-try:
-    import av
-except ImportError:
-    av = None
+_av = None
+_av_import_attempted = False
+
+
+def _load_av():
+    global _av, _av_import_attempted
+    if not _av_import_attempted:
+        _av_import_attempted = True
+        try:
+            import av
+        except ImportError:
+            _av = None
+        else:
+            _av = av
+    return _av
 
 
 def get_video_metadata_pyav(p: Path) -> tuple[int, str]:
+    av = _load_av()
     if av is None:
         raise ImportError("Should not be called if pyav is not available")
     height = 0
@@ -52,9 +64,12 @@ def get_video_metadata_ffmpeg(p: Path) -> tuple[int, str]:
     return height, codec_fourcc
 
 
-if av is not None:
-    VIDEO_BACKEND = "pyav"
-    get_video_metadata = get_video_metadata_pyav
-else:
-    VIDEO_BACKEND = "ffmpeg"
-    get_video_metadata = get_video_metadata_ffmpeg
+def get_video_metadata(p: Path) -> tuple[int, str]:
+    try:
+        return get_video_metadata_pyav(p)
+    except ImportError:
+        return get_video_metadata_ffmpeg(p)
+
+
+def get_video_backend() -> str:
+    return "pyav" if _load_av() is not None else "ffmpeg"

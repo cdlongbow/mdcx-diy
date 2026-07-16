@@ -3,7 +3,7 @@ import re
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import override
-from urllib.parse import urlsplit, urlunsplit
+from urllib.parse import urlencode, urlsplit, urlunsplit
 
 from lxml import etree
 from parsel import Selector
@@ -42,6 +42,30 @@ def normalize_cover_url(cover_url: str) -> str:
         return urlunsplit((parsed.scheme or "https", "i0.wp.com", "/madouqu.com" + uploads_path, parsed.query, ""))
 
     return urlunsplit(("https", "madouqu.com", uploads_path, "", ""))
+
+
+def _dedupe(items: list[str]) -> list[str]:
+    result = []
+    for item in items:
+        item = str(item or "").strip()
+        if item and item not in result:
+            result.append(item)
+    return result
+
+
+def _extract_number_candidates(number: str, appoint_number: str = "", file_path: str = "") -> list[str]:
+    values = [appoint_number, number]
+    if file_path:
+        filename = re.split(r"[\\/]", file_path)[-1]
+        values.append(re.sub(r"\.[^.]+$", "", filename))
+
+    candidates: list[str] = []
+    for value in values:
+        text = str(value or "").upper()
+        for match in re.finditer(r"(?<![A-Z0-9])([A-Z]{2,5})[-_ ]?(\d{3,5})(?!\d)", text):
+            prefix, digits = match.groups()
+            candidates.extend([f"{prefix}-{digits}", f"{prefix}{digits}"])
+    return _dedupe(candidates)
 
 
 def get_detail_info(html, number, file_path):
@@ -126,8 +150,9 @@ class MadouquCrawler(BaseCrawler):
     async def _generate_search_url(self, ctx: MadouquContext) -> list[str] | str | None:
         file_path = str(ctx.input.file_path or "")
         number_list, filename_list = get_number_list(ctx.input.number, ctx.input.appoint_number, file_path)
-        ctx.number_candidates = number_list[:1] + filename_list
-        return [f"{self.base_url}/?s={each}" for each in ctx.number_candidates]
+        exact_number_list = _extract_number_candidates(ctx.input.number, ctx.input.appoint_number, file_path)
+        ctx.number_candidates = _dedupe(exact_number_list + number_list[:1] + filename_list)
+        return [f"{self.base_url}/?{urlencode({'s': each})}" for each in ctx.number_candidates]
 
     @override
     async def _parse_search_page(self, ctx: MadouquContext, html: Selector, search_url: str) -> list[str] | str | None:

@@ -160,6 +160,7 @@ _DEFAULT_FINGERPRINTS = (
     _FIREFOX_133_WIN,
 )
 _AMAZON_FINGERPRINTS = _DEFAULT_FINGERPRINTS
+_MADOUQU_FINGERPRINTS = (_CHROME_136_WIN, _FIREFOX_133_WIN)
 
 _ASSET_EXTENSIONS = (
     ".jpg",
@@ -189,6 +190,8 @@ def select_fingerprint(
     exclude_fingerprint_id: str = "",
 ) -> BrowserFingerprint:
     normalized_host = (host or "").lower()
+    if normalized_host == "madouqu.com" or normalized_host.endswith(".madouqu.com"):
+        return _choose_fingerprint(_MADOUQU_FINGERPRINTS, exclude_fingerprint_id=exclude_fingerprint_id)
     if normalized_host.endswith("amazon.co.jp"):
         return select_amazon_fingerprint(exclude_fingerprint_id=exclude_fingerprint_id)
     if purpose == "api":
