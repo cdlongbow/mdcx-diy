@@ -85,6 +85,7 @@ from mdcx.utils.file import (
     resolve_link_source_sync,
     resolve_success_record_source_sync,
 )
+from mdcx.utils.path import safe_rmtree
 from mdcx.views.MDCx import Ui_MDCx
 
 from ..cut_window import CutWindow
@@ -2010,7 +2011,8 @@ class MyMAinWindow(QMainWindow):
         failure_details: list[tuple[Path, str]] = []
         for folder_path in folder_paths:
             try:
-                shutil.rmtree(folder_path)
+                # 守护: 拒绝系统关键路径(用户主目录/文件根), 防止路径计算错误误删用户文件
+                safe_rmtree(folder_path)
                 success_folder_count += 1
                 success_show_names.extend(folder_to_show_names.get(folder_path, []))
                 signal_qt.show_log_text(f" ✅ 已删除文件夹: {folder_path}")

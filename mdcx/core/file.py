@@ -26,7 +26,7 @@ from ..utils.file import (
     find_file_from_index,
     move_file_async,
 )
-from ..utils.path import showFilePath
+from ..utils.path import safe_rmtree, showFilePath
 from .mosaic import normalize_mosaic
 from .naming import FIELD_DESCRIPTIONS, NameRenderOptions, NamingTarget, render_name
 
@@ -795,7 +795,8 @@ async def deal_old_files(
                 await delete_file_async(each)
         for each in folder_path_list:
             if await aiofiles.os.path.isdir(each):
-                await asyncio.to_thread(shutil.rmtree, each, ignore_errors=True)
+                # 守护: 拒绝系统关键路径, 防止路径计算错误误删用户文件
+                await asyncio.to_thread(safe_rmtree, each)
         return False, False
 
     # 非视频模式，将本地已有的图片、剧照等文件按命名规则迁移到目标位置。

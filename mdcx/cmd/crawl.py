@@ -27,6 +27,23 @@ os.environ["MDCX_SHOW_BROWSER"] = "1"  # 显示浏览器界面
 proxy_help = "代理地址 (例如: http://127.0.0.1:7890). 如未指定将加载 config 设置"
 
 
+def _mask_proxy(proxy: str) -> str:
+    """脱敏代理地址, 仅保留 host 前 3 字符 + *** + :port, 避免 user:pass 明文泄露到日志/终端。
+
+    支持 scheme://[user:pass@]host:port / user:pass@host:port / host:port 等形态。
+    """
+    s = (proxy or "").strip()
+    if not s:
+        return ""
+    if "@" in s:  # 去掉 user:pass 凭据部分
+        s = s[s.rfind("@") + 1 :]
+    if ":" in s:
+        host, _, port = s.rpartition(":")
+        shown = (host[:3] + "***") if len(host) > 3 else "***"
+        return f"{shown}:{port}"
+    return "***"
+
+
 @app.callback(invoke_without_command=True)
 def main(
     ctx: typer.Context,
@@ -187,7 +204,8 @@ def show_config():
     """显示当前配置信息"""
     console.print("[bold blue]当前配置信息:[/bold blue]")
     console.print()
-    console.print(f"代理: {(manager.config.proxy if manager.config.use_proxy else None) or '未设置'}")
+    proxy_display = _mask_proxy(manager.config.proxy) if (manager.config.use_proxy and manager.config.proxy) else "未设置"
+    console.print(f"代理: {proxy_display}")
     console.print(f"超时时间: {manager.config.timeout} 秒")
     console.print(f"重试次数: {manager.config.retry}")
     console.print(f"配置文件路径: {manager.path}")
@@ -225,7 +243,7 @@ async def _fetch_async(
     if website:
         console.print(f"[cyan]网站类型: {website.value}[/cyan]")
     if client_proxy:
-        console.print(f"[cyan]代理: {client_proxy}[/cyan]")
+        console.print(f"[cyan]代理: {_mask_proxy(client_proxy)}[/cyan]")
 
     # 创建异步客户端
     async_client = AsyncWebClient(
