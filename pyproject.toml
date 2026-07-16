@@ -68,6 +68,7 @@ dev = [
     "ruff>=0.15.0,<0.16.0",
     "typer>=0.16.0",
     "types-lxml>=2025.3.30",
+    "mypy>=1.17.0",
 ]
 
 [tool.pytest.ini_options]

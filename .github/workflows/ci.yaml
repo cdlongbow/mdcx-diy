@@ -28,3 +28,17 @@ jobs:
 
       - name: Run ruff check
         run: uvx ruff@0.15.12 check --output-format=github
+
+      - name: Install dependencies
+        run: |
+          if ! uv sync --locked --dev 2>/dev/null; then
+            echo "Lock file out of date, running uv lock..."
+            uv lock
+            uv sync --dev
+          fi
+
+      - name: Run mypy
+        run: uv run mypy mdcx/
+
+      - name: Run pytest
+        run: uv run pytest tests/ -x --tb=short -m "not network"

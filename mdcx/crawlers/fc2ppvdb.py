@@ -7,6 +7,7 @@ from urllib.parse import unquote, urljoin
 
 from lxml import html as lxml_html
 
+from ..config.enums import FieldRule
 from ..config.manager import manager
 from ..config.models import Website
 from .base import BaseCrawler, Context, CrawlerData, CrawlerException
@@ -513,8 +514,9 @@ class Fc2ppvdbCrawler(BaseCrawler):
         actors = get_actors(html_info)
         tags = [tag for tag in get_tags(html_info) if tag != "無修正"]
         studio = get_studio(html_info)  # 使用卖家作为厂商
-        if "fc2_seller" in manager.config.fields_rule and studio:
-            actors = [studio]
+        if FieldRule.FC2_SELLER in manager.config.fields_rule and studio:
+            if not actors:
+                actors = [studio]
         video_type = get_video_type(html_info)
 
         data = CrawlerData(
