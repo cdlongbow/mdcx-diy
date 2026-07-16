@@ -161,6 +161,18 @@ class JavdbAPICrawler(BaseCrawler):
             return ""
         return str(value)
 
+    @staticmethod
+    def _is_female(actor: dict) -> bool:
+        gender = actor.get("gender")
+        if gender is not None:
+            if isinstance(gender, str):
+                return gender.lower() in ("female", "女", "女优", "女優")
+            if isinstance(gender, bool):
+                return gender
+            if isinstance(gender, int):
+                return gender == 1
+        return True
+
     async def _request_api(self, path: str, params: dict | None = None) -> dict | None:
         hosts = [_API_BASE] + _API_FALLBACKS
         signature = make_signature()
@@ -279,7 +291,7 @@ class JavdbAPICrawler(BaseCrawler):
                 [
                     self._clean_str(actor.get("name"))
                     for actor in (movie.actors or [])
-                    if actor and self._clean_str(actor.get("name"))
+                    if actor and self._clean_str(actor.get("name")) and self._is_female(actor)
                 ]
                 if movie.actors
                 else []
