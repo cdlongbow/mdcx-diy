@@ -1,4 +1,5 @@
 """Download cloakbrowser stealth Chromium for cache warm-up."""
+
 import os
 import shutil
 from pathlib import Path
