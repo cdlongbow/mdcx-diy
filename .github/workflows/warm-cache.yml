@@ -2,7 +2,6 @@ name: Warm Chromium Cache
 
 on:
   schedule:
-    # 每周一早8点跑一次，保持 cache 不失效（GitHub cache 7天无访问即淘汰）
     - cron: "0 8 * * 1"
   workflow_dispatch:
 
@@ -48,22 +47,8 @@ jobs:
         shell: bash
         run: |
           if [ -d chromium ] && ls chromium/chrome-*/* 2>/dev/null | head -1; then
-            echo "Chromium 已缓存，跳过下载"
+            echo "Chromium already cached, skipping download"
           else
-            echo "下载 stealth Chromium..."
-            uv run python3 -c "
-import cloakbrowser as cb
-import os, shutil
-from pathlib import Path
-os.environ.setdefault('CLOAKBROWSER_DOWNLOAD_URL',
-  'https://v6.gh-proxy.com/https://github.com/CloakHQ/cloakbrowser/releases/download')
-binary = cb.ensure_binary()
-if binary:
-  platform_sub = {'Windows': 'chrome-win64', 'Linux': 'chrome-linux', 'Darwin': 'chrome-macos'}
-  src = Path(binary).resolve().parent
-  dest = Path('chromium') / platform_sub.get(os.name, 'chrome-win64')
-  dest.mkdir(parents=True, exist_ok=True)
-  shutil.copytree(src, dest, dirs_exist_ok=True)
-  print(f'Chromium 已缓存到 {dest}')
-"
+            echo "Downloading stealth Chromium..."
+            uv run python3 scripts/warm_cache.py
           fi
