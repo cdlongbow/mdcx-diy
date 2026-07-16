@@ -4,8 +4,6 @@ from types import SimpleNamespace
 
 import pytest
 
-pytestmark = pytest.mark.network
-
 from mdcx.config.enums import Website
 from mdcx.core.network_check import (
     NetworkCheckSpec,
@@ -15,6 +13,8 @@ from mdcx.core.network_check import (
     run_network_check,
     run_network_check_item,
 )
+
+pytestmark = pytest.mark.network
 
 
 class FakeResponse:
