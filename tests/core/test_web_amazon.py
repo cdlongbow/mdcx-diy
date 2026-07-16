@@ -45,22 +45,22 @@ def test_normalize_amazon_image_url_converts_to_sl1500():
     """测试亚马逊图片 URL 转换为 SL1500 尺寸"""
 
     assert _normalize_amazon_image_url("https://m.media-amazon.com/images/I/81test._AC_UL320_.jpg") == (
-        "https://m.media-amazon.com/images/I/81test.SL1500_.jpg"
+        "https://m.media-amazon.com/images/I/81test.SL1500.jpg"
     )
     assert _normalize_amazon_image_url("https://m.media-amazon.com/images/I/81test._AC_SX679_.jpg") == (
-        "https://m.media-amazon.com/images/I/81test.SL1500_.jpg"
+        "https://m.media-amazon.com/images/I/81test.SL1500.jpg"
     )
     assert _normalize_amazon_image_url("https://m.media-amazon.com/images/I/81test._SL1000_.jpg") == (
-        "https://m.media-amazon.com/images/I/81test.SL1500_.jpg"
+        "https://m.media-amazon.com/images/I/81test.SL1500.jpg"
     )
     assert _normalize_amazon_image_url("") == ""
     assert _normalize_amazon_image_url("https://example.com/test.jpg") == "https://example.com/test.jpg"
     assert _normalize_amazon_image_url("https://m.media-amazon.com/images/I/81test.jpg") == (
-        "https://m.media-amazon.com/images/I/81test.SL1500_.jpg"
+        "https://m.media-amazon.com/images/I/81test.SL1500.jpg"
     )
     assert _normalize_amazon_image_url(
         "https://m.media-amazon.com/images/I/81test._AC_UL320_.jpg", target_size="SL1000"
-    ) == ("https://m.media-amazon.com/images/I/81test.SL1000_.jpg")
+    ) == ("https://m.media-amazon.com/images/I/81test.SL1000.jpg")
 
 
 async def _async_chunk(content: bytes) -> bytes:

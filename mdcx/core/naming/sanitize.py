@@ -1,6 +1,5 @@
 import re
 
-from ...consts import IS_WINDOWS
 from ...utils import nfd2c
 
 WINDOWS_RESERVED_NAMES = {
@@ -19,8 +18,6 @@ def cleanup_rendered_text(text: str) -> str:
 
 
 def _avoid_windows_reserved_name(segment: str) -> str:
-    if not IS_WINDOWS:
-        return segment
     name, dot, suffix = segment.partition(".")
     if name.rstrip(". ").upper() in WINDOWS_RESERVED_NAMES:
         return f"{name}_{dot}{suffix}"

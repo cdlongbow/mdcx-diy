@@ -8,8 +8,31 @@ from ..config.enums import Website
 from ..config.manager import manager
 from .base import BaseCrawler, Context, CrawlerData, CrawlerException
 from .base.types import split_csv
+from .official_uncensored import route_uncensored_official
 
 _SUPPORTED_LANGUAGES = {"zh_cn", "zh_tw", "jp"}
+_WEB_NUMBER_PREFIX_PATTERN = re.compile(
+    r"^(?:_?1pondo|1pon|caribbeancom(?:pr)?|carib|pacopacomama|pacoma|paco|10musume|10mu)[_-]*",
+    re.IGNORECASE,
+)
+_WEB_NUMBER_PREFIX_CAPTURE_PATTERN = re.compile(
+    r"^_?(?P<prefix>1pondo|1pon|caribbeancom(?:pr)?|carib|pacopacomama|pacoma|paco|10musume|10mu)[_-]*",
+    re.IGNORECASE,
+)
+_WEB_NUMBER_SUFFIX_PATTERN = re.compile(r"^(?=.*\d)[a-z0-9]+(?:[-_][a-z0-9]+)*$", re.IGNORECASE)
+_TITLE_TRAILING_MARKERS = {"HD", "FHD", "UHD", "SD", "VR", "2K", "4K", "720P", "1080P", "2160P"}
+_WEB_NUMBER_PREFIX_SITE_ALIASES = {
+    "1pon": "1pondo",
+    "1pondo": "1pondo",
+    "carib": "caribbeancom",
+    "caribbeancom": "caribbeancom",
+    "caribbeancompr": "caribbeancom",
+    "paco": "pacopacomama",
+    "pacoma": "pacopacomama",
+    "pacopacomama": "pacopacomama",
+    "10mu": "10musume",
+    "10musume": "10musume",
+}
 _OUTLINE_PREFIX_PATTERN = re.compile(r"^(?:简介|簡介|介绍|介紹|紹介)\s*[:：]?\s*")
 
 
@@ -24,7 +47,7 @@ def get_title(html):
 
 def get_real_title(title):
     temp_t = title.strip(" ").split(" ")
-    if len(temp_t) > 1 and len(temp_t[-1]) < 5:
+    if len(temp_t) > 1 and temp_t[-1].upper() in _TITLE_TRAILING_MARKERS:
         temp_t.pop()
     return " ".join(temp_t).strip()
 
@@ -32,14 +55,66 @@ def get_real_title(title):
 def getWebNumber(title, number):
     result = title.split(" ")
     result = result[-1] if len(result) > 1 else number.upper()
-    return (
-        result.replace("_1pondo_", "")
-        .replace("1pondo_", "")
-        .replace("caribbeancom-", "")
-        .replace("caribbeancom", "")
-        .replace("-PPV", "")
-        .strip(" _-")
-    )
+    result = _clean_web_number_token(result)
+    return result if _looks_like_web_number(result) else number.upper()
+
+
+def _clean_web_number_token(value: str) -> str:
+    result = str(value or "").strip()
+    result = re.sub(r"-PPV$", "", result, flags=re.IGNORECASE)
+    result = _WEB_NUMBER_PREFIX_PATTERN.sub("", result)
+    return result.strip(" _-")
+
+
+def _site_hint_from_web_number_token(value: str) -> str:
+    match = _WEB_NUMBER_PREFIX_CAPTURE_PATTERN.match(str(value or "").strip())
+    if not match:
+        return ""
+    return _WEB_NUMBER_PREFIX_SITE_ALIASES.get(match.group("prefix").lower(), "")
+
+
+def _same_web_number(left: str, right: str) -> bool:
+    left = _clean_web_number_token(left).upper()
+    right = _clean_web_number_token(right).upper()
+    return bool(left and right and _web_number_key(left) == _web_number_key(right))
+
+
+def _looks_like_web_number(value: str) -> bool:
+    return bool(_WEB_NUMBER_SUFFIX_PATTERN.fullmatch(str(value or "").strip()))
+
+
+def _web_number_key(value: str) -> str:
+    return re.sub(r"[-_]", "", _clean_web_number_token(value).upper())
+
+
+def remove_web_number_suffix(title: str, number: str) -> str:
+    title = str(title or "").strip()
+    if not title:
+        return ""
+
+    parts = title.rsplit(maxsplit=1)
+    if len(parts) != 2:
+        return title
+
+    suffix = parts[-1]
+    if _looks_like_web_number(_clean_web_number_token(suffix)) and _same_web_number(suffix, number):
+        return parts[0].strip()
+    return title
+
+
+def assert_web_number_suffix_site_matches(title: str, number: str) -> None:
+    parts = str(title or "").strip().rsplit(maxsplit=1)
+    if len(parts) != 2:
+        return
+
+    suffix = parts[-1]
+    suffix_site = _site_hint_from_web_number_token(suffix)
+    if not suffix_site or not _same_web_number(suffix, number):
+        return
+
+    expected_site = route_uncensored_official(number)
+    if expected_site and suffix_site != expected_site:
+        raise CrawlerException(f"搜索结果站点前缀不匹配: {suffix_site} != {expected_site}")
 
 
 def getActor(html):
@@ -201,7 +276,8 @@ class IqqtvCrawler(BaseCrawler):
         if not title:
             raise CrawlerException("数据获取失败: 未获取到title！")
         web_number = getWebNumber(title, number)
-        title = title.replace(f" {web_number}", "").strip()
+        assert_web_number_suffix_site_matches(title, number)
+        title = remove_web_number_suffix(title, number)
         actor = getActor(html_info)
         title = get_real_title(title)
         cover_url = getCover(html_info)

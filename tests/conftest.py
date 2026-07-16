@@ -152,6 +152,7 @@ class _DummyComputed:
         # get_file_info_v2 等会从 manager.computed.escape_string_list 读取，
         # 桩需提供该属性，否则解析番号时会抛 AttributeError 被吞成空番号。
         self.escape_string_list: list[str] = []
+        self.official_websites: dict[str, str] = {}
 
     def retain(self):
         return None

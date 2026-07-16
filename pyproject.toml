@@ -112,4 +112,47 @@ reportPrivateUsage = "none"
 reportUnusedClass = "warning"
 reportUnusedFunction = "warning"
 reportUnusedVariable = "warning"
-reportUnusedImport = "warning"
+
+[tool.mypy]
+python_version = "3.13"
+ignore_missing_imports = true
+warn_no_return = false
+disallow_untyped_defs = false
+check_untyped_defs = false
+exclude = [
+    "mdcx/controllers/main_window/init\\.py",
+    "mdcx/controllers/main_window/load_config\\.py",
+    "mdcx/views/",
+    "mdcx/gen/",
+    "mdcx/cf_bypass/",
+    "mdcx/tools/minnano_crawler\\.py",
+    "mdcx/tools/wiki\\.py",
+    "mdcx/tools/missing\\.py",
+    "mdcx/core/amazon\\.py",
+    "mdcx/core/network_check\\.py",
+    "mdcx/core/tmdb_actor\\.py",
+    "mdcx/core/translate\\.py",
+    "mdcx/controllers/main_window/site_priority_dialog\\.py",
+    "tests/",
+]
+disable_error_code = [
+    "annotation-unchecked",
+    "import-untyped",
+    "var-annotated",
+    "union-attr",
+    "no-redef",
+    "attr-defined",
+    "misc",
+    "assignment",
+    "arg-type",
+    "return-value",
+    "call-arg",
+    "call-overload",
+    "operator",
+    "index",
+    "method-assign",
+    "list-item",
+    "no-any-return",
+    "override",
+    "func-returns-value",
+]

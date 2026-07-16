@@ -1,6 +1,7 @@
 import pytest
 
 from mdcx.config.enums import Language, Website
+from mdcx.config.manager import manager
 from mdcx.crawlers.base import get_crawler
 from mdcx.crawlers.official import OfficialCrawler
 from mdcx.models.types import CrawlerInput
@@ -48,6 +49,7 @@ def _detail_html() -> str:
 
 @pytest.mark.asyncio
 async def test_official_crawler_uses_prefix_mapping_and_dynamic_source():
+    manager.computed.official_websites = {"SSIS": "https://s1s1s1.com"}
     crawler = OfficialCrawler(client=FakeOfficialClient())
     res = await crawler.run(
         CrawlerInput(
