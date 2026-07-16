@@ -659,7 +659,6 @@ async def update_actor_db_row(
 
             write_status = "unchanged"
             external_wb = _wb is not None
-            deferred = _wb is not None
 
             if external_wb:
                 wb = _wb
@@ -736,7 +735,7 @@ async def update_actor_db_row(
                     ws.cell(row=last_row, column=COL_TMDB_URL + 1, value=tmdb_url)
                     ws.cell(row=last_row, column=COL_TMDB_URL + 1).hyperlink = tmdb_url
 
-            if not deferred:
+            if not external_wb:
                 _format_db_worksheet(ws)
                 wb.save(db_path)
                 wb.close()

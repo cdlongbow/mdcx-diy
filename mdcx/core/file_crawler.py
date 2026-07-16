@@ -1,3 +1,4 @@
+import asyncio
 import re
 from dataclasses import dataclass
 from datetime import date
@@ -302,8 +303,6 @@ class FileScraper:
                 all_needed_keys.add(key)
 
         # 并发请求所有尚未请求的网站
-        import asyncio
-
         async def _fetch_site(key: tuple[Website, Language]) -> None:
             site, lang = key
             try:
@@ -674,11 +673,8 @@ class FileScraper:
         res.originaltitle_amazon = res.originaltitle
         if res.actor_amazon:
             for each in res.actor_amazon:  # 去除演员名，避免搜索不到
-                try:
-                    end_actor = re.compile(rf" {re.escape(each)}$")
-                    res.originaltitle_amazon = re.sub(end_actor, "", res.originaltitle_amazon)
-                except Exception:
-                    pass
+                end_actor = re.compile(rf" {re.escape(each)}$")
+                res.originaltitle_amazon = re.sub(end_actor, "", res.originaltitle_amazon)
         res.amazon_raw_director = res.director
         res.amazon_raw_studio = res.studio
         res.amazon_raw_publisher = res.publisher

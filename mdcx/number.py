@@ -141,7 +141,9 @@ def get_number_first_letter(number: str) -> str:
     if not number:
         return "#"
     result = number.upper()[0]
-    return result if result.encode("utf-8").isalnum() else "#"
+    # 用 str.isalnum() 而非 bytes.isalnum(): 后者按字节判 ASCII,
+    # 会使日/韩/中文等非 ASCII 首字母一律归 "#", 导致归类错误
+    return result if result.isalnum() else "#"
 
 
 def long_name(short_name: str) -> str:
