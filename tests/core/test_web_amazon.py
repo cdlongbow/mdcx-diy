@@ -157,7 +157,6 @@ async def test_poster_auto_best_removes_failed_candidate_and_reselects(monkeypat
     assert other.poster_path == poster_path
 
 
-@pytest.mark.xfail(reason="poster_auto_best 选优逻辑偏好 thumb 裁剪而非原始 DMM 海报，待后续修复")
 @pytest.mark.asyncio
 async def test_poster_auto_best_uses_original_dmm_poster_size(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     async def fake_get_big_poster(*args, **kwargs):
@@ -291,7 +290,6 @@ async def test_youma_without_auto_best_crops_when_direct_poster_loses_to_crop(
     assert other.poster_path == poster_path
 
 
-@pytest.mark.xfail(reason="poster_download 在非 auto_best 路径下不会将 image_download 置 False，待后续修复")
 @pytest.mark.asyncio
 async def test_javdb_app_small_cover_skips_direct_download_and_crops(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     async def fake_get_big_poster(*args, **kwargs):
