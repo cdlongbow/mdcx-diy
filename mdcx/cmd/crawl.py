@@ -204,7 +204,9 @@ def show_config():
     """显示当前配置信息"""
     console.print("[bold blue]当前配置信息:[/bold blue]")
     console.print()
-    proxy_display = _mask_proxy(manager.config.proxy) if (manager.config.use_proxy and manager.config.proxy) else "未设置"
+    proxy_display = (
+        _mask_proxy(manager.config.proxy) if (manager.config.use_proxy and manager.config.proxy) else "未设置"
+    )
     console.print(f"代理: {proxy_display}")
     console.print(f"超时时间: {manager.config.timeout} 秒")
     console.print(f"重试次数: {manager.config.retry}")

@@ -320,6 +320,7 @@ class LocalBypassServer:
     async def _start_in_process(self) -> tuple[bool, str]:
         try:
             import uvicorn
+
             from mdcx.cf_bypass.local_server import create_protected_app
         except Exception as e:
             return False, f"无法导入 bypass 服务依赖: {e}"

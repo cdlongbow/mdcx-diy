@@ -38,7 +38,7 @@ class MissavApiCrawler(BaseCrawler):
 
     @staticmethod
     def _log(message: str) -> None:
-        signal.add_log(f"\U0001F310 [MISSAV-API] {message}")
+        signal.add_log(f"\U0001f310 [MISSAV-API] {message}")
 
     @classmethod
     @override

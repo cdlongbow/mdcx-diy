@@ -32,10 +32,10 @@ from mdcx.config.enums import (
 from mdcx.config.extend import get_movie_path_setting
 from mdcx.config.manager import manager
 from mdcx.config.models import SiteConfig, str_to_list
+from mdcx.consts import LOCAL_VERSION, VERSION_NAME
 from mdcx.gen.field_enums import CrawlerResultFields
 from mdcx.models.flags import Flags
 from mdcx.signals import signal_qt
-from mdcx.consts import LOCAL_VERSION, VERSION_NAME
 from mdcx.tools.actress_db import ActressDB
 
 from .bind_utils import get_checkbox, get_checkboxes, get_radio_buttons
