@@ -20331,14 +20331,14 @@
                       <x>0</x>
                       <y>0</y>
                       <width>760</width>
-                      <height>1626</height>
+                      <height>1750</height>
                     </rect>
                   </property>
                   <widget class="QGroupBox" name="groupBox_10">
                     <property name="geometry">
                       <rect>
                         <x>30</x>
-                        <y>356</y>
+                        <y>435</y>
                         <width>701</width>
                         <height>531</height>
                       </rect>
@@ -20657,7 +20657,7 @@
                         <x>30</x>
                         <y>20</y>
                         <width>701</width>
-                        <height>357</height>
+                        <height>400</height>
                       </rect>
                     </property>
                     <property name="styleSheet">
@@ -20672,11 +20672,11 @@
                           <x>20</x>
                           <y>30</y>
                           <width>661</width>
-                          <height>340</height>
+                          <height>370</height>
                         </rect>
                       </property>
                       <layout class="QGridLayout" name="gridLayout_9">
-                        <item row="7" column="1">
+                        <item row="8" column="1">
                           <widget class="QLabel" name="label_103">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -20712,7 +20712,7 @@
                             </item>
                           </layout>
                         </item>
-                        <item row="4" column="1">
+                        <item row="6" column="1">
                           <layout class="QHBoxLayout" name="horizontalLayout_3">
                             <item>
                               <widget class="CustomQSlider" name="horizontalSlider_timeout">
@@ -20793,7 +20793,7 @@
                             </item>
                           </layout>
                         </item>
-                        <item row="5" column="1">
+                        <item row="7" column="1">
                           <layout class="QHBoxLayout" name="horizontalLayout_retry">
                             <item>
                               <widget class="CustomQSlider" name="horizontalSlider_retry">
@@ -20868,7 +20868,7 @@
                             </item>
                           </layout>
                         </item>
-                        <item row="5" column="0">
+                        <item row="6" column="0">
                           <widget class="QLabel" name="label_73">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -21050,7 +21050,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="4" column="0">
+                        <item row="5" column="0">
                           <widget class="QLabel" name="label_cf_bypass_proxy">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -21075,7 +21075,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="4" column="1">
+                        <item row="5" column="1">
                           <widget class="QLineEdit" name="lineEdit_cf_bypass_proxy">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -21100,7 +21100,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="5" column="1">
+                        <item row="4" column="1">
                           <widget class="QCheckBox" name="checkBox_cf_bypass_auto">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -21116,7 +21116,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="6" column="0">
+                        <item row="7" column="0">
                           <widget class="QLabel" name="label_65">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -21169,7 +21169,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="8" column="0">
+                        <item row="9" column="0">
                           <widget class="QLabel" name="label_verify_ssl">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -21197,7 +21197,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="8" column="1">
+                        <item row="9" column="1">
                           <widget class="QCheckBox" name="checkBox_verify_ssl">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -21217,7 +21217,7 @@
                     <property name="geometry">
                       <rect>
                         <x>30</x>
-                        <y>1245</y>
+                        <y>1386</y>
                         <width>701</width>
                         <height>301</height>
                       </rect>
@@ -21408,9 +21408,9 @@
                     <property name="geometry">
                       <rect>
                         <x>30</x>
-                        <y>906</y>
+                        <y>981</y>
                         <width>701</width>
-                        <height>320</height>
+                        <height>390</height>
                       </rect>
                     </property>
                     <property name="styleSheet">
@@ -21425,11 +21425,11 @@
                           <x>20</x>
                           <y>30</y>
                           <width>661</width>
-                          <height>130</height>
+                          <height>210</height>
                         </rect>
                       </property>
                       <layout class="QGridLayout" name="gridLayout_65">
-                        <item row="1" column="0">
+                        <item row="2" column="0">
                           <widget class="QLabel" name="label_355">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -21454,7 +21454,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="1" column="1">
+                        <item row="2" column="1">
                           <widget class="QLineEdit" name="lineEdit_api_token_theporndb">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -21476,7 +21476,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="2" column="0">
+                        <item row="0" column="0">
                           <widget class="QLabel" name="label_423">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -21501,7 +21501,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="2" column="1">
+                        <item row="0" column="1">
                           <widget class="QLineEdit" name="lineEdit_tmdb_api_base">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -21526,7 +21526,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="0" column="0">
+                        <item row="1" column="0">
                           <widget class="QLabel" name="label_424">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -21551,7 +21551,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="0" column="1">
+                        <item row="1" column="1">
                           <widget class="QLineEdit" name="lineEdit_tmdb_api_key">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
