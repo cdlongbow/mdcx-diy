@@ -526,6 +526,7 @@ class Website(Enum):
     MMTV = "7mmtv"
     MYWIFE = "mywife"
     PRESTIGE = "prestige"
+    R18DEV = "r18dev"
     THEPORNDB = "theporndb"
     XCITY = "xcity"
 

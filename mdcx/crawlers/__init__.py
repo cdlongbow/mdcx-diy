@@ -62,6 +62,7 @@ from .mmtv import MmtvCrawler
 from .mywife import MywifeCrawler
 from .official import OfficialCrawler
 from .prestige import PrestigeCrawler
+from .r18dev import R18devCrawler
 from .theporndb import TheporndbCrawler
 from .xcity import XcityCrawler
 
@@ -92,6 +93,7 @@ register_crawler(MgstageCrawler)
 register_crawler(JavdayCrawler)
 register_crawler(Fc2ppvdbCrawler)
 register_crawler(PrestigeCrawler)
+register_crawler(R18devCrawler)
 register_crawler(Fc2clubCrawler)
 register_crawler(Fc2Crawler)
 register_crawler(Fc2hubCrawler)
