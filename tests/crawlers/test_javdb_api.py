@@ -21,7 +21,7 @@ def test_normalize_actor_name_simplified_to_traditional():
 
 
 def test_normalize_actor_name_alias():
-    assert normalize_actor_name("藤森里穗") == "藤森裏穂"
+    assert normalize_actor_name("藤森理穗") == "藤森裏穂"
     assert normalize_actor_name("筱田") == "篠田"
 
 
@@ -64,48 +64,52 @@ def test_parse_search_list():
     assert items[2][2] == " Title C"
 
 
-def test_parse_search_page_matches_exact():
+@pytest.mark.asyncio
+async def test_parse_search_page_matches_exact():
     crawler = JavdbApiCrawler(client=None)
     html = _load_html("search_list.html")
     from mdcx.crawlers.base.types import Context
 
     ctx = Context(input=CrawlerInput.empty())
     ctx.input.number = "IPX-535"
-    result = crawler._parse_search_page(ctx, html, "http://test/search")
+    result = await crawler._parse_search_page(ctx, html, "http://test/search")
     assert result is not None
     assert any("abc123" in url for url in result)
 
 
-def test_parse_search_page_matches_fuzzy():
+@pytest.mark.asyncio
+async def test_parse_search_page_matches_fuzzy():
     crawler = JavdbApiCrawler(client=None)
     html = _load_html("search_single.html")
     from mdcx.crawlers.base.types import Context
 
     ctx = Context(input=CrawlerInput.empty())
     ctx.input.number = "URE-018"
-    result = crawler._parse_search_page(ctx, html, "http://test/search")
+    result = await crawler._parse_search_page(ctx, html, "http://test/search")
     assert result is not None
     assert any("xyz000" in url for url in result)
 
 
-def test_parse_search_page_no_match():
+@pytest.mark.asyncio
+async def test_parse_search_page_no_match():
     crawler = JavdbApiCrawler(client=None)
     html = _load_html("search_single.html")
     from mdcx.crawlers.base.types import Context
 
     ctx = Context(input=CrawlerInput.empty())
     ctx.input.number = "ZZZ-999"
-    result = crawler._parse_search_page(ctx, html, "http://test/search")
+    result = await crawler._parse_search_page(ctx, html, "http://test/search")
     assert result is None
 
 
-def test_generate_search_url():
+@pytest.mark.asyncio
+async def test_generate_search_url():
     crawler = JavdbApiCrawler(client=None)
     from mdcx.crawlers.base.types import Context
 
     ctx = Context(input=CrawlerInput.empty())
     ctx.input.number = "IPX-535"
-    urls = crawler._generate_search_url(ctx)
+    urls = await crawler._generate_search_url(ctx)
     assert len(urls) == 1
     assert "f=all" in urls[0]
     assert "q=IPX-535" in urls[0]
@@ -167,7 +171,8 @@ async def test_parse_detail_minimal():
     assert data.trailer == ""
 
 
-def test_post_process_fixes():
+@pytest.mark.asyncio
+async def test_post_process_fixes():
     from mdcx.crawlers.base.types import CrawlerData
 
     crawler = JavdbApiCrawler(client=None)
@@ -181,7 +186,7 @@ def test_post_process_fixes():
     from mdcx.crawlers.base.types import Context
 
     ctx = Context(input=CrawlerInput.empty())
-    result = crawler.post_process(ctx, result)
+    result = await crawler.post_process(ctx, result)
 
     assert result.poster == "https://c0.jdbstatic.com/thumbs/xz/XzkY4.jpg"
     assert result.trailer == "https://example.com/trailer.mp4"
@@ -189,7 +194,8 @@ def test_post_process_fixes():
     assert result.mosaic == "有码"
 
 
-def test_post_process_uncensored():
+@pytest.mark.asyncio
+async def test_post_process_uncensored():
     from mdcx.crawlers.base.types import CrawlerData
 
     crawler = JavdbApiCrawler(client=None)
@@ -202,7 +208,7 @@ def test_post_process_uncensored():
     from mdcx.crawlers.base.types import Context
 
     ctx = Context(input=CrawlerInput.empty())
-    result = crawler.post_process(ctx, result)
+    result = await crawler.post_process(ctx, result)
 
     assert result.mosaic == "无码"
 

@@ -24,7 +24,7 @@ _SELECTOR_LIST_COVER = "div[@class='cover']/img/@src"
 _SELECTOR_DETAIL_TITLE = "//h2[@class='title is-4']/strong[@class='current-title']/text()"
 _SELECTOR_DETAIL_ORIGIN_TITLE = "//h2[@class='title is-4']/span[@class='origin-title']/text()"
 _SELECTOR_COVER = "//img[@class='video-cover']/@src"
-_SELECTOR_EXTRAFANART = "//div[@class='preview-images']/a[@class='tile-item']/@href"
+_SELECTOR_EXTRAFANART = "//div[@class='tile-images preview-images']/a[@class='tile-item']/@href"
 _SELECTOR_TRAILER = "//video[@id='preview-video']/source/@src"
 _SELECTOR_CLIPBOARD = "//a[@class='button is-white copy-to-clipboard']/@data-clipboard-text"
 
