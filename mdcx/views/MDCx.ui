@@ -20331,14 +20331,14 @@
                       <x>0</x>
                       <y>0</y>
                       <width>760</width>
-                      <height>1626</height>
+                      <height>1648</height>
                     </rect>
                   </property>
                   <widget class="QGroupBox" name="groupBox_10">
                     <property name="geometry">
                       <rect>
                         <x>30</x>
-                        <y>356</y>
+                        <y>378</y>
                         <width>701</width>
                         <height>531</height>
                       </rect>
@@ -21217,7 +21217,7 @@
                     <property name="geometry">
                       <rect>
                         <x>30</x>
-                        <y>1245</y>
+                        <y>1267</y>
                         <width>701</width>
                         <height>301</height>
                       </rect>
@@ -21408,7 +21408,7 @@
                     <property name="geometry">
                       <rect>
                         <x>30</x>
-                        <y>906</y>
+                        <y>928</y>
                         <width>701</width>
                         <height>320</height>
                       </rect>
