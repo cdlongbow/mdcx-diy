@@ -119,7 +119,7 @@ def _normalize_id(id_str: str) -> str:
         return id_str
     series, num = m.group(1), m.group(2)
     num_int = int(num)
-    return f"{series}{num_int:03d}"
+    return f"{series}{num_int:05d}"
 
 
 def _generate_content_id_variations(id_str: str) -> list[str]:

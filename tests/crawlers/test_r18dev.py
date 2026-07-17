@@ -7,19 +7,20 @@ from mdcx.models.types import CrawlerInput
 
 def test_normalize_id():
     assert _normalize_id("IPX-535") == "ipx00535"
-    assert _normalize_id("SSIS-001") == "ssis001"
-    assert _normalize_id("ABF-030") == "abf030"
-    assert _normalize_id("SSIS-1") == "ssis001"
-    assert _normalize_id("midv-512") == "midv512"
+    assert _normalize_id("SSIS-001") == "ssis00001"
+    assert _normalize_id("ABF-030") == "abf00030"
+    assert _normalize_id("SSIS-1") == "ssis00001"
+    assert _normalize_id("midv-512") == "midv00512"
 
 
 def test_normalize_id_already_normalized():
     assert _normalize_id("ipx00535") == "ipx00535"
-    assert _normalize_id("ssis001") == "ssis001"
+    assert _normalize_id("ssis00001") == "ssis00001"
 
 
 def test_normalize_id_with_spaces():
     assert _normalize_id("IPX 535") == "ipx00535"
+    assert _normalize_id("midv 512") == "midv00512"
 
 
 def test_content_id_variations():
@@ -195,7 +196,9 @@ async def test_run_with_dvd_id_match(monkeypatch):
             return (None, "")
 
     crawler = R18devCrawler(client=FakeClient())
-    result = await crawler.run(CrawlerInput(number="IPX-535"))
+    input_data = CrawlerInput.empty()
+    input_data.number = "IPX-535"
+    result = await crawler.run(input_data)
 
     assert result.data is not None
     assert result.data.number == "IPX-535"
@@ -238,7 +241,9 @@ async def test_run_with_content_id_fallback(monkeypatch):
             return (None, "")
 
     crawler = R18devCrawler(client=FakeClient())
-    result = await crawler.run(CrawlerInput(number="ABF-030"))
+    input_data = CrawlerInput.empty()
+    input_data.number = "ABF-030"
+    result = await crawler.run(input_data)
 
     assert result.data is not None
     assert result.data.number == "ABF-030"
@@ -248,7 +253,7 @@ async def test_run_with_content_id_fallback(monkeypatch):
 
 
 def test_post_process_fixes_trailer():
-    from mdcx.models.types import CrawlerData
+    from mdcx.crawlers.base.types import CrawlerData
 
     crawler = R18devCrawler(client=None)
     data = CrawlerData(
@@ -263,7 +268,7 @@ def test_post_process_fixes_trailer():
 
 
 def test_post_process_fills_originaltitle():
-    from mdcx.models.types import CrawlerData
+    from mdcx.crawlers.base.types import CrawlerData
 
     crawler = R18devCrawler(client=None)
     data = CrawlerData(
