@@ -1,6 +1,7 @@
 """Download cloakbrowser stealth Chromium for cache warm-up."""
 
 import os
+import platform
 import shutil
 from pathlib import Path
 
@@ -19,7 +20,7 @@ def main():
 
     platform_sub = {"Windows": "chrome-win64", "Linux": "chrome-linux", "Darwin": "chrome-macos"}
     src = Path(binary).resolve().parent
-    dest = Path("chromium") / platform_sub.get(os.name, "chrome-win64")
+    dest = Path("chromium") / platform_sub.get(platform.system(), "chrome-win64")
     dest.mkdir(parents=True, exist_ok=True)
     shutil.copytree(src, dest, dirs_exist_ok=True)
     print(f"Chromium cached to {dest}")

@@ -50,5 +50,5 @@ jobs:
             echo "Chromium already cached, skipping download"
           else
             echo "Downloading stealth Chromium..."
-            uv run python3 scripts/warm_cache.py
+            uv run python scripts/warm_cache.py
           fi
