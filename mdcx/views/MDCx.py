@@ -9075,7 +9075,7 @@ class Ui_MDCx(object):
         self.checkBox_verify_ssl.setObjectName("checkBox_verify_ssl")
         self.gridLayout_9.addWidget(self.checkBox_verify_ssl, 9, 1, 1, 1)
         self.groupBox_44 = QtWidgets.QGroupBox(self.scrollAreaWidgetContents_wangluo)
-        self.groupBox_44.setGeometry(QtCore.QRect(30, 1327, 701, 301))
+        self.groupBox_44.setGeometry(QtCore.QRect(30, 1348, 701, 301))
         self.groupBox_44.setStyleSheet("font:\"Courier\";")
         self.groupBox_44.setObjectName("groupBox_44")
         self.gridLayoutWidget = QtWidgets.QWidget(self.groupBox_44)
