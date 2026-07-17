@@ -289,7 +289,7 @@ class JavdbApiCrawler(BaseCrawler):
     @classmethod
     @override
     def base_url_(cls) -> str:
-        return manager.config.get_site_url(Website.JAVDB_API, "https://javdb.com")
+        return manager.config.get_site_url(Website.JAVDB_API, "https://javdb573.com")
 
     @override
     def _get_headers(self, ctx) -> dict[str, str] | None:
