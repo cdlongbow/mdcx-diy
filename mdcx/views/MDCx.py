@@ -305,6 +305,7 @@ class Ui_MDCx:
         font.setWeight(50)
         self.treeWidget_number.headerItem().setFont(0, font)
         QtWidgets.QTreeWidgetItem(self.treeWidget_number)
+        QtWidgets.QTreeWidgetItem(self.treeWidget_number)
         self.treeWidget_number.header().setVisible(False)
         self.treeWidget_number.header().setSortIndicatorShown(False)
         self.label_file_path = QtWidgets.QLabel(parent=self.page_main)
