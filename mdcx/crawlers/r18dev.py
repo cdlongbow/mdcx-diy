@@ -318,6 +318,22 @@ class R18devCrawler(BaseCrawler):
         return json.dumps(data, ensure_ascii=False), ""
 
     @override
+    async def _detail(self, ctx, detail_urls: list[str]) -> CrawlerData | None:
+        for detail_url in detail_urls:
+            html, error = await self._fetch_detail(ctx, detail_url)
+            if html is None:
+                ctx.debug(f"R18dev 详情页请求失败: {error=}")
+                continue
+            try:
+                data = json.loads(html)
+            except json.JSONDecodeError:
+                continue
+            scraped_data = self._parse_json(data, ctx)
+            if scraped_data and not scraped_data.external_id:
+                scraped_data.external_id = detail_url
+            return scraped_data
+
+    @override
     async def _search(self, ctx, search_urls: list[str]) -> list[str] | None:
         for search_url in search_urls:
             html, error = await self._fetch_search(ctx, search_url)

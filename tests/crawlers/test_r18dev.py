@@ -252,7 +252,8 @@ async def test_run_with_content_id_fallback(monkeypatch):
     assert call_count >= 2
 
 
-def test_post_process_fixes_trailer():
+@pytest.mark.asyncio
+async def test_post_process_fixes_trailer():
     from mdcx.crawlers.base.types import CrawlerData
 
     crawler = R18devCrawler(client=None)
@@ -262,12 +263,13 @@ def test_post_process_fixes_trailer():
         trailer="//example.com/video.mp4",
     )
     result = data.to_result()
-    result = crawler.post_process(None, result)
+    result = await crawler.post_process(None, result)
 
     assert result.trailer == "https://example.com/video.mp4"
 
 
-def test_post_process_fills_originaltitle():
+@pytest.mark.asyncio
+async def test_post_process_fills_originaltitle():
     from mdcx.crawlers.base.types import CrawlerData
 
     crawler = R18devCrawler(client=None)
@@ -277,6 +279,6 @@ def test_post_process_fills_originaltitle():
         originaltitle="",
     )
     result = data.to_result()
-    result = crawler.post_process(None, result)
+    result = await crawler.post_process(None, result)
 
     assert result.originaltitle == "Test Title"
