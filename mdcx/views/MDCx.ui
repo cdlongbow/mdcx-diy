@@ -20331,14 +20331,14 @@
                       <x>0</x>
                       <y>0</y>
                       <width>760</width>
-                      <height>1648</height>
+                      <height>1678</height>
                     </rect>
                   </property>
                   <widget class="QGroupBox" name="groupBox_10">
                     <property name="geometry">
                       <rect>
                         <x>30</x>
-                        <y>378</y>
+                        <y>408</y>
                         <width>701</width>
                         <height>531</height>
                       </rect>
@@ -20657,7 +20657,7 @@
                         <x>30</x>
                         <y>20</y>
                         <width>701</width>
-                        <height>357</height>
+                        <height>387</height>
                       </rect>
                     </property>
                     <property name="styleSheet">
@@ -20672,7 +20672,7 @@
                           <x>20</x>
                           <y>30</y>
                           <width>661</width>
-                          <height>340</height>
+                          <height>370</height>
                         </rect>
                       </property>
                       <layout class="QGridLayout" name="gridLayout_9">
@@ -21100,7 +21100,7 @@
                             </property>
                           </widget>
                         </item>
-                        <item row="5" column="1">
+                        <item row="9" column="1">
                           <widget class="QCheckBox" name="checkBox_cf_bypass_auto">
                             <property name="sizePolicy">
                               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -21217,7 +21217,7 @@
                     <property name="geometry">
                       <rect>
                         <x>30</x>
-                        <y>1267</y>
+                        <y>1297</y>
                         <width>701</width>
                         <height>301</height>
                       </rect>
@@ -21408,7 +21408,7 @@
                     <property name="geometry">
                       <rect>
                         <x>30</x>
-                        <y>928</y>
+                        <y>958</y>
                         <width>701</width>
                         <height>320</height>
                       </rect>
