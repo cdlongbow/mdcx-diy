@@ -365,13 +365,9 @@ class JavdbApiCrawler(BaseCrawler):
     async def _parse_search_page(self, ctx, html: Selector, search_url: str) -> list[str] | None:
         html_text = html.get()
         if "ray-id" in html_text or "cdn-cgi/challenge-platform" in html_text:
-            raise CrawlerException(
-                "搜索结果: 被 Cloudflare 5 秒盾拦截！请尝试更换cookie或使用其他域名！"
-            )
+            raise CrawlerException("搜索结果: 被 Cloudflare 5 秒盾拦截！请尝试更换cookie或使用其他域名！")
         if "The owner of this website has banned your access" in html_text:
-            raise CrawlerException(
-                f"由于请求过多，javdb网站暂时禁止了你当前IP的访问！！点击 {search_url} 查看详情！"
-            )
+            raise CrawlerException(f"由于请求过多，javdb网站暂时禁止了你当前IP的访问！！点击 {search_url} 查看详情！")
         if "Due to copyright restrictions" in html_text:
             raise CrawlerException(
                 f"由于版权限制，javdb网站禁止了日本IP的访问！！请更换日本以外代理！点击 {search_url} 查看详情！"

@@ -1,7 +1,6 @@
 import pytest
 from parsel import Selector
 
-from mdcx.config.models import Website
 from mdcx.models.types import CrawlerInput
 
 FIXTURES_DIR = "tests/crawlers/fixtures"
@@ -48,7 +47,7 @@ class TestNameNormalizer:
 
 class TestURLBuilder:
     def test_search_url(self):
-        from mdcx.crawlers.javdb_api import search_url, search_actor_url, video_url
+        from mdcx.crawlers.javdb_api import search_actor_url, search_url, video_url
 
         assert search_url("https://javdb.com", "DLDSS-271") == "https://javdb.com/search?q=DLDSS-271&f=all&page=1&locale=zh"
         assert search_actor_url("https://javdb.com", "篠田優") == "https://javdb.com/search?q=篠田優&f=actor&page=1&locale=zh"
@@ -119,7 +118,6 @@ class TestParser:
         assert data.external_id == "ZNdEbV"
 
     def test_search_page_parse(self, search_html, ctx):
-        import asyncio
 
         from mdcx.crawlers.javdb_api import Parser
 
@@ -168,7 +166,6 @@ class TestJavdbApiCrawler:
         monkeypatch.setattr(javdb_api_module._HTTPX_CLIENT, "get", mock_get)
 
         # 创建爬虫实例
-        from mdcx.crawlers.base import Context
 
         crawler = JavdbApiCrawler(client=None)
         input_data = CrawlerInput.empty()
