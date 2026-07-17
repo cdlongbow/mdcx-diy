@@ -116,7 +116,7 @@ uv run pytest tests/crawlers
 - `dmm`
 - `javdb`
 - `javdb_app`
-- `javdbapi`
+- `dmm_api`
 - `avbase`
 - `missav`
 - `missav_api`

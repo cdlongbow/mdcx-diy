@@ -149,7 +149,7 @@ def test_config_default_site_priorities_follow_current_frontend_defaults():
         Website.OFFICIAL,
         Website.MISSAV,
         Website.JAVBUS,
-        Website.JAVDBAPI,
+        Website.DMM_API,
         Website.JAV321,
         Website.DMM,
         Website.AVBASE,

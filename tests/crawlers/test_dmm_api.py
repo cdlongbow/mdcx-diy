@@ -4,14 +4,14 @@ import mdcx.crawlers.dmm_new as dmm_module
 from mdcx.config.enums import DownloadableFile
 from mdcx.config.manager import manager
 from mdcx.config.models import Website
-from mdcx.crawlers.javdbapi import JavdbApiCrawler, JavdbApiMovie
+from mdcx.crawlers.dmm_api import DmmApiCrawler, DmmApiMovie
 from mdcx.models.types import CrawlerInput
 
 
 def test_to_crawler_data_maps_api_response():
-    crawler = JavdbApiCrawler(client=None)
+    crawler = DmmApiCrawler(client=None)
     data = crawler._to_crawler_data(
-        JavdbApiMovie.model_validate(
+        DmmApiMovie.model_validate(
             {
                 "universal_id": "SSIS-001",
                 "title": "Title",
@@ -83,14 +83,14 @@ async def test_run_calls_api_and_reuses_dmm_image_processing(monkeypatch: pytest
         [DownloadableFile.POSTER, DownloadableFile.THUMB, DownloadableFile.EXTRAFANART],
     )
 
-    crawler = JavdbApiCrawler(client=FakeClient())
+    crawler = DmmApiCrawler(client=FakeClient())
     input_data = CrawlerInput.empty()
     input_data.number = "SSIS-001"
 
     response = await crawler.run(input_data)
 
     assert response.data is not None
-    assert response.data.source == Website.JAVDBAPI.value
+    assert response.data.source == Website.DMM_API.value
     assert response.data.number == "SSIS-001"
     assert response.data.title == "Title"
     assert response.data.release == "2021-02-18"

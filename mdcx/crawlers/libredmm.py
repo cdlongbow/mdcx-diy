@@ -236,7 +236,7 @@ class LibredmmCrawler(BaseCrawler):
         """当 LibreDMM 无简介时，尝试从 JavDB API 补充.
 
         使用 BaseCrawler 自带的 async_client 请求 JavDB 公开 API，
-        不依赖 javdbapi.py，失败时静默返回空字符串。
+        不依赖 dmm_api.py，失败时静默返回空字符串。
         """
         api_url = f"https://api.thejavdb.net/v1/movies?q={number}"
         ctx.debug(f"LibreDMM 无简介，尝试 JavDB API: {api_url}")

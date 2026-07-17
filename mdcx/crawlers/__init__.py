@@ -5,13 +5,13 @@ from . import (
     cableav,
     cnmdb,
     dahlia,
+    dmm_api,
     faleno,
     fantastica,
     giga,
     hscangku,
     jav321,
     javday,
-    javdbapi,
     kin8,
     lulubar,
     madouqu,
@@ -68,7 +68,7 @@ from .xcity import XcityCrawler
 register_crawler(DmmCrawler)
 register_crawler(JavdbCrawler)
 register_crawler(JavdbAPICrawler)
-register_crawler(javdbapi.JavdbApiCrawler)
+register_crawler(dmm_api.DmmApiCrawler)
 register_crawler(AvbaseCrawler)
 register_crawler(missav.MissavCrawler)
 register_crawler(MissavApiCrawler)

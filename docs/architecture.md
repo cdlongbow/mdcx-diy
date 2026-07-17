@@ -107,7 +107,7 @@
 │   │   ├── javday.py                # JavDay 爬虫
 │   │   ├── javdb_app.py              # JavDB 移动端 API 爬虫
 │   │   ├── javdb_new.py             # JavDB 爬虫
-│   │   ├── javdbapi.py              # JavDB API 爬虫
+│   │   ├── dmm_api.py              # JavDB API 爬虫
 │   │   ├── javlibrary.py            # JavLibrary 爬虫
 │   │   ├── kin8.py                  # Kin8 爬虫
 │   │   ├── libredmm.py              # LibreDMM 爬虫

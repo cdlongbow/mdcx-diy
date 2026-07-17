@@ -36,11 +36,18 @@ def _is_removed_airav_site(site: object) -> bool:
     return site == Website.AIRAV or site == Website.AIRAV.value
 
 
+_SITE_RENAMES = {"javdbapi": "dmm_api"}
+
+
+def _rename_site(site: str) -> str:
+    return _SITE_RENAMES.get(site, site)
+
+
 def _migrate_site_list(value: Any) -> Any:
     if isinstance(value, str):
-        return [site for site in _str_to_list(value, ",") if not _is_removed_airav_site(site)]
+        return [_rename_site(site) for site in _str_to_list(value, ",") if not _is_removed_airav_site(site)]
     if isinstance(value, list | set):
-        return [site for site in value if not _is_removed_airav_site(site)]
+        return [_rename_site(site) for site in value if not _is_removed_airav_site(site)]
     return value
 
 
@@ -49,7 +56,7 @@ def _migrate_field_config_sites(value: Any) -> None:
         return
     sites = value.get("site_prority")
     if isinstance(sites, list):
-        value["site_prority"] = [site for site in sites if not _is_removed_airav_site(site)]
+        value["site_prority"] = [_rename_site(site) for site in sites if not _is_removed_airav_site(site)]
 
 
 def _migrate_removed_hd_pic_sources(data: dict[str, Any]) -> None:

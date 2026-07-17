@@ -176,23 +176,23 @@ async def test_run_network_check_can_cancel_between_groups(monkeypatch: pytest.M
 
 
 @pytest.mark.anyio
-async def test_javdbapi_spec_uses_real_query_url(monkeypatch: pytest.MonkeyPatch):
+async def test_dmm_api_spec_uses_real_query_url(monkeypatch: pytest.MonkeyPatch):
     class ApiCrawler:
         @classmethod
         def base_url_(cls):
             return "https://api.thejavdb.net/v1"
 
     fake_crawlers = SimpleNamespace(
-        get_registered_crawler_sites=lambda include_hidden=False: [Website.JAVDBAPI],
+        get_registered_crawler_sites=lambda include_hidden=False: [Website.DMM_API],
         get_crawler=lambda site: ApiCrawler,
     )
     monkeypatch.setitem(sys.modules, "mdcx.crawlers", fake_crawlers)
 
     specs = await build_network_check_specs()
 
-    javdbapi = next(spec for spec in specs if spec.site == Website.JAVDBAPI)
-    assert javdbapi.url == "https://api.thejavdb.net/v1/movies?q=ssni-200"
-    assert javdbapi.validator == "javdbapi"
+    dmm_api = next(spec for spec in specs if spec.site == Website.DMM_API)
+    assert dmm_api.url == "https://api.thejavdb.net/v1/movies?q=ssni-200"
+    assert dmm_api.validator == "dmm_api"
 
 
 def test_format_result_line_does_not_duplicate_error():

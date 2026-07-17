@@ -366,7 +366,7 @@ class Config(BaseModel):
             Website.OFFICIAL,
             Website.MISSAV,
             Website.JAVBUS,
-            Website.JAVDBAPI,
+            Website.DMM_API,
             Website.JAV321,
             Website.DMM,
             Website.AVBASE,

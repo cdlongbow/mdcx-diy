@@ -67,7 +67,7 @@
 | `javbus` | JavBus | JavBus 番号搜索 |
 | `jav321` | Jav321 | Jav321 番号搜索 |
 | `javdb_new` | JavDB | JavDB 番号数据库 |
-| `javdbapi` | JavDB API | JavDB API 接口 |
+| `dmm_api` | JavDB API | JavDB API 接口 |
 | `javlibrary` | JavLibrary | JavLibrary 番号搜索 |
 | `javday` | JavDay | JavDay 信息站 |
 | `missav` | MissAV | MissAV 番号搜索 |

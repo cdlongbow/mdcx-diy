@@ -765,7 +765,7 @@ Qt 信号机制，线程安全，UI 更新信号
 - 统一返回 `CrawlerResponse` 和 `CrawlerResult`
 
 **已迁移站点**：
-dmm, javdb, javdbapi, javdb_app, avbase, missav, faleno, jav321, cableav, madouqu, mmtv, dahlia, fantastica, avsox, cnmdb, hscangku, kin8, lulubar, xcity, giga, mdtv, mgstage, javday, fc2ppvdb, prestige, fc2club, fc2, fc2hub, javbus, freejavbt, hdouban, iqqtv, airav_cc, getchu, getchu_dmm, mywife, javlibrary, official, theporndb
+dmm, javdb, dmm_api, javdb_app, avbase, missav, faleno, jav321, cableav, madouqu, mmtv, dahlia, fantastica, avsox, cnmdb, hscangku, kin8, lulubar, xcity, giga, mdtv, mgstage, javday, fc2ppvdb, prestige, fc2club, fc2, fc2hub, javbus, freejavbt, hdouban, iqqtv, airav_cc, getchu, getchu_dmm, mywife, javlibrary, official, theporndb
 
 ---
 

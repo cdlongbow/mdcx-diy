@@ -2712,7 +2712,7 @@ class MyMAinWindow(QMainWindow):
   <li>javday</li>
   <li>javdb</li>
   <li>javdb_app</li>
-  <li>javdbapi</li>
+  <li>dmm_api</li>
   <li>javlibrary</li>
   <li>kin8</li>
   <li>libredmm</li>

@@ -15,7 +15,7 @@ from .base import CrawlerData, CrawlerException
 from .dmm_new import DMMContext, DmmCrawler
 
 
-class JavdbApiMovie(BaseModel):
+class DmmApiMovie(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
     universal_id: str | None = None
@@ -36,15 +36,15 @@ class JavdbApiMovie(BaseModel):
     samples: list[str | None] | None = None
 
 
-class JavdbApiCrawler(DmmCrawler):
+class DmmApiCrawler(DmmCrawler):
     @staticmethod
-    def _log(message: str) -> None:
-        signal.add_log(f"🎬 [JavdbApi] {message}")
+    def _log(message: str):
+        signal.add_log(f"[DmmApi] {message}")
 
     @classmethod
     @override
     def site(cls) -> Website:
-        return Website.JAVDBAPI
+        return Website.DMM_API
 
     @classmethod
     @override
@@ -95,7 +95,7 @@ class JavdbApiCrawler(DmmCrawler):
             raise CrawlerException(f"API 请求失败: {error}")
 
         try:
-            movie = JavdbApiMovie.model_validate(response)
+            movie = DmmApiMovie.model_validate(response)
         except Exception as e:
             ctx.debug(f"API 响应解析失败: {e} {response=}")
             raise CrawlerException("API 响应解析失败") from e
@@ -112,7 +112,7 @@ class JavdbApiCrawler(DmmCrawler):
         result = data.to_result()
         return await self.post_process(ctx, result)
 
-    def _to_crawler_data(self, movie: JavdbApiMovie, *, fallback_number: str) -> CrawlerData:
+    def _to_crawler_data(self, movie: DmmApiMovie, *, fallback_number: str) -> CrawlerData:
         title = self._clean_text(movie.title)
         outline = self._clean_text(movie.description)
         source_url = self._clean_text(movie.source_url)

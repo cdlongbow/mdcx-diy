@@ -9,10 +9,9 @@ def test_fc2ppvdb_is_available_in_single_website_options():
     assert Website.FC2PPVDB.value in registered_sites
 
 
-def test_javdbapi_is_available_in_single_website_options():
+def test_dmm_api_is_available_in_single_website_options():
     registered_sites = get_registered_crawler_site_values()
-
-    assert Website.JAVDBAPI.value in registered_sites
+    assert Website.DMM_API.value in registered_sites
 
 
 def test_config_website_schema_uses_registered_crawler_sites():

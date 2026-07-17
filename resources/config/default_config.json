@@ -158,7 +158,7 @@
     "official",
     "missav",
     "javbus",
-    "javdbapi",
+    "dmm_api",
     "jav321",
     "dmm",
     "avbase",
@@ -852,13 +852,13 @@
       "title": {
         "site_prority": [
           "xcity",
-          "javdbapi",
+          "dmm_api",
           "libredmm"
         ]
       },
       "originaltitle": {
         "site_prority": [
-          "javdbapi",
+          "dmm_api",
           "libredmm"
         ]
       },
@@ -867,37 +867,37 @@
           "xcity",
           "iqqtv",
           "airav_cc",
-          "javdbapi",
+          "dmm_api",
           "libredmm"
         ]
       },
       "originalplot": {
         "site_prority": [
-          "javdbapi",
+          "dmm_api",
           "libredmm"
         ]
       },
       "actors": {
         "site_prority": [
           "libredmm",
-          "javdbapi"
+          "dmm_api"
         ]
       },
       "all_actors": {
         "site_prority": [
           "libredmm",
-          "javdbapi"
+          "dmm_api"
         ]
       },
       "thumb": {
         "site_prority": [
-          "javdbapi",
+          "dmm_api",
           "libredmm"
         ]
       },
       "poster": {
         "site_prority": [
-          "javdbapi",
+          "dmm_api",
           "libredmm"
         ]
       },
@@ -907,20 +907,20 @@
       "tags": {
         "site_prority": [
           "javdb_app",
-          "javdbapi",
+          "dmm_api",
           "libredmm"
         ]
       },
       "release": {
         "site_prority": [
           "javdb_app",
-          "javdbapi",
+          "dmm_api",
           "libredmm"
         ]
       },
       "runtime": {
         "site_prority": [
-          "javdbapi",
+          "dmm_api",
           "libredmm"
         ]
       },
@@ -933,21 +933,21 @@
       "series": {
         "site_prority": [
           "xcity",
-          "javdbapi",
+          "dmm_api",
           "javbus"
         ]
       },
       "studio": {
         "site_prority": [
           "xcity",
-          "javdbapi",
+          "dmm_api",
           "libredmm"
         ]
       },
       "publisher": {
         "site_prority": [
           "xcity",
-          "javdbapi",
+          "dmm_api",
           "libredmm"
         ]
       },
