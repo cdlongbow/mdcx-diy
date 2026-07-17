@@ -8,6 +8,8 @@
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 
+from .CustomClass import CustomQSlider
+
 
 class Ui_MDCx:
     def setupUi(self, MDCx):
@@ -304,8 +306,6 @@ class Ui_MDCx:
         font.setBold(False)
         font.setWeight(50)
         self.treeWidget_number.headerItem().setFont(0, font)
-        item_0 = QtWidgets.QTreeWidgetItem(self.treeWidget_number)
-        item_0 = QtWidgets.QTreeWidgetItem(self.treeWidget_number)
         self.treeWidget_number.header().setVisible(False)
         self.treeWidget_number.header().setSortIndicatorShown(False)
         self.label_file_path = QtWidgets.QLabel(self.page_main)
@@ -13316,6 +13316,3 @@ class Ui_MDCx:
         self.pushButton_nfo_close.setText(_translate("MDCx", "关闭"))
         self.pushButton_nfo_close.setShortcut(_translate("MDCx", "Esc"))
         self.label_4.setText(_translate("MDCx", "编辑 NFO"))
-
-
-from .CustomClass import CustomQSlider
