@@ -2725,7 +2725,7 @@ class MyMAinWindow(QMainWindow):
   <li>missav</li>
   <li>missav_api</li>
   <li>mywife</li>
-  <li>mmtv</li>
+  <li>7mmtv</li>
   <li>official</li>
   <li>prestige</li>
   <li>r18dev</li>
