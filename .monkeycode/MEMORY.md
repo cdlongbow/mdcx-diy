@@ -46,23 +46,36 @@ Agent 在任务执行过程中发现的条目应遵循以下格式：
 - 优先把重复性的本地检查配置为自动执行。
 - 对推送前校验这类工作流，优先提供自动拦截方案，减少手动步骤。
 
-[提交前必须运行 ruff format + ruff check]
-- Date: 2026-06-11
-- Context: CI 因 ruff format 不合规报错，用户提醒应自动做推送前检查
+[提交前必须运行 ruff format + ruff check + pytest]
+- Date: 2026-07-17
+- Context: 多次 CI 因测试失败报错，用户要求在推送前自动运行测试
 - Category: 工作流协作
 - Instructions:
 - 每次修改 Python 代码后、提交前，必须运行 `ruff format` 和 `ruff check --fix`，确认通过后再提交推送。
-- 项目有 `.pre-commit-config.yaml` 配置了 ruff 钩子，MonkeyCode 沙箱环境不持久化 git hooks，每次新会话开始时必须先执行 `pre-commit install` 安装钩子，然后再执行 `ruff format` 和 `ruff check --fix`。
+- 推送前必须运行 `pytest tests/ --tb=short -m "not network" -x` 确保无回归。
+- 项目有 `.pre-commit-config.yaml` 配置了 ruff 和 pytest 钩子，MonkeyCode 沙箱环境不持久化 git hooks，每次新会话开始时必须先执行 `pre-commit install` 安装钩子，然后再手动执行上述检查。
 - 项目有 `.githooks/pre-push` 推送前自检脚本（运行 `uv run check`），每次新会话开始时必须先执行 `git config core.hooksPath .githooks` 启用它，否则推送不会触发自检。
-- 不要依赖 CI 来发现格式问题，本地先拦截。
+- 不要依赖 CI 来发现问题，本地先拦截。
 
 [每次新会话自动安装 pre-commit 钩子]
-- Date: 2026-06-16
+- Date: 2026-07-17
 - Context: 用户希望每次新会话开始时自动安装 pre-commit 钩子，无需手动执行
 - Instructions:
   - 每次新会话开始时，自动执行 `pre-commit install` 命令安装 git hooks。
   - 如果 pre-commit 工具未安装，先执行 `pip install pre-commit --break-system-packages` 安装。
   - 安装完成后确认 `.git/hooks/pre-commit` 文件存在且可执行。
+
+[环境 Python 版本升级到 >= 3.13.4]
+- Date: 2026-07-17
+- Context: 项目要求 Python >= 3.13.4（使用 type parameter defaults 语法），但沙箱环境默认只有 Python 3.11，导致无法运行测试和导入项目。
+- Category: 环境配置
+- Instructions:
+  - 项目只能 `uv run` 执行测试（`pytest tests/ --tb=short -m "not network"`），因为 sandbox 默认 python3 是 3.11，无法解析 3.12+ 的 `class Rename[TRaw = str, TNew = TRaw]` 语法。
+  - Python 3.13.14 已安装到 `/opt/python3.13`，`uv` 已安装到 `/usr/local/bin/uv`。
+  - 每次新会话开始时，检查 `/opt/python3.13` 是否存在：
+    - 若存在，直接使用 `uv run pytest` 跑测试。
+    - 若不存在，需要下载并安装：从 `https://github.com/astral-sh/python-build-standalone` 下载最新 `cpython-3.13.x-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz`，解压到 `/opt/python3.13`，创建 `/usr/local/bin/uv` 和 `/usr/local/bin/python3.13` 软链接，然后执行 `uv sync` 安装项目依赖。
+  - 依赖安装后可以运行 `uv run pytest tests/ --tb=short -m "not network"` 验证。
 
 [Windows exe 打包依赖约束]
 - Date: 2026-06-21
