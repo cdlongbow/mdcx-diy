@@ -48,11 +48,11 @@
 - 通过 `register_crawler()` 函数注册
 - 通过 `get_crawler()` 查询注册表获取爬虫类
 - 子类定义后通过 `__init_subclass__` 自动注册到 `crawler_registry`
-- 站点下拉框由注册表通过 `get_registered_crawler_site_values()` 动态生成（当前共 43 个已注册爬虫）
+- 站点下拉框由注册表通过 `get_registered_crawler_site_values()` 动态生成（当前共 45 个已注册爬虫）
 
 ## 爬虫实现目录（[mdcx/crawlers/](../mdcx/crawlers/)）
 
-每个网站一个爬虫文件，共 43 个已注册站点（具体以代码注册为准，下拉框由注册表动态生成）。
+每个网站一个爬虫文件，共 45 个已注册站点（具体以代码注册为准，下拉框由注册表动态生成）。
 
 **支持的网站**：
 - Airav.cc
@@ -95,6 +95,7 @@
 - MMTV
 - MyWife
 - Prestige
+- R18.dev
 - ThePornDB
 - X-City
 

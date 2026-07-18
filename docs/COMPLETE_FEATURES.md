@@ -68,6 +68,7 @@
 | `jav321` | Jav321 | Jav321 番号搜索 |
 | `javdb_new` | JavDB | JavDB 番号数据库 |
 | `dmm_api` | JavDB API | JavDB API 接口 |
+| `javdb_api` | JavDB API | JavDB 镜像站 HTML 直连爬虫 |
 | `javlibrary` | JavLibrary | JavLibrary 番号搜索 |
 | `javday` | JavDay | JavDay 信息站 |
 | `missav` | MissAV | MissAV 番号搜索 |
@@ -81,6 +82,7 @@
 | `dahlia` | Dahlia | Dahlia 官方网站 |
 | `xcity` | XCity | XCity 信息站 |
 | `libredmm` | LibreDMM | LibreDMM 开源项目 |
+| `r18dev` | R18.dev | R18.dev JSON API 爬虫 |
 
 ### 无码类 (4 个)
 
@@ -129,7 +131,7 @@
 | `mdtv` | MDTV | MDTV |
 | `avbase_new` | AVBase | AVBase |
 
-**总计：44 个网站爬虫**
+**总计：46 个网站爬虫**
 
 ---
 
@@ -1090,7 +1092,7 @@ results = await asyncio.gather(*tasks)
 ---
 
 **功能统计**
-- 🌐 44 个网站爬虫
+- 🌐 46 个网站爬虫
 - 📝 30+ NFO 字段
 - 🌐 6 大翻译引擎
 - 🎭 8 大功能模块

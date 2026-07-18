@@ -107,6 +107,7 @@
 │   │   ├── javday.py                # JavDay 爬虫
 │   │   ├── javdb_app.py              # JavDB 移动端 API 爬虫
 │   │   ├── javdb_new.py             # JavDB 爬虫
+│   │   ├── javdb_api.py             # JavDB 镜像站 HTML 直连爬虫
 │   │   ├── dmm_api.py              # JavDB API 爬虫
 │   │   ├── javlibrary.py            # JavLibrary 爬虫
 │   │   ├── kin8.py                  # Kin8 爬虫
@@ -122,6 +123,7 @@
 │   │   ├── mywife.py                # MyWife 爬虫
 │   │   ├── official.py              # 官方站点爬虫
 │   │   ├── prestige.py              # Prestige 爬虫
+│   │   ├── r18dev.py                # R18.dev JSON API 爬虫
 │   │   ├── theporndb.py             # ThePornDB 爬虫
 │   │   └── xcity.py                 # X-City 爬虫
 │   ├── gen/                         # 自动生成的枚举
