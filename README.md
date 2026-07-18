@@ -43,21 +43,20 @@ uv run python main.py
 
 ### 推送前自检
 
+推送前会自动执行以下三道检查，全部通过才能推送：
+
+1. **代码格式** — `ruff format --check`，看缩进空格对不对
+2. **代码规范** — `ruff check`，检查有没有低级错误
+3. **单元测试** — `pytest --tb=short -m "not network" -x`，跑所有不联网的测试，保证改完没搞坏别的东西
+
 ```bash
-uv run check
+# 手动运行自检
+uv run check --skip-hook-install
 ```
-
-首次运行会自动配置 Git hooks（`.githooks/`）。之后每次 `git push` 都会先自动运行自检。
-
-`uv run check` 依次执行：
-
-- `ruff format --check`
-- `ruff check`
-- `python -m pytest tests/`
 
 ### 核心特色
 
-- **40+ 网站爬虫** - 有码、无码、FC2、国产、欧美全覆盖
+- **40+ 网站爬虫** - 有码、无码、FC2、国产、欧美全覆盖，其中多个网站支持免墙直连（MissAV API、R18.dev JSON、JavDB API 镜像站）
 - **智能番号识别** - 自动判断番号类型并分类处理
 - **标准 NFO 生成** - 符合 KODI/Emby/Jellyfin 规范，30+ 元数据字段
 - **图片处理** - 人脸裁剪、水印、Amazon 高清封面、图片修复
@@ -85,7 +84,7 @@ uv run check
 
 | 类型 | 网站 |
 |-----|------|
-| **有码** | DMM、JavDB、JavBus、Jav321、MGStage、Prestige、Official、JavLibrary、MissAV、AVSOX、MMTV、MyWife、Getchu、GetchuDMM、Faleno、Fantastica、Dahlia、Giga、XCity、CableAV、FreeJavBT、Hscangku、AVBASE、Mdtv、Love6、LibreDMM |
+| **有码** | DMM、JavDB、JavDB API（镜像站直连）、JavDB App（手机接口）、JavBus、Jav321、MGStage、Prestige、Official、JavLibrary、MissAV、MissAV API（免墙）、AVSOX、MMTV、MyWife、Getchu、GetchuDMM、Faleno、Fantastica、Dahlia、Giga、XCity、CableAV、FreeJavBT、Hscangku、AVBASE、Mdtv、Love6、LibreDMM、R18.dev（JSON 直连） |
 | **无码** | Kin8、JavDB（无码分类）、airav_cc、Caribbeancom、HEYZO、1Pondo、Pacopacomama、10Musume |
 | **FC2** | FC2、FC2Club、FC2Hub、FC2PPVDB（已适配 fc2cmadb.com） |
 | **国产** | HDOUBAN、CNMDB、MADOUQU、Lulubar、IQQTV、JavDay |
