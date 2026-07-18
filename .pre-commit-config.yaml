@@ -18,10 +18,3 @@ repos:
         types: [python, pyi]
         require_serial: true
         minimum_pre_commit_version: "2.9.2"
-      - id: pytest
-        name: pytest
-        entry: uv run pytest tests/ --tb=short -m "not network" -x
-        stages: [pre-push]
-        language: system
-        pass_filenames: false
-        always_run: true

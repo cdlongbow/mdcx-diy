@@ -14,6 +14,10 @@ COMMANDS = [
         "-m",
         "pytest",
         "tests/",
+        "--tb=short",
+        "-m",
+        "not network",
+        "-x",
     ],
 ]
 

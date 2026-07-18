@@ -46,15 +46,14 @@ Agent 在任务执行过程中发现的条目应遵循以下格式：
 - 优先把重复性的本地检查配置为自动执行。
 - 对推送前校验这类工作流，优先提供自动拦截方案，减少手动步骤。
 
-[提交前必须运行 ruff format + ruff check + pytest]
+[提交前必须运行 ruff + pytest]
 - Date: 2026-07-17
 - Context: 多次 CI 因测试失败报错，用户要求在推送前自动运行测试
 - Category: 工作流协作
 - Instructions:
-- 每次修改 Python 代码后、提交前，必须运行 `ruff format` 和 `ruff check --fix`，确认通过后再提交推送。
-- 推送前必须运行 `pytest tests/ --tb=short -m "not network" -x` 确保无回归。
-- 项目有 `.pre-commit-config.yaml` 配置了 ruff 和 pytest 钩子，MonkeyCode 沙箱环境不持久化 git hooks，每次新会话开始时必须先执行 `pre-commit install` 安装钩子，然后再手动执行上述检查。
-- 项目有 `.githooks/pre-push` 推送前自检脚本（运行 `uv run check`），每次新会话开始时必须先执行 `git config core.hooksPath .githooks` 启用它，否则推送不会触发自检。
+- 推送前运行 `uv run check --skip-hook-install`（会自动执行 ruff format --check + ruff check + pytest --tb=short -m "not network" -x）。
+- 项目有 `.githooks/pre-push` 推送前自检脚本（运行 `uv run check`），每次新会话开始时必须先执行 `git config core.hooksPath .githooks` 启用它。
+- 项目有 `.pre-commit-config.yaml` 配置了 ruff 钩子，每次新会话开始时先执行 `pre-commit install`。
 - 不要依赖 CI 来发现问题，本地先拦截。
 
 [每次新会话自动安装 pre-commit 钩子]
