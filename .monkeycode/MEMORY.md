@@ -46,15 +46,14 @@ Agent 在任务执行过程中发现的条目应遵循以下格式：
 - 优先把重复性的本地检查配置为自动执行。
 - 对推送前校验这类工作流，优先提供自动拦截方案，减少手动步骤。
 
-[提交前必须运行 ruff + pytest]
+[提交推送前自动运行 ruff + pytest]
 - Date: 2026-07-17
-- Context: 多次 CI 因测试失败报错，用户要求在推送前自动运行测试
+- Context: 用户希望每次提交推送前自动运行测试，不要手动操作
 - Category: 工作流协作
 - Instructions:
-- 推送前运行 `uv run check --skip-hook-install`（会自动执行 ruff format --check + ruff check + pytest --tb=short -m "not network" -x）。
-- 项目有 `.githooks/pre-push` 推送前自检脚本（运行 `uv run check`），每次新会话开始时必须先执行 `git config core.hooksPath .githooks` 启用它。
-- 项目有 `.pre-commit-config.yaml` 配置了 ruff 钩子，每次新会话开始时先执行 `pre-commit install`。
-- 不要依赖 CI 来发现问题，本地先拦截。
+  - 每次执行 `git push` 前，必须先运行 `uv run check --skip-hook-install`（自动执行 ruff format --check + ruff check + pytest --tb=short -m "not network" -x）。
+  - 如果 `uv run check` 失败，修复问题后再推送，不要强行推送。
+  - 不要依赖 git hooks 或 pre-commit 来拦截，由 Agent 手动执行上述检查。
 
 [每次新会话自动安装 pre-commit 钩子]
 - Date: 2026-07-17
