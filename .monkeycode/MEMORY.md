@@ -39,21 +39,23 @@ Agent 在任务执行过程中发现的条目应遵循以下格式：
   - 面向小白解释问题，给出细致、可执行、易落地的建议。
   - 在发现风险、缺陷、遗漏时主动指出，并尽量给出修复方案和进行验证。
 
-[优先自动执行本地检查]
-- Date: 2026-06-09
-- Context: 用户希望尽量自动执行，减少手动命令操作
+[改动代码和提交推送前必须征得用户同意]
+- Date: 2026-07-18
+- Context: 用户要求每次改动代码和提交推送前必须先问过用户，不能擅自操作
 - Instructions:
-- 优先把重复性的本地检查配置为自动执行。
-- 对推送前校验这类工作流，优先提供自动拦截方案，减少手动步骤。
+  - 所有代码改动（新建文件、修改代码、删除文件等）必须先向用户说明改动内容和原因，获得同意后再执行。
+  - 提交推送前必须先向用户说明要提交什么、推送到哪里，获得同意后再执行 `git add` + `git commit` + `git push`。
+  - 本指令优先级高于此前所有"自动执行"类指令，改动代码和提交推送这两件事必须先问后做。
 
 [提交推送前自动运行 ruff + pytest]
-- Date: 2026-07-17
+- Date: 2026-07-18
 - Context: 用户希望每次提交推送前自动运行测试，不要手动操作
 - Category: 工作流协作
 - Instructions:
-  - 每次执行 `git push` 前，必须先运行 `uv run check --skip-hook-install`（自动执行 ruff format --check + ruff check + pytest --tb=short -m "not network" -x）。
+  - 用户同意推送后，执行 `git push` 前必须先运行 `uv run check --skip-hook-install`（自动执行 ruff format --check + ruff check + pytest --tb=short -m "not network" -x）。
   - 如果 `uv run check` 失败，修复问题后再推送，不要强行推送。
   - 不要依赖 git hooks 或 pre-commit 来拦截，由 Agent 手动执行上述检查。
+  - 注意：实际 `git add` + `git commit` + `git push` 操作必须在获得用户明确同意后才能执行。本指令仅限推送前的技术检查步骤。
 
 [每次新会话自动安装 pre-commit 钩子]
 - Date: 2026-07-17
