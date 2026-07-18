@@ -4,7 +4,6 @@
 ![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)
 ![Crawlers](https://img.shields.io/badge/Sites-40+-brightgreen.svg)
-![Architecture](https://img.shields.io/badge/Architecture-Async%20%2F%20Modular-blue.svg)
 
 <p align="center"><b>如果你觉得不错可否赏我杯奶茶费，谢谢！ 😊</b></p>
 
@@ -16,427 +15,75 @@
   </tr>
 </table>
 
-## 简介
+## MDCx 是什么
 
-MDCx 从网站抓取视频文件对应的元数据（标题、演员、封面、简介等），生成标准 .nfo 文件和规范命名的文件夹，供 Emby、Jellyfin、Kodi 等媒体服务器直接使用。支持 Windows、macOS、Linux。
+MDCx 是一个桌面工具，自动从 45 个网站抓取视频文件的元数据（标题、演员、封面、简介等），生成标准的 .nfo 文件和整理好的文件夹，给 Emby、Jellyfin、Kodi 这类媒体服务器直接用。
 
-## 新手入口
+一句话：把一堆乱七八糟的视频文件，变成媒体服务器能认的整齐资料库。
 
-### 普通用户
+## 快速安装
 
-1. 从 [GitHub Releases](https://github.com/cdlongbow/mdcx/releases) 下载对应系统的版本
-2. 设置媒体文件夹、下载选项和刮削网站
-3. 先拿 1-3 个文件测试，确认效果后再批量处理
+从 [GitHub Releases](https://github.com/cdlongbow/mdcx/releases) 下载对应系统的压缩包，解压后双击运行。
 
-### 遇到问题先看这里
+详细安装说明：[docs/INSTALL.md](docs/INSTALL.md)
 
-- 运行日志：程序自动在日志目录生成
-- 配置文档：[docs/README.md](docs/README.md)
-- 常见问题：[docs/FAQ.md](docs/FAQ.md)
+## 第一次使用
 
-### 开发者
+看这篇 5 分钟上手指南：[docs/QUICKSTART.md](docs/QUICKSTART.md)
 
-```bash
-uv sync --dev
-uv run python main.py
-```
+## 文档导航
 
-### 推送前自检
+| 文档 | 适合谁看 | 内容 |
+|------|---------|------|
+| [QUICKSTART.md](docs/QUICKSTART.md) | 所有人 | 5 分钟上手，完成第一次刮削 |
+| [INSTALL.md](docs/INSTALL.md) | 需要安装的人 | 系统要求、Release/源码/Docker 三种安装方式 |
+| [FEATURES.md](docs/FEATURES.md) | 想了解能做什么的人 | 全部功能、45 个网站列表、四种刮削模式 |
+| [USER_GUIDE.md](docs/USER_GUIDE.md) | 日常使用的人 | 完整使用手册、常见问题、实际场景 |
+| [CONFIGURATION.md](docs/CONFIGURATION.md) | 想调设置的人 | 每个配置项是干什么的 |
+| [changelog.md](docs/changelog.md) | 关注版本更新的人 | 每个版本改了啥 |
+| [DEVELOPMENT.md](docs/DEVELOPMENT.md) | 想改代码的人 | 项目架构、爬虫开发、测试、代码规范 |
 
-推送前会自动执行以下三道检查，全部通过才能推送：
+## 核心特色
 
-1. **代码格式** — `ruff format --check`，看缩进空格对不对
-2. **代码规范** — `ruff check`，检查有没有低级错误
-3. **单元测试** — `pytest --tb=short -m "not network" -x`，跑所有不联网的测试，保证改完没搞坏别的东西
+- **45 个网站爬虫** — 有码、无码、FC2、国产、欧美全覆盖，部分站点免墙直连
+- **智能番号识别** — 自动判断番号类型（有码/无码/FC2/国产/欧美）
+- **标准 NFO 生成** — 30+ 元数据字段，Emby/Jellyfin/Kodi 通用
+- **多引擎翻译** — Google、Bing、Baidu、DeepL、DeepLX、LLM 共 6 种
+- **图片处理** — 人脸裁剪、水印、Amazon 高清封面
+- **演员数据库** — Excel 数据库 + TMDB/Wikidata/Gfriends 多源补全
+- **Emby/Jellyfin 集成** — 自动同步演员信息和头像
+- **异步并发** — 同时刮多个文件，不卡界面
+- **Cloudflare 绕过** — 内置隐身浏览器自动绕过防护页
 
-```bash
-# 手动运行自检
-uv run check --skip-hook-install
-```
-
-### 核心特色
-
-- **40+ 网站爬虫** - 有码、无码、FC2、国产、欧美全覆盖，其中多个网站支持免墙直连（MissAV API、R18.dev JSON、JavDB API 镜像站）
-- **智能番号识别** - 自动判断番号类型并分类处理
-- **标准 NFO 生成** - 符合 KODI/Emby/Jellyfin 规范，30+ 元数据字段
-- **图片处理** - 人脸裁剪、水印、Amazon 高清封面、图片修复
-- **多语言翻译** - 6 个翻译引擎（Google、Bing、Baidu、DeepL、DeepLX、LLM）
-- **演员数据库管理** - Excel 数据库 + TMDB/Wikidata/Gfriends 多源补全
-- **Emby/Jellyfin 深度集成** - 自动同步演员信息、头像和元数据
-- **PyQt6 界面** - 现代化 GUI，支持界面缩放比例调节和暗色模式
-- **异步并发架构** - asyncio + 渐进式任务调度，处理大量文件不溢出
-- **灵活配置系统** - 字段级优先级、Jinja2 命名模板、代理按站点路由
-
-### 技术亮点
-
-- **模块化设计** - 爬虫、核心、基础、工具层清晰分离
-- **浏览器指纹伪装** - 6 种 curl-cffi TLS 指纹（Chrome 124/131/136，Firefox 133/135），自动轮换
-- **Cloudflare Bypass** - 内置隐身 Chromium（cloakbrowser）自动绕过，无需 license key；同时支持 Mirror/HTML 模式与外部 bypass 服务（独立代理）
-- **令牌桶限流器** - 精准控制 API 请求频率，自适应退避重试
-- **字段级优先级** - 每个字段可独立设置来源网站
-- **连接池管理** - 域名级并发控制，Session 热更新，空闲自动回收
-
-## 核心特性
-
-### 智能抓取系统
-
-**40+ 网站覆盖各类内容**
-
-| 类型 | 网站 |
-|-----|------|
-| **有码** | DMM、JavDB、JavDB API（镜像站直连）、JavDB App（手机接口）、JavBus、Jav321、MGStage、Prestige、Official、JavLibrary、MissAV、MissAV API（免墙）、AVSOX、MMTV、MyWife、Getchu、GetchuDMM、Faleno、Fantastica、Dahlia、Giga、XCity、CableAV、FreeJavBT、Hscangku、AVBASE、Mdtv、Love6、LibreDMM、R18.dev（JSON 直连） |
-| **无码** | Kin8、JavDB（无码分类）、airav_cc、Caribbeancom、HEYZO、1Pondo、Pacopacomama、10Musume |
-| **FC2** | FC2、FC2Club、FC2Hub、FC2PPVDB（已适配 fc2cmadb.com） |
-| **国产** | HDOUBAN、CNMDB、MADOUQU、Lulubar、IQQTV、JavDay |
-| **欧美** | THEPORNDB |
-
-**智能番号识别**
-- 国产番号（MD/MKY 系列）自动标记
-- 素人番号（SIRO 系列、短番号）识别
-- FC2 番号自动分类
-- 欧美番号（XXX.00.00.00 格式）识别
-- 无码番号通过格式自动识别
-
-**统一爬虫框架**
-- 基类 `GenericBaseCrawler` 定义标准流程
-- 上下文管理，避免状态混乱
-- 支持自定义 URL 和 UI 隐藏
-- 多网站结果智能合并
-
-### 完整的 NFO 生成
-
-**30+ 元数据字段**
-- 基本信息：番号、标题、排序标题、剧情简介
-- 发行信息：发行日期、年份、分级、国家代码
-- 人员信息：演员（多语言）、导演
-- 评分信息：公众评分、影评人评分、想看人数
-- 分类标签：标签、类型、系列
-- 制作信息：制作商、厂牌、发行商
-- 媒体资源：海报、缩略图、背景图、预告片 URL
-- 外部 ID：javdbid、javlibid 等各网站 ID
-
-### 图片处理
-
-**智能图片处理**
-- 多类型图片下载（海报、缩略图、背景图、预告片）
-- 人脸检测和智能裁剪（OpenCV）
-- 2:3 比例标准海报
-- 自定义水印
-- 图片修复
-
-**Amazon 高清封面**
-- ASIN 条码识别
-- Amazon 产品智能搜索（条码快路径、标题搜索、演员兜底三层策略）
-- SL1500 尺寸高清封面
-- ASIN 数据库缓存（Excel 保存，避免重复搜索）
-- 详细文档：[Amazon 缓存系统详解](docs/amazon-cache.md)
-
-### 多语言翻译系统
-
-**6 个翻译引擎**
-
-| 引擎 | 特点 |
-|------|------|
-| Google 翻译 | 免费免配置，自动爬取接口 |
-| Bing 翻译 | 免费免配置，自动爬取接口，国内网络友好 |
-| 百度翻译 | 需自行申请 API Key |
-| DeepL 翻译 | 需自行申请 API Key |
-| DeepLX 翻译 | 需配置自建 URL |
-| LLM 翻译 | 大模型翻译，支持自定义 API/Key/Model/Prompt |
-
-**翻译功能**
-- 字段级翻译配置
-- 多语言支持（简体中文、繁体中文、日语）
-- 映射表机制
-- 演员真实姓名获取（Av-wiki）
-- 降级策略和自动重试
-
-### 灵活的命名系统
-
-**Jinja2 模板引擎**
-- 强大的模板语法，支持条件渲染
-- 丰富的变量（番号、标题、演员、标签、系列等）
-- 智能字符清理和截断
-- 三种命名目标（文件夹、文件、媒体库）
-
-**文件处理**
-- 批量重命名
-- 软链接和硬链接支持
-- 字幕自动匹配和管理
-- 旧文件和空文件夹清理
-
-### 演员数据库管理
-
-**Excel 格式数据库**
-- 字段：ID、日文名、中文名、繁体名、别名、信息链接、TMDB ID
-- 信息链接：相关网站链接（LibreDMM、JavDB、TMDB 链接等）
-- 导入导出、格式化和清理
-
-**TMDB 集成**
-- TMDB API 查询和批量获取（Excel 缓存避免重复查询）
-- 令牌桶限流器（每秒 3.5 次请求）
-- 并发查询（并发数 3）
-- 基于日文名、中文名、繁体名和别名的反向缓存搜索
-- 名字变体归一化匹配
-- 演员 TMDB ID 自动写入 NFO `actor/tmdbid`
-- 详细文档：[TMDB 缓存系统详解](docs/tmdb-cache.md)
-
-**数据补全来源**
-- TMDB API：电影数据库信息
-- Wikidata：维基百科数据
-- Gfriends：演员头像和写真
-- graphis.ne.jp：写真集信息
-
-### Emby/Jellyfin 深度集成
-
-**演员信息补全**
-- 自动更新演员简介（Wikipedia）
-- 更新演员元数据（出生日期、出生地等）
-- 批量更新
-
-**演员头像更新**
-- 多来源获取（graphis.ne.jp、Gfriends、本地文件夹）
-- 自动下载和上传
-- 图片格式转换和优化
-
-**其他集成**
-- 创建 .actors 文件夹（Kodi/Plex/Jvedio 兼容）
-- 生成标准 NFO 文件
-- API 调用支持（Emby/Jellyfin 两种服务器）
-
-### 异步并发处理
-
-- asyncio 异步编程
-- 渐进式任务调度，支持大量文件处理
-- 可配置并发数
-- 实时进度显示
-- 令牌桶限流器，避免超过 API 限制
-- 网站请求限流，避免触发反爬机制
-- 间歇抓取模式
-
-### 丰富的工具集
-
-1. **字幕管理** - 自动匹配、复制、重命名
-2. **缺失文件检测** - 检查媒体库缺失的文件
-3. **海报裁剪工具** - 交互式裁剪海报
-4. **演员数据库管理** - Excel 数据库维护
-5. **Wiki 工具** - 从维基百科获取信息
-
-### 界面特性
-
-- **PyQt6 原生界面** - 基于 Qt6，支持 Fusion 主题
-- **缩放比例调节** - 八档缩放比例（跟随系统/80%/90%/100%/125%/150%/175%/200%），解决高分屏兼容问题
-- **非整数倍缩放** - 支持 Window 高 DPI 非整数缩放策略
-- **暗色模式** - 内置暗色主题切换
-- **窗口拖拽缩放** - 最小 850x550，灵活调整
-
-### 网络和反爬机制
-
-**HTTP 客户端**
-- `curl_cffi` AsyncSession - TLS 指纹模拟，6 种浏览器画像自动轮换
-- `httpx` - 同步检查更新
-- SOCKS/HTTP 代理支持
-- 三级连接池管理（HostPool → ConnectionPool → Session）
-
-**Cloudflare Bypass**
-- 内置隐身 Chromium（cloakbrowser）自动绕过 Cloudflare 挑战页，无需 license key
-- 自动检测 CF 挑战页（cf-chl、cdn-cgi 标记）并自动 bypass
-- 同时支持 Mirror 模式（外部 bypass 服务代理请求）与 HTML 模式（调用 bypass 服务 `/html` 端点）
-- 支持外部 bypass 服务，可配置独立代理，不影响常规请求
-- 部分站点提供免 CF 的 API 数据（如 MissAV-API）
-- 详细用法：[配置说明](docs/configuration.md#cloudflare-bypass-配置)
-
-**代理配置**
-- HTTP/HTTPS 代理
-- SOCKS5 代理
-- 走代理网站功能（仅指定网站走代理，其余直连）
-- CF Bypass 独立代理
-
-**反爬措施**
-- 浏览器指纹伪装（完整 sec-ch-ua、Accept-Language 等请求头）
-- 指纹按请求类型（document/api/asset）动态调整
-- 自适应域名限流（默认 8 req/s）
-- 失败自动退避重试（支持 403/429/500/502/503/504）
-- 指纹生命周期管理（定期自动轮换）
-
-## 文档
-
-- [文档中心](docs/README.md) - 所有文档入口
-- [Code Wiki](docs/CODE_WIKI.md) - 完整技术文档
-- [功能特色](docs/FEATURES.md)
-- [完整功能列表](docs/COMPLETE_FEATURES.md)
-- [使用场景](docs/SCENARIOS.md)
-- [开发指南](docs/DEVELOPMENT.md)
-- [FAQ](docs/FAQ.md)
-- [配置说明](docs/configuration.md)
-- [用户使用手册](docs/USER_GUIDE.md)
-- [刮削模式详解](docs/SCRAPING_MODES.md)
-- [架构设计](docs/architecture.md)
-- [API 文档](docs/api-documentation.md)
-- [贡献指南](docs/CONTRIBUTING.md)
-- [安装指南](docs/INSTALL.md)
-- [Amazon 缓存系统](docs/amazon-cache.md)
-- [TMDB 缓存系统](docs/tmdb-cache.md)
-- [PyQt6 迁移](docs/pyqt6-migration.md)
-- [爬虫迁移](docs/crawler-migration.md)
-- [变更日志](docs/changelog.md)
-
-## 快速开始
-
-### 安装
-
-#### 方法一：从 Release 下载（推荐）
-
-去 [Release](https://github.com/cdlongbow/mdcx/releases/latest) 页面下载对应系统版本，解压后直接运行。
-
-#### 方法二：从源码运行
+## 开发者
 
 ```bash
 git clone https://github.com/cdlongbow/mdcx.git
 cd mdcx
-
-# 安装依赖（推荐使用 uv）
-uv sync --locked --all-extras --dev
-
-# 运行应用
+uv sync --dev
 uv run python main.py
 ```
 
-### 使用示例
-
-#### 基本使用流程
-
-1. **配置媒体路径** - "设置" → "通用"，设置媒体路径和成功输出目录
-2. **配置抓取来源** - "设置" → "刮削"，为不同类型视频选择网站
-3. **配置下载选项** - "设置" → "下载"，选择需下载的文件类型和图片质量
-4. **开始抓取** - 点击扫描 → 选择文件 → 点击开始
-
-#### 翻译配置
-
-1. 进入"设置" → "翻译"
-2. 选择翻译服务（Google、Bing、Baidu、DeepL、DeepLX、LLM）
-3. 配置 API 密钥（如需要）
-4. 选择需要翻译的字段
-
-#### 命令行使用
-
+推送前自检：
 ```bash
-# 命令行抓取
-uv run python -m mdcx.cmd.crawl
-
-# 生成枚举
-uv run python -m mdcx.cmd.gen_enums
+uv run check --skip-hook-install
 ```
-
-### 配置文件
-
-配置文件默认路径：
-
-- Windows: `%APPDATA%\MDCx\`
-- macOS: `~/Library/Application Support/MDCx/`
-- Linux: `~/.config/MDCx/`
-
-### 系统要求
-
-- Python 3.13.4+
-- Windows 10+ / macOS 10.15+ (x86_64/arm64) / Linux (x86_64)
-- 网络连接
-
-### 故障排除
-
-#### 网络问题
-
-在"设置" → "网络"中配置代理。参考错误提示排查。
-
-#### 界面太大或太小
-
-在"设置" → "界面外观" → "高分屏缩放"中调节缩放比例，保存后重启生效。
-
-#### NFO 不显示
-
-- 确保已勾选"下载 NFO"
-- 检查 NFO 配置
-- 确认媒体服务器已刷新媒体库
-
-#### 翻译失败
-
-- 检查翻译服务配置
-- 确认 API 密钥有效
-- 查看日志了解详细错误
 
 ## 交流群
 
 [![Telegram](https://img.shields.io/badge/Telegram-Join_Chat-2CA5E0?style=flat&logo=telegram&logoColor=white)](https://t.me/mdcx_chat)
 
-> [!TIP]
-> **使用问题**：配置、使用心得等，建议加入 Telegram 交流群。
-> **Bug 反馈**：确认不是已知问题后提交 Issue，附上相关日志和番号。
-
 ## 上游项目
 
-* [yoshiko2/Movie_Data_Capture](https://github.com/yoshiko2/Movie_Data_Capture): 命令行工具，已不活跃，新版已闭源。
-* [moyy996/AVDC](https://github.com/moyy996/AVDC): 上述项目的 PyQt GUI 分支，已停止维护。
-* @Hermit/MDCx: AVDC 的分支，曾在 [anyabc/something](https://github.com/anyabc/something/releases) 分发源码和可执行文件。
-* 2023-11-3 @anyabc 因未知原因销号删库，最后一个版本号 20231014。
-* [@sqzw-x/mdcx](https://github.com/sqzw-x/mdcx) 暂时停止维护。
-* 本项目基于 [@sqzw-x/mdcx](https://github.com/sqzw-x/mdcx) 继续维护和优化。
-
-感谢相关开发者。
-
-## 开发指南
-
-### 项目结构
-
-```
-mdcx/
-├── base/              # 基础功能模块（翻译、请求、同步桥接）
-├── cmd/               # 命令行工具（crawl、gen_enums）
-├── config/            # 配置管理（模型、枚举、管理器）
-├── controllers/       # 控制器（主窗口、设置、日志）
-├── core/              # 核心功能（抓取、NFO、命名、图片处理）
-├── crawlers/          # 爬虫实现（40+ 网站）
-├── gen/               # 自动生成的枚举
-├── tools/             # 工具模块
-├── utils/             # 工具函数（速率限制、日志）
-└── views/             # UI 视图（Qt Designer）
-```
-
-### 构建
-
-一般情况不要自己构建，去 [Release](https://github.com/cdlongbow/mdcx/releases) 下载最新版即可。
-
-### 测试
-
-```bash
-# 运行所有测试
-uv run pytest tests/
-
-# 运行测试并生成覆盖率报告
-uv run pytest tests/ --cov=mdcx --cov-report=html
-```
-
-### 代码规范
-
-项目用 `ruff` 做代码检查（行宽 120，启用 isort/pyupgrade/flake8 规则）：
-
-```bash
-# 代码检查
-uv run ruff check .
-
-# 自动修复
-uv run ruff check . --fix
-```
-
-### 贡献指南
-
-请看 [CONTRIBUTING.md](docs/CONTRIBUTING.md)。
+* [yoshiko2/Movie_Data_Capture](https://github.com/yoshiko2/Movie_Data_Capture) — 命令行工具，已不活跃
+* [moyy996/AVDC](https://github.com/moyy996/AVDC) — 上述项目的 PyQt 分支，已停维护
+* [@sqzw-x/mdcx](https://github.com/sqzw-x/mdcx) — 本项目前身
+* 本项目基于 @sqzw-x/mdcx 继续维护和优化
 
 ## 授权许可
 
-本项目在 GPLv3 许可下发布。使用本项目代表你接受以下条款：
-
-* 本项目仅供学习和技术交流使用
-* 请勿在公共社交平台上宣传此项目
+GPLv3。使用本项目代表你接受：
+* 仅供学习和技术交流
 * 使用本软件时请遵守当地法律法规
 * 法律及使用后果由使用者自己承担
-* 禁止将本软件用于商业用途
+* 禁止用于商业用途

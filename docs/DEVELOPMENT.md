@@ -1,329 +1,234 @@
-# 开发指南
+# 开发者专区
 
-本文档面向 MDCX 的开发者，介绍开发环境搭建、代码规范、开发流程和最佳实践。
-
-## 目录
-
-1. [开发环境搭建](#开发环境搭建)
-2. [项目结构](#项目结构)
-3. [开发流程](#开发流程)
-4. [代码规范](#代码规范)
-5. [测试](#测试)
-6. [提交规范](#提交规范)
-7. [发布流程](#发布流程)
-
-## 开发环境搭建
-
-### 系统要求
-
-- Python 3.13.4+
-- [uv](https://docs.astral.sh/uv/getting-started/installation/) 包管理器
-- Git
-- 文本编辑器（推荐 VSCode 或 PyCharm）
-
-### 环境配置
-
-1. **克隆仓库**
-```bash
-git clone https://github.com/cdlongbow/mdcx.git
-cd mdcx
-```
-
-2. **安装依赖**
-```bash
-uv sync --dev
-uv pip install -e .
-```
-
-3. **配置 Git Hooks**
-```bash
-uv run pre-commit install
-```
-
-### IDE 配置
-
-推荐使用 VSCode：
-
-```json
-{
-  "python.defaultInterpreterPath": "./.venv/bin/python",
-  "[python]": {
-    "editor.defaultFormatter": "charliermarsh.ruff",
-    "editor.formatOnSave": true
-  },
-  "ruff.format.args": ["--config", "ruff.toml"],
-  "ruff.lint.args": ["--config", "ruff.toml"]
-}
-```
+给想改代码、加功能的人看的文档。合并了原仓库中所有技术文档（架构、核心模块、数据模型、爬虫系统、命名系统、缓存、测试、代码规范、迁移指南等）。
 
 ## 项目结构
 
 ```
-./
-├── main.py                # 程序入口
-├── pyproject.toml         # 项目配置和依赖管理
-├── ruff.toml              # Ruff 代码检查和格式化配置
-├── mdcx/                  # 主源码目录
-│   ├── __init__.py
-│   ├── consts.py          # 常量定义（版本号、平台检测等）
-│   ├── crawler.py         # 爬虫提供器
-│   ├── number.py          # 番号解析和验证
-│   ├── signals.py         # 信号机制 (Qt 信号)
-│   ├── web_async.py       # 异步网络客户端
-│   ├── browser.py         # 浏览器相关模块
-│   ├── llm.py             # LLM 翻译核心实现
-│   ├── manual.py          # 手动操作模块
-│   ├── image.py           # 顶层图片模块
-│   ├── network_fingerprint.py  # 网络指纹模块
-│   ├── base/              # 基础功能模块
-│   ├── config/            # 配置管理
-│   ├── controllers/       # 控制器 (业务逻辑)
-│   ├── core/              # 核心功能
-│   ├── crawlers/          # 爬虫实现 (40+ 个站点)
-│   ├── gen/               # 自动生成的枚举
-│   ├── models/            # 数据模型
-│   ├── tools/             # 工具模块
-│   ├── utils/             # 工具函数
-│   └── views/             # UI 视图
-├── resources/             # 资源文件
-├── scripts/               # 脚本工具
-├── tests/                 # 测试代码
-└── docs/                  # 项目文档
+mdcx/
+├── base/              # 基础功能（文件、图片、翻译、网络请求）
+├── cmd/               # 命令行工具（crawl 调试爬虫、gen_enums）
+├── config/            # 配置管理（Pydantic 模型、枚举、管理器）
+├── controllers/       # 控制器（主窗口、海报裁剪）
+│   └── main_window/   # 主窗口逻辑（~3400 行）
+├── core/              # 核心业务（刮削器、NFO、命名、图片、翻译等）
+├── crawlers/          # 45 个网站爬虫 + 基类框架
+├── gen/               # 自动生成的枚举
+├── models/            # 数据模型（FileInfo、CrawlerResult 等）
+├── tools/             # 工具（演员数据库、Emby 同步、字幕等）
+├── utils/             # 工具函数（限流、日志、文件操作）
+└── views/             # UI 视图（Qt Designer 生成的 .ui 和 .py）
 ```
 
-详细架构说明请参阅 [架构设计文档](architecture.md)。
+## 架构
 
-## 开发流程
+采用 MVC 分层：
 
-### 分支策略
-
-- `master` - 主分支，放稳定版本
-- `develop` - 开发分支
-- `feature/*` - 功能分支
-- `fix/*` - 修复分支
-- `hotfix/*` - 紧急修复分支
-
-### 开发步骤
-
-1. **创建功能分支**
-```bash
-git checkout -b feature/your-feature-name
+```
+UI 层 (PyQt6)         → 界面展示、用户操作
+控制器层               → 事件处理、配置管理、信号调度
+核心业务层             → 刮削器、NFO 生成、翻译、图片处理
+爬虫框架               → 45 个爬虫，统一基类
+基础设施层             → HTTP 客户端、文件系统、OpenCV
 ```
 
-2. **编写代码**
-- 遵循代码规范
-- 添加必要的注释
-- 编写测试
+**数据流程**：
 
-3. **本地测试**
-```bash
-uv run pytest
-uv run ruff check mdcx/
-uv run ruff format mdcx/
+1. 文件扫描 → 番号识别 → 爬虫执行 → 数据整合 → 翻译
+2. → 命名生成 → 资源下载 → NFO 生成 → 文件移动
+
+## 数据模型
+
+完整数据流转链路：
+
+```
+FileInfo → CrawlerInput → CrawlTask
+              ↓
+          CrawlerResult ← 单个爬虫返回
+              ↓
+          CrawlersResult ← 多站聚合
+              ↓
+          ScrapeResult ← 最终刮削结果
+              ↓
+          ShowData ← 界面展示
 ```
 
-4. **提交代码**
-```bash
-git add .
-git commit -m "feat: 添加新功能描述"
-```
+关键数据类在 `mdcx/models/types.py`：
 
-5. **推送并创建 PR**
-```bash
-git push origin feature/your-feature-name
-```
+- **FileInfo**：视频文件信息（番号、路径、分辨率等）
+- **CrawlerInput**：爬虫输入参数（番号、语言、指定 URL）
+- **CrawlTask**：完整刮削任务，继承 CrawlerInput
+- **BaseCrawlerResult**：23 个字段（标题、演员、海报、评分等）
+- **CrawlerResult**：单站结果，增加 source 和 external_id
+- **CrawlersResult**：多站聚合结果，含字段来源追踪
+- **ScrapeResult**：最终结果 = file_info + data + other_info
 
-6. **代码审查**
-- 等待别人审查你的代码
-- 根据反馈修改代码
+## 核心模块
 
-7. **合并到主分支**
-- 通过审查后合并
-- 删除功能分支
+### 主刮削器（mdcx/core/scraper.py）
 
-## 代码规范
+`Scraper` 类统筹整个刮削流程：扫描文件 → 调度爬虫 → 聚合结果 → 翻译 → 下载 → 生成 NFO → 移动文件。使用渐进式任务调度，支持大量文件不溢出。
 
-### Python 代码规范
+### 文件爬虫（mdcx/core/file_crawler.py）
 
-遵循 PEP 8 规范，使用 ruff 进行自动格式化和检查（配置见 `ruff.toml`）：
+`FileScraper` 处理单个文件，负责番号识别、多站并发请求、字段级优先级合并。
 
-```python
-def get_actor_name(actor_id: int) -> str:
-    """获取演员名称"""
-    pass
+### NFO 生成（mdcx/core/nfo.py）
 
-class ActorManager:
-    """演员管理器"""
-    pass
-```
+生成 Emby/Jellyfin/Kodi 兼容的 XML NFO 文件，30+ 字段，含外部 ID（javdbid、javlibid 等）。
 
-### 导入规范
+### TMDB 演员（mdcx/core/tmdb_actor.py）
 
-```python
-# 标准库导入
-import os
-import sys
-from typing import Optional
+通过 TMDB API 查询演员信息，日文名/中文名/繁体名多语言搜索。令牌桶限流（3.5 req/s），双层缓存（Excel + 内存）。
 
-# 第三方库导入
-import httpx
-from openpyxl import Workbook
+### Amazon 集成（mdcx/core/amazon.py）
 
-# 本地导入
-from mdcx.core.tmdb_actor import TmdbActor
-```
+从 Amazon 搜索高清封面，EAN-13 条码检测 → ASIN 映射。三层搜索策略：条码快路径 → 标题搜索 → 演员兜底。
 
-### 注释规范
+### 人脸裁剪（mdcx/core/face_crop.py）
 
-```python
-def batch_update_actors(actors: list[dict], batch_size: int = 10) -> None:
-    """
-    批量更新演员信息
+基于 OpenCV YuNet ONNX 模型，自动检测人脸并裁剪为 2:3 海报。
 
-    Args:
-        actors: 演员列表
-        batch_size: 批次大小，默认 10
+### 图片处理（mdcx/core/image.py）
 
-    Returns:
-        None
+图片下载、多尺寸修复、水印添加（9 宫格位置，支持文字水印）。
 
-    Raises:
-        ValueError: 当 actors 为空时
-    """
-    if not actors:
-        raise ValueError("演员列表不能为空")
-```
+### 翻译（mdcx/core/translate.py）
 
-### 类型提示
+6 个翻译引擎（Google/Bing/Baidu/DeepL/DeepLX/LLM），字段级翻译配置，多引擎降级。
 
-```python
-def search_actors(query: str, limit: int = 10) -> list[dict]:
-    pass
+### 命名系统（mdcx/core/naming/）
 
-def get_actor(id: int) -> dict | None:
-    pass
-```
+Jinja2 模板引擎，支持条件渲染、智能截断。三类命名目标：文件夹、文件名、NFO 标题。
 
-### 错误处理
+命名变量：number、title、actor、all_actor、studio、series、year、release 等 24 个字段。
 
-```python
-try:
-    response = await client.get(url, timeout=10)
-    response.raise_for_status()
-except httpx.HTTPStatusError as e:
-    logger.error(f"请求失败: {e}")
-    raise
-```
+### 马赛克标准化（mdcx/core/mosaic.py）
+
+`normalize_mosaic()` 将各类标签归一化为：有码、无码、无码破解、流出、无码流出、国产。
+
+## 爬虫框架
+
+### 基类
+
+`GenericBaseCrawler[T]` 在 `mdcx/crawlers/base/base.py` 中定义，泛型抽象基类，所有爬虫继承。
+
+**爬虫生命周期**：
+1. `_generate_search_url()` — 生成搜索 URL
+2. `_search()` — 请求搜索页
+3. `_parse_search_page()` — 解析搜索页，拿详情页 URL
+4. `_detail()` — 请求详情页
+5. `_parse_detail_page()` — 解析详情页，返回 CrawlerData
+6. `post_process()` — 后处理，返回 CrawlerResult
+
+### CrawlerData
+
+爬虫解析的中间数据，所有字段默认 `NOT_SUPPORT`（表示本站不支持此字段）。可选字段包括 title、actors、poster、outline、score、tags、series 等 76 个。
+
+### 注册机制
+
+爬虫通过 `register_crawler()` 注册到 `crawler_registry`，站点下拉框由注册表动态生成。需要在 `mdcx/crawlers/__init__.py` 中导入，并在 `Website` 枚举中添加。
+
+### 添加新爬虫的步骤
+
+1. 在 `mdcx/crawlers/` 下新建 .py 文件
+2. 继承 `BaseCrawler` 或 `GenericBaseCrawler`
+3. 实现抽象方法：`site()`、`base_url_()`、`new_context()`、`_generate_search_url()`、`_parse_search_page()`、`_parse_detail_page()`
+4. 可选重写 `post_process()` 做后处理
+5. 在 `mdcx/config/enums.py` 的 `Website` 枚举中加新值
+6. 在 `mdcx/crawlers/__init__.py` 中导入并注册
+
+## 缓存系统
+
+### TMDB 缓存
+
+双层缓存：Excel 文件（持久化）+ 内存 dict（加速）。查询策略：先查内存→再查 Excel→再调 TMDB API。限流 3.5 req/s，并发数 3。
+
+### Amazon 缓存
+
+ASIN 数据库（Excel），搜索到的 ASIN 与番号对应关系持久化，避免重复搜索。
+
+## 网络层
+
+- **异步 HTTP**：httpx（默认）+ curl-cffi（指纹伪装）
+- **浏览器指纹**：6 种 TLS 指纹（Chrome 124/131/136、Firefox 133/135），按请求类型动态调整，定期轮换
+- **限流**：每个域名独立令牌桶，默认 8 req/s，失败自动退避重试
+- **Cloudflare Bypass**：内置 cloakbrowser 隐身 Chromium，自动绕过 CF 防护页，无需 license key
+- **代理**：HTTP/HTTPS/SOCKS5，可按站点路由
+
+## 配置系统
+
+基于 Pydantic 的 `Config` 模型（200+ 配置项），JSON 格式存储。旧版 INI 格式自动迁移。
+
+`ConfigManager` 单例管理加载/保存/热切换。`Computed` 派生对象（HTTP 客户端、LLM 客户端等）在配置变更时自动重建。
+
+敏感字段（API Key）导出时自动脱敏为 `***`。
+
+## 依赖
+
+从 `pyproject.toml` 读取，核心依赖：
+- PyQt6 6.11.0（UI 框架）
+- httpx（HTTP 客户端）
+- curl-cffi 0.11.4（TLS 指纹模拟）
+- lxml + parsel + beautifulsoup4（HTML/XML 解析）
+- Pillow + opencv-contrib-python-headless（图片处理）
+- Jinja2（命名模板）
+- openpyxl（Excel 读写）
+- cloakbrowser + CloudflareBypassForScraping（CF 绕过）
 
 ## 测试
 
-### 测试框架
+- **框架**：pytest + pytest-asyncio
+- **标记**：`network`（需要联网的测试，默认跳过）、`integration`（集成测试，默认跳过）
+- **运行**：
+  ```bash
+  uv run pytest tests/                          # 全部测试
+  uv run pytest tests/ --tb=short -m "not network" -x  # 仅不联网测试
+  ```
+- **覆盖**：tests/crawlers/ 爬虫测试、tests/core/ 核心测试、NFO 测试、配置测试等
+- **推送前自检**：`uv run check --skip-hook-install`（ruff format + ruff check + pytest）
 
-使用 pytest：
+## 代码规范
+
+- **格式化**：ruff（行宽 120，启用 isort/pyupgrade/flake8）
+- **类型检查**：pyright（部分文件豁免）、mypy
+- **Git 钩子**：pre-commit 安装 ruff check + ruff format
+- **检查和修复**：
+  ```bash
+  uv run ruff check .          # 代码检查
+  uv run ruff check . --fix    # 自动修复
+  uv run ruff format .         # 格式化
+  ```
+
+## 构建
+
+使用 PyInstaller 打包，入口文件 main.py。不推荐自己构建，去 GitHub Releases 下载即可。
+
+## 迁移指南
+
+### 旧版爬虫 → GenericBaseCrawler
+
+旧版函数式刮削器迁移步骤：
+1. 创建新文件继承 BaseCrawler
+2. 将搜索逻辑移入 `_search()` + `_parse_search_page()`
+3. 将详情逻辑移入 `_detail()` + `_parse_detail_page()`
+4. 使用 `CrawlerData` 代替手动构造字典
+5. 注册到 `crawlers/__init__.py`
+
+### PyQt5 → PyQt6
+
+主要变更：QtCore.pyqtSignal → QtCore.pyqtSignal（相同），枚举使用 Enum 风格，QRegExp → QRegularExpression。
+
+### 配置 v1 (INI) → v2 (JSON)
+
+通过 `migrations.py` 自动转换，旧版 INI 配置在加载时自动迁移为 JSON。
+
+## 支持的命令行
 
 ```bash
-uv run pytest
-uv run pytest tests/test_tmdb_actor.py
-uv run pytest --cov=mdcx --cov-report=html
+uv run crawl           # 命令行爬虫调试
+uv run gen_enums       # 生成枚举
+uv run build           # PyInstaller 打包
+uv run bump            # 版本号更新
+uv run changelog       # 生成变更日志
 ```
-
-详细测试说明请参阅 [测试文档](TEST_COVERAGE_SUMMARY.md)。
-
-## 提交规范
-
-### 提交信息格式
-
-使用 Conventional Commits 规范：
-
-```
-<type>(<scope>): <subject>
-
-<body>
-
-<footer>
-```
-
-**Type 类型：**
-- `feat`: 新功能
-- `fix`: 修复
-- `docs`: 文档
-- `style`: 格式（不影响代码运行）
-- `refactor`: 重构
-- `test`: 测试
-- `chore`: 构建/工具
-
-**示例：**
-```
-feat(tmdb): 添加令牌桶限流器
-
-实现基于令牌桶的限流器，控制 TMDB API 请求速率，
-避免触发 API 限流。
-
-Closes #123
-```
-
-### 提交前检查
-
-1. 代码通过所有测试
-2. 代码通过检查（`uv run ruff check`）
-3. 代码格式正确（`uv run ruff format`）
-4. 更新了相关文档
-5. 编写了测试用例
-
-## 发布流程
-
-### 版本号规范
-
-语义化版本（Semantic Versioning）：`MAJOR.MINOR.PATCH`
-
-### 发布步骤
-
-1. **更新版本号**
-```bash
-uv run bump <new_version>
-```
-
-2. **更新 CHANGELOG**
-```bash
-uv run changelog
-```
-
-3. **创建 Git Tag**
-```bash
-git tag -a v<version> -m "Release v<version>"
-```
-
-4. **构建发布包**
-```bash
-uv run build
-```
-
-5. **发布 GitHub Release**
-
-## 代码审查
-
-使用 [代码审查检查清单](CODE_REVIEW_CHECKLIST.md) 确保代码质量。
-
-详细说明请参阅 [代码审查指南](CODE_REVIEW_GUIDE.md) 和 [代码审查标准](CODE_REVIEW_STANDARDS.md)。
-
-## 文档更新
-
-代码变更时同步更新文档：
-
-- API 变更 → 更新 [API 文档](api-documentation.md)
-- 新功能 → 更新 [用户手册](USER_GUIDE.md)
-- 架构变更 → 更新 [架构文档](architecture.md)
-- 配置变更 → 更新 [配置说明](configuration.md)
-
-## 贡献
-
-欢迎贡献代码。详细贡献指南请参阅 [贡献指南](CONTRIBUTING.md)。
-
-## 相关文档
-
-- [架构设计](architecture.md)
-- [核心模块](core-modules.md)
-- [API 文档](api-documentation.md)
-- [代码规范](CODE_REVIEW_STANDARDS.md)
-- [测试指南](TEST_COVERAGE_SUMMARY.md)
-- [迁移指南](crawler-migration.md)

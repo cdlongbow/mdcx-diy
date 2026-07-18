@@ -2694,6 +2694,7 @@ class MyMAinWindow(QMainWindow):
   <li>cnmdb</li>
   <li>dahlia</li>
   <li>dmm</li>
+  <li>dmm_api</li>
   <li>faleno</li>
   <li>fantastica</li>
   <li>fc2</li>
@@ -2711,8 +2712,8 @@ class MyMAinWindow(QMainWindow):
   <li>javbus</li>
   <li>javday</li>
   <li>javdb</li>
+  <li>javdb_api</li>
   <li>javdb_app</li>
-  <li>dmm_api</li>
   <li>javlibrary</li>
   <li>kin8</li>
   <li>libredmm</li>
@@ -2722,22 +2723,25 @@ class MyMAinWindow(QMainWindow):
   <li>mdtv</li>
   <li>mgstage</li>
   <li>missav</li>
+  <li>missav_api</li>
   <li>mywife</li>
+  <li>mmtv</li>
   <li>official</li>
   <li>prestige</li>
+  <li>r18dev</li>
   <li>theporndb</li>
   <li>xcity</li>
-  <li>7mmtv</li>
   <p><span style=" font-weight:700;">指定类型影片可指定刮削网站:<span></p>
-  <p>· 欧美：theporndb 、javdb_app </p>
+  <p>· 有码：javdb、javbus、dmm、jav321、mgstage、prestige、missav、r18dev 等，javdb_api/missav_api/r18dev 是免墙通道</p>
+  <p>· 欧美：theporndb、javdb_app </p>
   <p>· 国产：mdtv、madouqu、hdouban、cnmdb、javdb_app </p>
   <p>· 里番：getchu_dmm </p>
   <p>· Mywife：mywife </p>
   <p>· GIGA：giga </p>
   <p>· Kin8：kin8 </p>
-  <p>· 无码：javdb_app </p>
-  <p>· 素人：javdb_app </p>
-  <p>· FC2：javdb_app </p>
+  <p>· 无码：kin8、avsox、airav_cc、avsex、javdb_app </p>
+  <p>· 素人：mgstage、javbus、jav321、dmm、avbase </p>
+  <p>· FC2：fc2、fc2club、fc2hub、fc2ppvdb、love6、javdb_app </p>
 </body>
 </html>""")
 
