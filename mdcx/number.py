@@ -311,8 +311,11 @@ def get_file_number(filepath: str, escape_string_list: list[str]) -> str:
         (r := re.search(r"[A-Z]+-[A-Z]\d+", filename))  # mkbd-s120
         or (
             r := re.search(r"(?<![A-Z0-9])\d{2,}[-_]\d{2,}", filename)
-        )  # 111111-000 111111_000（前导字母的 T38-041 类不匹配，保留完整番号，议题 #92）
+        )  # 111111-000 111111_000（纯数字段，避免把 T38-041 截成 38-041，议题 #92）
         or (r := re.search(r"(?<![A-Z0-9])\d{3,}-[A-Z]{3,}", filename))  # 111111-MMMM
+        or (r := re.search(r"(?<![A-Z0-9])[A-Z]\d{2}[-_]\d{2,4}(?![A-Z0-9])", filename))
+        # T38-041（单字母 + 两位数字厂牌；文件名带标题时也能命中，议题 #95；
+        # 收窄为两位头数字以避开 H264-1080/x264-10 一类编码串）
     ):
         file_number = r.group()
 

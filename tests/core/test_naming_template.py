@@ -325,6 +325,37 @@ def test_series_clipped_before_actor_in_folder_template():
     assert len(rendered.text) <= 40
 
 
+def test_directory_segment_truncation_is_stable_across_files():
+    """议题 #95：同系列文件即便标题/演员长短不同，系列一级目录也必须一致。"""
+    template = "{{ series }}/{{ actor }}/[{{ release }}]{{ number }}~{{ title }}"
+    long_series = ("両親が旅行で不在中に幼馴染がやってきて" * 10)[:108]
+
+    def render_for(title: str, actor: str, number: str, release: str) -> str:
+        file_info = _build_file_info()
+        result = _build_result()
+        result.series = long_series
+        result.actor = actor
+        result.title = title
+        result.number = number
+        result.release = release
+        rendered = render_name(
+            template,
+            file_info,
+            result,
+            NameRenderOptions(target=NamingTarget.FOLDER, max_length=140),
+        )
+        return rendered.text
+
+    # A：其它字段都很短，整体未超限，但系列仍被主动截到稳定预算
+    short_file = render_for("短", "泉百华", "MIDA-209", "2025-07-10")
+    # B：标题/演员更长，整体超限
+    long_file = render_for("很长很长的标题" * 10, "小野六花", "MIDV-757", "2024-06-28")
+
+    assert short_file.split("/")[0] == long_file.split("/")[0]
+    assert long_series.startswith(short_file.split("/")[0])
+    assert "MIDV-757" in long_file
+
+
 def test_truncated_log_lists_only_template_fields():
     """议题 #93：不在模板里的字段（简介/原标题）不应出现在「已智能缩短」日志里。"""
     file_info = _build_file_info()

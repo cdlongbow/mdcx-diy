@@ -122,10 +122,30 @@ def test_get_file_number_normalizes_dmm_preorder_9_prefix(raw_number: str, expec
         (r"D:/test/DSVR-1234.mp4", "DSVR-1234"),
         # 议题 #92：字母+数字系列（T38）不能把前导字母 T 丢成 38-041
         (r"D:/test/T38-041.mp4", "T38-041"),
+        (r"D:/test/T28-223.mp4", "T28-223"),
+        # 议题 #95：文件名带标题时也要命中单字母+两位数字厂牌番号
+        (
+            r"D:/test/T38-041__田舎に帰省した日焼け姪っ子姉妹 原陽菜乃·南日菜乃_【原阳菜乃】__[].mp4",
+            "T38-041",
+        ),
     ],
 )
 def test_get_file_number_keeps_non_suren_prefixes(raw_number: str, expected_number: str):
     assert get_file_number(raw_number, []) == expected_number
+
+
+@pytest.mark.parametrize(
+    ("raw_number", "not_expected_number"),
+    [
+        # 单字母+两位数字厂牌分支收窄为两位头数字，编码/分辨率串不能被当作番号
+        (r"D:/test/xxx H264-1080.mp4", "H264-1080"),
+        (r"D:/test/xxx x264-10bit.mp4", "x264-10"),
+        (r"D:/test/xxx H265-10.mp4", "H265-10"),
+        (r"D:/test/xxx A123-4567.mp4", "A123-4567"),
+    ],
+)
+def test_get_file_number_ignores_codec_like_single_letter(raw_number: str, not_expected_number: str):
+    assert get_file_number(raw_number, []) != not_expected_number
 
 
 @pytest.mark.asyncio
