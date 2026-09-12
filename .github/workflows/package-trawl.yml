@@ -239,7 +239,7 @@ jobs:
             
             ### 故障排查
             - 启动失败：运行 `download-bun.bat` 重新下载 Bun
-            - 端口冲突：编辑 `src/.env`，修改 `PORT=8191`
+            - 端口冲突：编辑 `.env`，修改 `PORT=8191`
             - 浏览器慢：Camoufox 已随包附带，首次预热约 30s-1min
             
             ---
