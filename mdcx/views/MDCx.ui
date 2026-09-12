@@ -11975,7 +11975,8 @@
                       <property name="text">
                         <string>&lt;p style='line-height:20px'&gt;指目录名最长字符数（建议不要超过 100，太长时 Windows
                           可能报错）&lt;br&gt;
-                          当超过最大长度时，将通过截短标题字段内容来缩短长度&lt;/p&gt;</string>
+                          当超过最大长度时，将通过截短标题字段内容来缩短长度&lt;br&gt;
+                          系列等目录级字段按固定预算截断，同系列影片始终归到同一文件夹&lt;/p&gt;</string>
                       </property>
                       <property name="wordWrap">
                         <bool>true</bool>
