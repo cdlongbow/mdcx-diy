@@ -619,13 +619,13 @@ class MyMAinWindow(QMainWindow):
     _NFO_EDITOR_TEXT_MIN_H = 150
     _NFO_EDITOR_TAG_MIN_H = 100
     _NFO_COMMA_HINT = "多个以逗号隔开"
-    _NFO_OVERLAY_X = 18
+    _NFO_OVERLAY_X = 8
     _NFO_OVERLAY_Y = 8
     _NFO_OVERLAY_MARGIN = 12
     _NFO_OVERLAY_BTN_W = 91
     _NFO_OVERLAY_BTN_H = 40
-    _NFO_OVERLAY_BTN_GAP = 24
-    _NFO_OVERLAY_BAR_H = 52
+    _NFO_OVERLAY_BTN_GAP = 108
+    _NFO_OVERLAY_BAR_H = 50
     _NFO_OVERLAY_TREE_GAP = 8
 
     def _ensure_nfo_editor_layout(self) -> None:
