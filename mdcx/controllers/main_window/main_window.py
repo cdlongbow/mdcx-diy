@@ -619,7 +619,7 @@ class MyMAinWindow(QMainWindow):
     _NFO_EDITOR_TEXT_MIN_H = 150
     _NFO_EDITOR_TAG_MIN_H = 100
     _NFO_COMMA_HINT = "多个以逗号隔开"
-    _NFO_OVERLAY_X = 215
+    _NFO_OVERLAY_X = 18
     _NFO_OVERLAY_Y = 8
     _NFO_OVERLAY_MARGIN = 12
     _NFO_OVERLAY_BTN_W = 91
